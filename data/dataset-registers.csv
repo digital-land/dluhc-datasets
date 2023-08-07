@@ -9,7 +9,7 @@ development-plan-type,
 development-policy-categories,
 document-type,
 listed-building-grade,https://raw.githubusercontent.com/digital-land/listed-building-collection/main/data/listed-building-grade.csv
-OwnershipStatus,
+ownership-status,https://raw.githubusercontent.com/digital-land/ownership-status-collection/main/data/ownership-status.csv
 permitted-development-right,
 planning-application-status,
 planning-application-type,

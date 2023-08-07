@@ -15,4 +15,5 @@ planning-application-status,
 planning-application-type,
 planning-decision,
 planning-decision-type,
+planning-permission-status,https://raw.githubusercontent.com/digital-land/planning-permission-status-collection/main/data/planning-permission-status.csv
 PlanningStatus,

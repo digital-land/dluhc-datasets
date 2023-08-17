@@ -11,7 +11,7 @@ development-plan-type,https://raw.githubusercontent.com/digital-land/development
 development-policy-categories,,
 document-type,https://raw.githubusercontent.com/digital-land/document-collection/main/data/document-type.csv,
 listed-building-grade,https://raw.githubusercontent.com/digital-land/listed-building-collection/main/data/listed-building-grade.csv,
-organisation-dataset,https://raw.githubusercontent.com/digital-land/specification/main/specification/organisation-dataset.csv,this lists what data we expected each LPA to provide
+organisation-dataset,https://raw.githubusercontent.com/digital-land/specification/main/content/organisation-dataset.csv,this lists what data we expected each LPA to provide
 ownership-status,https://raw.githubusercontent.com/digital-land/ownership-status-collection/main/data/ownership-status.csv,
 permitted-development-right,,
 planning-application-status,,
@@ -19,3 +19,4 @@ planning-application-type,https://raw.githubusercontent.com/digital-land/plannin
 planning-decision,,
 planning-decision-type,,
 planning-permission-status,https://raw.githubusercontent.com/digital-land/planning-permission-status-collection/main/data/planning-permission-status.csv,Used by brownfield land in planning-status field
+provision-reason,https://raw.githubusercontent.com/digital-land/specification/main/content/provision-reason.csv,A list of the types of reason as to why an LPA needs to publish data

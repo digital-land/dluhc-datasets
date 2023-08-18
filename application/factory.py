@@ -69,4 +69,6 @@ def register_templates(app):
 
 
 def register_commands(app):
-    pass
+    from application.commands import data_cli
+
+    app.cli.add_command(data_cli)

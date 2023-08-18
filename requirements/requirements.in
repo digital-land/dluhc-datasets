@@ -8,3 +8,4 @@ Flask-Migrate
 psycopg2-binary
 flask-sslify
 requests
+python-frontmatter

@@ -9,6 +9,9 @@ import frontmatter
 import requests
 from flask.cli import AppGroup
 
+from application.extensions import db
+from application.models import Dataset, DatasetField, Field
+
 data_cli = AppGroup("data")
 
 base_url = "https://raw.githubusercontent.com/digital-land"
@@ -72,3 +75,86 @@ def load_data():
                 except requests.exceptions.HTTPError as err:
                     print(err)
                     continue
+
+
+@data_cli.command("db")
+def load_db():
+    print("loading db")
+
+    if not Field.query.get("reference"):
+        reference_field = Field(name="reference")
+        try:
+            db.session.add(reference_field)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+
+    if not Field.query.get("prefix"):
+        prefix_field = Field(name="prefix")
+        try:
+            db.session.add(prefix_field)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+
+    data_dir = os.path.join(Path(__file__).parent.parent, "data", "registers")
+
+    for filename in os.listdir(data_dir):
+        if filename.endswith(".csv"):
+            file = Path(filename)
+            dataset_name = file.stem
+            if not Dataset.query.get(dataset_name):
+                dataset = Dataset(name=dataset_name)
+                try:
+                    db.session.add(dataset)
+                    db.session.commit()
+                    print(f"dataset {dataset_name} added")
+                except Exception as e:
+                    print(e)
+                    db.session.rollback()
+
+            with open(os.path.join(data_dir, file), newline="") as csvfile:
+                reader = csv.DictReader(csvfile)
+                for header in reader.fieldnames:
+                    field = Field(name=header)
+                    if not Field.query.filter_by(name=header).first():
+                        try:
+                            db.session.add(field)
+                            db.session.commit()
+                            print(f"field {field.name} added")
+                        except Exception as e:
+                            print(e)
+                            db.session.rollback()
+
+                for row_num, row in enumerate(reader):
+                    for key, value in row.items():
+                        dataset_field = DatasetField(
+                            id=row_num,
+                            dataset_name=dataset_name,
+                            field_name=key,
+                            value=value,
+                        )
+                        try:
+                            db.session.add(dataset_field)
+                            db.session.commit()
+                        except Exception as e:
+                            print(e)
+                            db.session.rollback()
+                    try:
+                        db.session.add(dataset_field)
+                        db.session.commit()
+                    except Exception as e:
+                        print(e)
+                        db.session.rollback()
+    print("db loaded")
+
+
+@data_cli.command("drop")
+def drop_data():
+    DatasetField.query.delete()
+    Dataset.query.delete()
+    Field.query.delete()
+    db.session.commit()
+    print("data dropped")

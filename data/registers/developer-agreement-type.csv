@@ -1,4 +1,4 @@
-developer-agreement-type,end-date,entity,entry-date,name,notes,prefix,reference,start-date
-section-106,,,2018-12-04,Section 106,,,,2018-12-04
-community-infrastructure-levy,,,2018-12-04,Community infrastructure levy,,,,2018-12-04
-section-278,,,2019-08-30,Section 278,,,,2019-08-30
+reference,end-date,entity,entry-date,name,notes,prefix,start-date
+section-106,,,2018-12-04,Section 106,,developer-agreement-type,2018-12-04
+community-infrastructure-levy,,,2018-12-04,Community infrastructure levy,,developer-agreement-type,2018-12-04
+section-278,,,2019-08-30,Section 278,,developer-agreement-type,2019-08-30

@@ -1,12 +1,12 @@
 end-date,entity,entry-date,name,notes,prefix,reference,start-date
-,,2020-07-13,Area Action Plan,,,,2020-07-13
-,,2020-07-13,Core Strategy,,,,2020-07-13
-,,2020-07-13,Development Management,,,,2020-07-13
-,,2020-07-13,Local Plan,,,,2020-07-13
-2021-03-29,,2020-07-13,Minerals & Waste,,,,2020-07-13
-,,2020-07-13,all other types,,,,2020-07-13
-,,2020-07-13,Partial Review,,,,2020-07-13
-,,2020-07-13,Site Allocations,,,,2020-07-13
-,,2021-02-04,Neighbourhood Plan,,,,2021-02-04
-,, 2021-03-29, Minerals plan,,,,2021-03-29
-,, 2021-03-29, Waste plan,,,,2021-03-29
+,,2020-07-13,Area Action Plan,,development-plan-type,area-action-plan,2020-07-13
+,,2020-07-13,Core Strategy,,development-plan-type,core-strategy,2020-07-13
+,,2020-07-13,Development Management,,development-plan-type,development-management,2020-07-13
+,,2020-07-13,Local Plan,,development-plan-type,local-plan,2020-07-13
+2021-03-29,,2020-07-13,Minerals & Waste,,development-plan-type,minerals-waste,2020-07-13
+,,2020-07-13,all other types,,development-plan-type,all-other-types,2020-07-13
+,,2020-07-13,Partial Review,,development-plan-type,partial-review,2020-07-13
+,,2020-07-13,Site Allocations,,development-plan-type,site-allocations,2020-07-13
+,,2021-02-04,Neighbourhood Plan,,development-plan-type,neighbourhood-plan,2021-02-04
+,," 2021-03-29"," Minerals plan",,development-plan-type,minerals-plan,2021-03-29
+,," 2021-03-29"," Waste plan",,development-plan-type,waste-plan,2021-03-29

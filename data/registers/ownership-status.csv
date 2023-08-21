@@ -1,4 +1,4 @@
-end-date,entity,entry-date,name,notes,ownership-status,prefix,reference,start-date
-,,2021-02-04,owned by a public authority,,owned-by-a-public-authority,,,2021-02-04
-,,2021-02-04,not owned by a public authority,,not-owned-by-a-public-authority,,,2021-02-04
-,,2021-02-04,mixed ownership,,mixed-ownership,,,2021-02-04
+end-date,entity,entry-date,name,notes,reference,prefix,start-date
+,,2021-02-04,owned by a public authority,,owned-by-a-public-authority,ownership-status,2021-02-04
+,,2021-02-04,not owned by a public authority,,not-owned-by-a-public-authority,ownership-status,2021-02-04
+,,2021-02-04,mixed ownership,,mixed-ownership,ownership-status,2021-02-04

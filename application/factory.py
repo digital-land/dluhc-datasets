@@ -45,7 +45,10 @@ def register_filters(app):
 
 
 def register_extensions(app):
-    pass
+    from application.extensions import db, migrate
+
+    db.init_app(app)
+    migrate.init_app(app, db)
 
 
 def register_templates(app):

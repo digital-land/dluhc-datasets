@@ -1,7 +1,6 @@
 # commands for loading csv files into database
 
 import csv
-import json
 import os
 from pathlib import Path
 
@@ -10,94 +9,17 @@ import requests
 from flask.cli import AppGroup
 
 from application.extensions import db
-from application.models import Dataset, DatasetField, Field
+from application.models import Dataset, Entry, Field, dataset_field
 
 data_cli = AppGroup("data")
 
 base_url = "https://raw.githubusercontent.com/digital-land"
-specfication_markdown_url = (
-    "{base_url}/specification/main/content/dataset/{register}.md"
-)
+specfication_markdown_url = "{base_url}/specification/main/content/dataset/{dataset}.md"
 
 
 @data_cli.command("load")
-def load_data():
-    register_fields = {}
-    data_dir = os.path.join(Path(__file__).parent.parent, "data")
-    data_out_dir = os.path.join(data_dir, "registers")
-    with open(os.path.join(data_dir, "dataset-registers.csv"), newline="") as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            if row["url"]:
-                register = row["register"]
-                url = specfication_markdown_url.format(register=register)
-                markdown = requests.get(url)
-                if markdown.status_code == 200:
-                    try:
-                        front = frontmatter.loads(markdown.text)
-                        fields = [field["field"] for field in front["fields"]]
-                        register_fields[register] = fields
-                        print("\nregister name: ", register)
-                        print("fields:", register_fields[register])
-                    except json.JSONDecodeError as err:
-                        print(err)
-                        continue
-                else:
-                    print(f"no markdown file found at {url}")
-                    continue
-                try:
-                    response = requests.get(row["url"])
-                    response.raise_for_status()
-                    try:
-                        reader = csv.DictReader(response.text.splitlines())
-                        rows = []
-                        expected_fields = register_fields[register]
-                        for row in reader:
-                            r = {}
-                            for field in expected_fields:
-                                r[field] = row.get(field, None)
-                            rows.append(r)
-                        if rows:
-                            with open(
-                                os.path.join(data_out_dir, f"{register}.csv"),
-                                "w",
-                                newline="\n",
-                            ) as csvfile:
-                                writer = csv.DictWriter(
-                                    csvfile, fieldnames=expected_fields
-                                )
-                                writer.writeheader()
-                                for row in rows:
-                                    writer.writerow(row)
-                    except csv.Error as err:
-                        print(err)
-                        continue
-                except requests.exceptions.HTTPError as err:
-                    print(err)
-                    continue
-
-
-@data_cli.command("db")
 def load_db():
     print("loading db")
-
-    if not Field.query.get("reference"):
-        reference_field = Field(name="reference")
-        try:
-            db.session.add(reference_field)
-            db.session.commit()
-        except Exception as e:
-            print(e)
-            db.session.rollback()
-
-    if not Field.query.get("prefix"):
-        prefix_field = Field(name="prefix")
-        try:
-            db.session.add(prefix_field)
-            db.session.commit()
-        except Exception as e:
-            print(e)
-            db.session.rollback()
 
     data_dir = os.path.join(Path(__file__).parent.parent, "data", "registers")
 
@@ -115,45 +37,59 @@ def load_db():
                     print(e)
                     db.session.rollback()
 
-            with open(os.path.join(data_dir, file), newline="") as csvfile:
-                reader = csv.DictReader(csvfile)
-                for header in reader.fieldnames:
-                    field = Field(name=header)
-                    if not Field.query.filter_by(name=header).first():
-                        try:
-                            db.session.add(field)
-                            db.session.commit()
-                            print(f"field {field.name} added")
-                        except Exception as e:
-                            print(e)
-                            db.session.rollback()
+    for dataset in Dataset.query.all():
+        schema_url = specfication_markdown_url.format(
+            base_url=base_url, dataset=dataset.name
+        )
+        markdown = requests.get(schema_url)
+        if markdown.status_code == 200:
+            front = frontmatter.loads(markdown.text)
+            fields = [field["field"] for field in front["fields"]]
+            udpated_fields = [field for field in fields if field != dataset.name]
 
+            for field in udpated_fields:
+                f = Field.query.get(field)
+                if f is None:
+                    f = Field(name=field)
+                    db.session.add(f)
+                    db.session.commit()
+                    print(f"field {f.name} added")
+                dataset.fields.append(f)
+            db.session.add(dataset)
+            db.session.commit()
+        else:
+            print(f"no markdown file found at {schema_url}")
+
+    for filename in os.listdir(data_dir):
+        f = Path(filename)
+        dataset_name = f.stem
+        if dataset_name not in [
+            "planning-application-category",
+            "development-plan-event",
+        ]:
+            print(f"load data for {filename}")
+            dataset = Dataset.query.get(dataset_name)
+            with open(os.path.join(data_dir, f), newline="") as csvfile:
+                reader = csv.DictReader(csvfile)
                 for row_num, row in enumerate(reader):
-                    for key, value in row.items():
-                        dataset_field = DatasetField(
-                            id=row_num,
-                            dataset_name=dataset_name,
-                            field_name=key,
-                            value=value,
-                        )
-                        try:
-                            db.session.add(dataset_field)
-                            db.session.commit()
-                        except Exception as e:
-                            print(e)
-                            db.session.rollback()
-                    try:
-                        db.session.add(dataset_field)
-                        db.session.commit()
-                    except Exception as e:
-                        print(e)
-                        db.session.rollback()
+                    entry = Entry(id=row_num, dataset_name=dataset.name, data=row)
+                    dataset.entries.append(entry)
+                try:
+                    db.session.add(dataset)
+                    db.session.commit()
+                except Exception as e:
+                    print(f"error adding file {file}")
+                    print(e)
+                    db.session.rollback()
+        else:
+            print(f"skipping {filename}")
+
     print("db loaded")
 
 
 @data_cli.command("drop")
 def drop_data():
-    DatasetField.query.delete()
+    db.session.query(dataset_field).delete()
     Dataset.query.delete()
     Field.query.delete()
     db.session.commit()

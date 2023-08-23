@@ -1,0 +1,25 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-three-quarters">
+    <h1 class="govuk-heading-l">DLUHC Dataset Editor</h1>
+  </div>
+</div>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-three-quarters">
+    <p class="govuk-body"><a href="{{ dataset.name}}">{{ dataset.name }}</a></p>
+  </div>
+</div>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-three-quarters">
+    <p class="govuk-body">Fields</p>
+    <ul class="govuk-list govuk-list--bullet">
+      {% for field in dataset.fields %}
+        <li>{{field.name}}</li>
+      {% endfor %}
+    </ul>
+    <p class="govuk-body"><a href="{{url_for('main.entries', dataset=dataset.name)}}">Entries in this dataset</a></p>
+  </div>
+</div>
+{% endblock content %}

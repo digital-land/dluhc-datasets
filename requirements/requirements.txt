@@ -6,14 +6,20 @@
 #
 alembic==1.11.3
     # via flask-migrate
+authlib==1.2.1
+    # via -r requirements/requirements.in
 blinker==1.6.2
     # via flask
 certifi==2023.7.22
     # via requests
+cffi==1.15.1
+    # via cryptography
 charset-normalizer==3.2.0
     # via requests
 click==8.1.7
     # via flask
+cryptography==41.0.3
+    # via authlib
 digital-land-frontend @ git+https://github.com/digital-land/digital-land-frontend.git
     # via -r requirements/requirements.in
 flask==2.3.2
@@ -31,6 +37,8 @@ flask-sqlalchemy==3.0.5
     #   flask-migrate
 flask-sslify==0.1.5
     # via -r requirements/requirements.in
+flask-talisman==1.1.0
+    # via -r requirements/requirements.in
 flask-wtf==1.1.1
     # via -r requirements/requirements.in
 govuk-frontend-jinja==2.7.0
@@ -41,6 +49,8 @@ gunicorn==21.2.0
     # via -r requirements/requirements.in
 idna==3.4
     # via requests
+is-safe-url==1.0
+    # via -r requirements/requirements.in
 itsdangerous==2.1.2
     # via
     #   flask
@@ -61,6 +71,8 @@ packaging==23.1
     # via gunicorn
 psycopg2-binary==2.9.7
     # via -r requirements/requirements.in
+pycparser==2.21
+    # via cffi
 python-dotenv==1.0.0
     # via -r requirements/requirements.in
 python-frontmatter==1.0.0

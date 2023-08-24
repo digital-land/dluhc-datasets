@@ -15,6 +15,10 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_RECORD_QUERIES = False
     DEBUG = False
+    GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
+    GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
+    SAFE_URLS = {}
+    AUTHENTICATION_ON = True
 
 
 class DevelopmentConfig(Config):
@@ -23,6 +27,7 @@ class DevelopmentConfig(Config):
     WTF_CSRF_ENABLED = False
     SQLALCHEMY_RECORD_QUERIES = True
     DEBUG_TB_INTERCEPT_REDIRECTS = False
+    AUTHENTICATION_ON = False
 
 
 class TestConfig(Config):

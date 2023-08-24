@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from flask import Flask
 from flask.cli import load_dotenv
 
@@ -24,9 +23,11 @@ def create_app(config_filename):
 
 
 def register_blueprints(app):
+    from application.blueprints.auth.views import auth
     from application.blueprints.main.views import main
 
     app.register_blueprint(main)
+    app.register_blueprint(auth)
 
 
 def register_context_processors(app):
@@ -45,10 +46,30 @@ def register_filters(app):
 
 
 def register_extensions(app):
-    from application.extensions import db, migrate
+    from application.extensions import db, migrate, oauth
 
     db.init_app(app)
     migrate.init_app(app, db)
+    oauth.init_app(app)
+
+    from flask_sslify import SSLify
+
+    sslify = SSLify(app)  # noqa
+
+    # create the CSP for the app - until then leave commented out
+    # talisman.init_app(app, content_security_policy=None)
+
+    oauth.register(
+        name="github",
+        client_id=app.config["GITHUB_CLIENT_ID"],
+        client_secret=app.config["GITHUB_CLIENT_SECRET"],
+        access_token_url="https://github.com/login/oauth/access_token",
+        access_token_params=None,
+        authorize_url="https://github.com/login/oauth/authorize",
+        authorize_params=None,
+        api_base_url="https://api.github.com/",
+        client_kwargs={"scope": "user:email read:org"},
+    )
 
 
 def register_templates(app):

@@ -2,6 +2,7 @@ from flask import Blueprint, render_template
 
 from application.extensions import db
 from application.models import Dataset
+from application.utils import login_required
 
 main = Blueprint("main", __name__)
 
@@ -12,6 +13,7 @@ def index():
 
 
 @main.route("/dataset")
+@login_required
 def datasets():
     ds = db.session.query(Dataset).all()
     return render_template("datasets.html", datasets=ds)

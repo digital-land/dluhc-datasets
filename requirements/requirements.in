@@ -13,4 +13,4 @@ Authlib
 flask-sslify
 is-safe-url
 flask-talisman
-Flask-De
+flask-debugtoolbar

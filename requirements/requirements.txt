@@ -9,7 +9,9 @@ alembic==1.11.3
 authlib==1.2.1
     # via -r requirements/requirements.in
 blinker==1.6.2
-    # via flask
+    # via
+    #   flask
+    #   flask-debugtoolbar
 certifi==2023.7.22
     # via requests
 cffi==1.15.1
@@ -25,10 +27,13 @@ digital-land-frontend @ git+https://github.com/digital-land/digital-land-fronten
 flask==2.3.2
     # via
     #   -r requirements/requirements.in
+    #   flask-debugtoolbar
     #   flask-migrate
     #   flask-sqlalchemy
     #   flask-sslify
     #   flask-wtf
+flask-debugtoolbar==0.13.1
+    # via -r requirements/requirements.in
 flask-migrate==4.0.4
     # via -r requirements/requirements.in
 flask-sqlalchemy==3.0.5
@@ -54,6 +59,7 @@ is-safe-url==1.0
 itsdangerous==2.1.2
     # via
     #   flask
+    #   flask-debugtoolbar
     #   flask-wtf
 jinja2==3.1.2
     # via
@@ -94,6 +100,8 @@ urllib3==2.0.4
 validators==0.21.2
     # via digital-land-frontend
 werkzeug==2.3.7
-    # via flask
+    # via
+    #   flask
+    #   flask-debugtoolbar
 wtforms==3.0.1
     # via flask-wtf

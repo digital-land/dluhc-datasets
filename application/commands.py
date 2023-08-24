@@ -28,18 +28,19 @@ def load_db():
             file = Path(filename)
             dataset_name = file.stem
             if not Dataset.query.get(dataset_name):
-                dataset = Dataset(name=dataset_name)
+                human_readable = dataset_name.replace("-", " ").capitalize()
+                dataset = Dataset(dataset=dataset_name, name=human_readable)
                 try:
                     db.session.add(dataset)
                     db.session.commit()
-                    print(f"dataset {dataset_name} added")
+                    print(f"dataset {dataset.dataset} with name {dataset.name} added")
                 except Exception as e:
                     print(e)
                     db.session.rollback()
 
     for dataset in Dataset.query.all():
         schema_url = specfication_markdown_url.format(
-            base_url=base_url, dataset=dataset.name
+            base_url=base_url, dataset=dataset.dataset
         )
         markdown = requests.get(schema_url)
         if markdown.status_code == 200:
@@ -50,10 +51,11 @@ def load_db():
             for field in udpated_fields:
                 f = Field.query.get(field)
                 if f is None:
-                    f = Field(name=field)
+                    human_readable = field.replace("-", " ").capitalize()
+                    f = Field(field=field, name=human_readable)
                     db.session.add(f)
                     db.session.commit()
-                    print(f"field {f.name} added")
+                    print(f"field {f.field} with name {f.name} added")
                 dataset.fields.append(f)
             db.session.add(dataset)
             db.session.commit()
@@ -72,7 +74,7 @@ def load_db():
             with open(os.path.join(data_dir, f), newline="") as csvfile:
                 reader = csv.DictReader(csvfile)
                 for row_num, row in enumerate(reader):
-                    entry = Entry(id=row_num, dataset_name=dataset.name, data=row)
+                    entry = Entry(id=row_num, data=row)
                     dataset.entries.append(entry)
                 try:
                     db.session.add(dataset)

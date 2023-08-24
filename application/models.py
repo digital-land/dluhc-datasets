@@ -10,9 +10,9 @@ from application.extensions import db
 
 dataset_field = db.Table(
     "dataset_field",
-    db.Column("dataset_name", db.Text, db.ForeignKey("dataset.name")),
-    db.Column("field_name", db.Text, db.ForeignKey("field.name")),
-    db.PrimaryKeyConstraint("dataset_name", "field_name"),
+    db.Column("dataset", db.Text, db.ForeignKey("dataset.dataset")),
+    db.Column("field", db.Text, db.ForeignKey("field.field")),
+    db.PrimaryKeyConstraint("dataset", "field"),
 )
 
 
@@ -29,7 +29,9 @@ class DateModel(db.Model):
 class Dataset(DateModel):
     __tablename__ = "dataset"
 
-    name: Mapped[str] = mapped_column(Text, primary_key=True)
+    dataset: Mapped[str] = mapped_column(Text, primary_key=True)
+    name: Mapped[str] = mapped_column(Text, nullable=False)
+
     fields: Mapped[List["Field"]] = relationship(
         "Field",
         secondary=dataset_field,
@@ -47,20 +49,21 @@ class Entry(db.Model):
     __tablename__ = "entry"
 
     id: Mapped[int] = mapped_column(db.BigInteger, primary_key=True)
-    dataset_name: Mapped[str] = mapped_column(
-        Text, ForeignKey("dataset.name"), primary_key=True
+    dataset_id: Mapped[str] = mapped_column(
+        Text, ForeignKey("dataset.dataset"), primary_key=True
     )
     dataset: Mapped["Dataset"] = relationship("Dataset", back_populates="entries")
     data: Mapped[dict] = mapped_column(MutableDict.as_mutable(JSONB), nullable=False)
 
     def __repr__(self):
-        return f"<Entry(dataset_name={self.dataset_name}, id={self.id}, data={self.data}))>"
+        return f"<Entry(dataset={self.dataset.name}, id={self.id}, data={self.data}))>"
 
 
 class Field(DateModel):
     __tablename__ = "field"
 
-    name: Mapped[str] = mapped_column(Text, primary_key=True)
+    field: Mapped[str] = mapped_column(Text, primary_key=True)
+    name: Mapped[str] = mapped_column(Text, nullable=False)
     datasets: Mapped[List["Dataset"]] = relationship(
         "Dataset", secondary=dataset_field, back_populates="fields"
     )

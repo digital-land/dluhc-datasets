@@ -29,7 +29,9 @@ flask==2.3.2
     #   -c requirements/requirements.in
     #   flask-debugtoolbar
 flask-debugtoolbar==0.13.1
-    # via -r requirements/dev-requirements.in
+    # via
+    #   -c requirements/requirements.in
+    #   -r requirements/dev-requirements.in
 identify==2.5.26
     # via pre-commit
 iniconfig==2.0.0

@@ -24,7 +24,7 @@ cryptography==41.0.3
     # via authlib
 digital-land-frontend @ git+https://github.com/digital-land/digital-land-frontend.git
     # via -r requirements/requirements.in
-flask==2.3.2
+flask==2.3.3
     # via
     #   -r requirements/requirements.in
     #   flask-debugtoolbar
@@ -48,8 +48,6 @@ flask-wtf==1.1.1
     # via -r requirements/requirements.in
 govuk-frontend-jinja==2.7.0
     # via digital-land-frontend
-greenlet==2.0.2
-    # via sqlalchemy
 gunicorn==21.2.0
     # via -r requirements/requirements.in
 idna==3.4

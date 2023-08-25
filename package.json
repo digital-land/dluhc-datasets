@@ -8,6 +8,7 @@
   "scripts": {
     "flask": "flask run",
     "watch": "npm-run-all --parallel watch:*",
+    "watch:assets": "npm run nps watch.assets",
     "nps": "nps -c ./node_modules/digital-land-frontend/package-scripts.js",
     "copyjs": "rsync -ar src/javascripts/ application/static/javascripts",
     "postinstall": "npm run copyjs && npm run nps copy.javascripts && npm run nps build.stylesheets && npm run nps build.javascripts",

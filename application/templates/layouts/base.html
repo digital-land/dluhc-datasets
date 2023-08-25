@@ -1,4 +1,35 @@
 {% extends 'digital-land-frontend/layouts/base.jinja' %}
+{%- from 'govuk_frontend_jinja/components/accordion/macro.html' import govukAccordion -%}
+{%- from 'govuk_frontend_jinja/components/back-link/macro.html' import govukBackLink -%}
+{%- from 'govuk_frontend_jinja/components/breadcrumbs/macro.html' import govukBreadcrumbs -%}
+{%- from 'govuk_frontend_jinja/components/button/macro.html' import govukButton -%}
+{%- from 'govuk_frontend_jinja/components/character-count/macro.html' import govukCharacterCount -%}
+{%- from 'govuk_frontend_jinja/components/checkboxes/macro.html' import govukCheckboxes -%}
+{%- from 'govuk_frontend_jinja/components/cookie-banner/macro.html' import govukCookieBanner -%}
+{%- from 'govuk_frontend_jinja/components/date-input/macro.html' import govukDateInput -%}
+{%- from 'govuk_frontend_jinja/components/details/macro.html' import govukDetails -%}
+{%- from 'govuk_frontend_jinja/components/error-message/macro.html' import govukErrorMessage -%}
+{%- from 'govuk_frontend_jinja/components/error-summary/macro.html' import govukErrorSummary -%}
+{%- from 'govuk_frontend_jinja/components/fieldset/macro.html' import govukFieldset -%}
+{%- from 'govuk_frontend_jinja/components/file-upload/macro.html' import govukFileUpload -%}
+{%- from 'govuk_frontend_jinja/components/footer/macro.html' import govukFooter -%}
+{%- from 'govuk_frontend_jinja/components/header/macro.html' import govukHeader -%}
+{%- from 'govuk_frontend_jinja/components/hint/macro.html' import govukHint -%}
+{%- from 'govuk_frontend_jinja/components/input/macro.html' import govukInput -%}
+{%- from 'govuk_frontend_jinja/components/inset-text/macro.html' import govukInsetText -%}
+{%- from 'govuk_frontend_jinja/components/label/macro.html' import govukLabel -%}
+{%- from 'govuk_frontend_jinja/components/notification-banner/macro.html' import govukNotificationBanner -%}
+{%- from 'govuk_frontend_jinja/components/panel/macro.html' import govukPanel -%}
+{%- from 'govuk_frontend_jinja/components/phase-banner/macro.html' import govukPhaseBanner -%}
+{%- from 'govuk_frontend_jinja/components/radios/macro.html' import govukRadios -%}
+{%- from 'govuk_frontend_jinja/components/select/macro.html' import govukSelect -%}
+{%- from 'govuk_frontend_jinja/components/skip-link/macro.html' import govukSkipLink -%}
+{%- from 'govuk_frontend_jinja/components/summary-list/macro.html' import govukSummaryList -%}
+{%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
+{%- from 'govuk_frontend_jinja/components/tabs/macro.html' import govukTabs -%}
+{%- from 'govuk_frontend_jinja/components/tag/macro.html' import govukTag -%}
+{%- from 'govuk_frontend_jinja/components/textarea/macro.html' import govukTextarea -%}
+{%- from 'govuk_frontend_jinja/components/warning-text/macro.html' import govukWarningText -%}
 
 {% block stylesheets %}
   <link rel="stylesheet" href="/static/stylesheets/application.css">
@@ -7,9 +38,9 @@
 {% endblock %}
 
 {% block mastHead %}
-<header class="govuk-header {{ app_header_classes }}" role="banner" data-module="govuk-header">
-  <div class="govuk-header__container govuk-width-container app-govuk-header__container">
-    <div class="header-proposition">
+  <header class="govuk-header {{ app_header_classes }}" role="banner" data-module="govuk-header">
+    <div class="govuk-header__container govuk-width-container app-govuk-header__container">
+      <div class="header-proposition">
         <a href="/" class="govuk-header__link govuk-header__link--service-name">
           Data Standards
           <span class="govuk-header__product-name">
@@ -19,22 +50,22 @@
         <!--<strong class="govuk-tag govuk-phase-banner__content__tag app-header__tag">
           research tool
         </strong>-->
+      </div>
     </div>
-  </div>
-</header>
+  </header>
 {% endblock mastHead %}
 
 {% block beforeContent %}
-<div class="govuk-phase-banner">
-  <p class="govuk-phase-banner__content">
-    <strong class="govuk-tag govuk-phase-banner__content__tag">
+  <div class="govuk-phase-banner">
+    <p class="govuk-phase-banner__content">
+      <strong class="govuk-tag govuk-phase-banner__content__tag">
       Proof of concept
     </strong>
-    <span class="govuk-phase-banner__text">
+      <span class="govuk-phase-banner__text">
       This is a proof of concept. Your <a class="govuk-link" href="mailto:digitalland@levellingup.gov.uk?subject=Prototype feedback">feedback</a> will help us to improve it.
     </span>
-  </p>
-</div>
+    </p>
+  </div>
 {% endblock beforeContent %}
 
 {% block content %}

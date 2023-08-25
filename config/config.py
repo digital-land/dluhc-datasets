@@ -17,7 +17,7 @@ class Config:
     DEBUG = False
     GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
     GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
-    SAFE_URLS = {}
+    SAFE_URLS = set(os.getenv("SAFE_URLS", "").split(","))
     AUTHENTICATION_ON = True
 
 

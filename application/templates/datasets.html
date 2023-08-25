@@ -3,15 +3,28 @@
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-three-quarters">
-    <h1 class="govuk-heading-l">DLUHC Dataset Editor</h1>
+    <h1 class="govuk-heading-l">Datasets</h1>
+    <p class="govuk-body-l">Datasets managed by the Planning Data Service within the Department for Levelling Up, Housing and Communities.</p>
+    <table class="govuk-table">
+      <thead class="govuk-table__head govuk-visually-hidden">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Name</th>
+          <th scope="col" class="govuk-table__header govuk-table__header--numeric">Download</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% for dataset in datasets %}
+        <tr class="govuk-table__row">
+          <th scope="row" class="govuk-table__header">
+            <a href="{{url_for('main.dataset', name=dataset.dataset)}}">{{ dataset.name }}</a>
+          </th>
+          <td class="govuk-table__cell govuk-table__cell--numeric"><a href="#" class="govuk-!-font-size-16"><span class="govuk-visually-hidden">Download a</span>CSV </a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-three-quarters">
-    {% for dataset in datasets %}
-      <p class="govuk-body"><a href="{{url_for('main.dataset', name=dataset.dataset)}}">{{ dataset.name }}</a></p>
-    {% endfor %}
 
-  </div>
-</div>
+
 {% endblock content %}

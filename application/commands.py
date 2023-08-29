@@ -16,6 +16,9 @@ data_cli = AppGroup("data")
 base_url = "https://raw.githubusercontent.com/digital-land"
 specfication_markdown_url = "{base_url}/specification/main/content/dataset/{dataset}.md"
 
+datasette_url = "https://datasette.planning.data.gov.uk/digital-land"
+datasette_query = "{datasette_url}/field.json?field__exact={field}&_shape=object"
+
 
 @data_cli.command("load")
 def load_db():
@@ -53,6 +56,11 @@ def load_db():
                 if f is None:
                     human_readable = field.replace("-", " ").capitalize()
                     f = Field(field=field, name=human_readable)
+                    field_query = datasette_query.format(
+                        datasette_url=datasette_url, field=field
+                    )
+                    resp = requests.get(field_query)
+                    f.datatype = resp.json()[field]["datatype"]
                     db.session.add(f)
                     db.session.commit()
                     print(f"field {f.field} with name {f.name} added")
@@ -92,6 +100,7 @@ def load_db():
 @data_cli.command("drop")
 def drop_data():
     db.session.query(dataset_field).delete()
+    Entry.query.delete()
     Dataset.query.delete()
     Field.query.delete()
     db.session.commit()

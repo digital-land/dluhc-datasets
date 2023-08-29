@@ -64,6 +64,7 @@ class Field(DateModel):
 
     field: Mapped[str] = mapped_column(Text, primary_key=True)
     name: Mapped[str] = mapped_column(Text, nullable=False)
+    datatype: Mapped[str] = mapped_column(Text, nullable=False)
     datasets: Mapped[List["Dataset"]] = relationship(
         "Dataset", secondary=dataset_field, back_populates="fields"
     )

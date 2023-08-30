@@ -14,6 +14,7 @@ listed-building-grade,https://raw.githubusercontent.com/digital-land/listed-buil
 organisation-dataset,https://raw.githubusercontent.com/digital-land/specification/main/content/organisation-dataset.csv,this lists what data we expected each LPA to provide
 ownership-status,https://raw.githubusercontent.com/digital-land/ownership-status-collection/main/data/ownership-status.csv,
 permitted-development-right,,
+permitted-development-right-part,,
 planning-application-status,,
 planning-application-type,https://raw.githubusercontent.com/digital-land/planning-application-collection/main/data/planning-application-type.csv,Not a proper csv
 planning-decision,,

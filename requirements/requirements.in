@@ -14,3 +14,4 @@ flask-sslify
 is-safe-url
 flask-talisman
 flask-debugtoolbar
+Flask-WTF

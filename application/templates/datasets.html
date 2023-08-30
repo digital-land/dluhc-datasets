@@ -6,25 +6,32 @@
     <h1 class="govuk-heading-l">Datasets</h1>
     <p class="govuk-body-l">Datasets managed by the Planning Data Service within the Department for Levelling Up, Housing and Communities.</p>
     <table class="govuk-table">
-      <thead class="govuk-table__head govuk-visually-hidden">
+      <thead class="govuk-table__head">
         <tr class="govuk-table__row">
-          <th scope="col" class="govuk-table__header">Name</th>
-          <th scope="col" class="govuk-table__header govuk-table__header--numeric">Download</th>
+          <th scope="col" class="govuk-table__header">Dataset</th>
+          <th scope="col" class="govuk-table__header govuk-table__header--numeric">Last updated</th>
+          <th scope="col" class="govuk-table__header govuk-table__header--numeric"><span class="govuk-visually-hidden">Action</span></th>
         </tr>
       </thead>
       <tbody class="govuk-table__body">
         {% for dataset in datasets %}
         <tr class="govuk-table__row">
           <th scope="row" class="govuk-table__header">
-            <a href="{{url_for('main.dataset', name=dataset.dataset)}}">{{ dataset.name }}</a>
+            <a href="#">{{ dataset.name }}</a>
           </th>
-          <td class="govuk-table__cell govuk-table__cell--numeric"><a href="#" class="govuk-!-font-size-16"><span class="govuk-visually-hidden">Download a</span>CSV </a></td>
+          <td class="govuk-table__cell govuk-table__cell--numeric">
+            09/12/2023
+          </td>
+          <td class="govuk-table__cell govuk-table__cell--numeric">
+            <ul class="govuk-list app-list--inline govuk-!-margin-bottom-0">
+              <li><a href="{{url_for('main.dataset', name=dataset.dataset)}}" class="govuk-!-font-size-16"><span class="govuk-visually-hidden">View </span>Schema</a></li>
+              <li><a href="#" class="govuk-!-font-size-16">Download</a></li>
+            </ul>
+          </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
-
-
 {% endblock content %}

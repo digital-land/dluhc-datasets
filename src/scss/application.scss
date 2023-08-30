@@ -2,3 +2,12 @@
 @import "digital-land-frontend/dl-frontend";
 
 // app specific component scss
+.app-list--inline {
+  > li {
+    display: inline-block;
+    margin: 0 1em 0 0;
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}

@@ -7206,3 +7206,9 @@
 .js-hidden {
   display: none;
   visibility: hidden; }
+
+.app-list--inline > li {
+  display: inline-block;
+  margin: 0 1em 0 0; }
+  .app-list--inline > li:last-child {
+    margin-right: 0; }

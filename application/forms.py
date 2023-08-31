@@ -4,6 +4,7 @@ from wtforms.validators import ValidationError
 from wtforms.widgets import TextInput
 
 
+# change to a regex validator
 def curie_check(form, field):
     if len(field.data.split(":")) != 2:
         raise ValidationError("curie should be in the format {namespace}:{identifier}")

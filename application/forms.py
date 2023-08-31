@@ -26,16 +26,16 @@ class FormBuilder:
         "url": URLField,
     }
 
-    def with_field(self, datatype):
+    def with_field(self, name, datatype):
         field = FormBuilder.field_types.get(datatype)
-        self.fields.append((datatype, field))
+        self.fields.append((name.lower(), field))
 
     def build(self):
         class TheForm(Form):
             pass
 
-        for datatype, field in self.fields:
-            setattr(TheForm, datatype, field())
+        for name, field in self.fields:
+            setattr(TheForm, name, field())
 
         self.fields = []
         return TheForm()

@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 
 from application.extensions import db
+from application.forms import FormBuilder
 from application.models import Dataset
 from application.utils import login_required
 
@@ -29,3 +30,17 @@ def dataset(name):
 def entries(dataset):
     ds = Dataset.query.get(dataset)
     return render_template("entries.html", dataset=ds)
+
+
+@main.route("/dataset/<string:dataset>/add", methods=["GET", "POST"])
+def add_entry(dataset):
+    ds = Dataset.query.get(dataset)
+    builder = FormBuilder()
+    for field in ds.fields:
+        builder.with_field(field.field, field.datatype)
+    form = builder.build()
+    if request.method == "POST":
+        # do something with form
+        return render_template("add_entry.html", dataset=ds, form=form)
+    else:
+        return render_template("add_entry.html", dataset=ds, form=form)

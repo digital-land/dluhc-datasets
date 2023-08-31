@@ -26,12 +26,6 @@ def dataset(name):
     return render_template("entries.html", dataset=dataset)
 
 
-@main.route("/dataset/<string:dataset>/entries")
-def entries(dataset):
-    ds = Dataset.query.get(dataset)
-    return render_template("entries.html", dataset=ds)
-
-
 @main.route("/dataset/<string:dataset>/add", methods=["GET", "POST"])
 def add_entry(dataset):
     ds = Dataset.query.get(dataset)
@@ -44,10 +38,6 @@ def add_entry(dataset):
         return render_template("add_entry.html", dataset=ds, form=form)
     else:
         return render_template("add_entry.html", dataset=ds, form=form)
-# @main.route("/dataset/<string:dataset>/entries")
-# def entries(dataset):
-#     ds = Dataset.query.get(dataset)
-#     return render_template("entries.html", dataset=ds)
 
 
 @main.route("/dataset/<string:dataset>/schema")

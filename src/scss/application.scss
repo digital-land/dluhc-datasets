@@ -1,5 +1,10 @@
 // import all digital land and GOVUK Frontend scss
+$app-images-path: "/statics/images/";
+
 @import "digital-land-frontend/dl-frontend";
+
+// components
+@import "components/button-menu";
 
 // app specific component scss
 .app-list--inline {

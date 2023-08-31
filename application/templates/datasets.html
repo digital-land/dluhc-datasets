@@ -17,14 +17,14 @@
         {% for dataset in datasets %}
         <tr class="govuk-table__row">
           <th scope="row" class="govuk-table__header">
-            <a href="#">{{ dataset.name }}</a>
+            <a href="{{url_for('main.dataset', name=dataset.dataset)}}">{{ dataset.name }}</a>
           </th>
           <td class="govuk-table__cell govuk-table__cell--numeric">
             09/12/2023
           </td>
           <td class="govuk-table__cell govuk-table__cell--numeric">
             <ul class="govuk-list app-list--inline govuk-!-margin-bottom-0">
-              <li><a href="{{url_for('main.dataset', name=dataset.dataset)}}" class="govuk-!-font-size-16"><span class="govuk-visually-hidden">View </span>Schema</a></li>
+              <li><a href="{{url_for('main.schema', dataset=dataset.dataset)}}" class="govuk-!-font-size-16"><span class="govuk-visually-hidden">View </span>Schema</a></li>
               <li><a href="#" class="govuk-!-font-size-16">Download</a></li>
             </ul>
           </td>

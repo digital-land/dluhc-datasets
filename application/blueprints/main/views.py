@@ -23,7 +23,7 @@ def datasets():
 @main.route("/dataset/<string:name>")
 def dataset(name):
     dataset = Dataset.query.get(name)
-    return render_template("dataset.html", dataset=dataset)
+    return render_template("entries.html", dataset=dataset)
 
 
 @main.route("/dataset/<string:dataset>/entries")
@@ -44,3 +44,18 @@ def add_entry(dataset):
         return render_template("add_entry.html", dataset=ds, form=form)
     else:
         return render_template("add_entry.html", dataset=ds, form=form)
+# @main.route("/dataset/<string:dataset>/entries")
+# def entries(dataset):
+#     ds = Dataset.query.get(dataset)
+#     return render_template("entries.html", dataset=ds)
+
+
+@main.route("/dataset/<string:dataset>/schema")
+def schema(dataset):
+    return render_template("schema.html")
+
+
+# will give a file download
+# @main.route("/dataset/<string:dataset>.csv")
+# def csv(dataset):
+#     pass

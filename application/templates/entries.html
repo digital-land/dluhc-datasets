@@ -3,23 +3,38 @@
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-three-quarters">
-    <h1 class="govuk-heading-l">DLUHC Dataset Editor</h1>
+    <span class="govuk-caption-l">Records</span>
+    <h1 class="govuk-heading-l">{{ dataset.name }}</h1>
   </div>
-</div>
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-three-quarters">
-    <p class="govuk-body"><a href="{{ url_for('main.dataset', name=dataset.dataset)}}">{{ dataset.name }}</a></p>
+  <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+    {{
+      buttonMenu({
+        "text": "blah",
+        "items": [
+          {
+            "element": "a",
+            "text": "Add record"
+          },
+        ]
+      })
+    }}
   </div>
 </div>
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
+    <hr class="govuk-section-break govuk-section-break--visible">
+    <section class="app-dataset-records">
       <table class="govuk-table">
-        <caption class="govuk-table__caption govuk-table__caption--m">Records</caption>
         <thead class="govuk-table__head">
           <tr class="govuk-table__row">
             {% for field in dataset.fields %}
             <th scope="col" class="govuk-table__header">{{field.field}}</th>
             {% endfor %}
+            {# start -- if logged in ---------------------- #}
+            <th scope="col" class="govuk-table__header">
+              <span class="govuk-visually-hidden">Action</span>
+            </th>
+            {# end ---- if logged in ---------------------- #}
           </tr>
         </thead>
         <tbody class="govuk-table__body">
@@ -28,11 +43,27 @@
             {% for field in dataset.fields %}
               <td class="govuk-table__cell">{{entry.data[field.field]}}</td>
             {% endfor %}
+            {# start -- if logged in ---------------------- #}
+            <td class="govuk-table__cell">
+              {{
+                buttonMenu({
+                  "text": "blah",
+                  "items": [
+                    {
+                      "element": "a",
+                      "text": "Edit",
+                      "classes": "govuk-button--secondary"
+                    }
+                  ]
+                })
+              }}
+            </td>
+            {# end ---- if logged in ---------------------- #}
           </tr>
           {% endfor %}
         </tbody>
       </table>
-    </ul>
-    </div>
+    </section>
+  </div>
 </div>
 {% endblock content %}

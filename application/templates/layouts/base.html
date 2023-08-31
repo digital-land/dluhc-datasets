@@ -30,6 +30,7 @@
 {%- from 'govuk_frontend_jinja/components/tag/macro.html' import govukTag -%}
 {%- from 'govuk_frontend_jinja/components/textarea/macro.html' import govukTextarea -%}
 {%- from 'govuk_frontend_jinja/components/warning-text/macro.html' import govukWarningText -%}
+{%- from 'partials/components/button-menu/macro.html' import buttonMenu -%}
 
 {% block stylesheets %}
   <link rel="stylesheet" href="/static/stylesheets/application.css">
@@ -53,7 +54,7 @@
         <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide menu" hidden>Menu</button>
         <ul id="navigation" class="govuk-header__navigation-list">
           <li class="govuk-header__navigation-item">
-            <a class="govuk-header__link" href="#">
+            <a class="govuk-header__link" href="/dataset">
               Datasets
             </a>
           </li>
@@ -76,7 +77,7 @@
       Proof of concept
     </strong>
       <span class="govuk-phase-banner__text">
-      This is a proof of concept. Your <a class="govuk-link" href="mailto:digitalland@levellingup.gov.uk?subject=Prototype feedback">feedback</a> will help us to improve it.
+      This experimental service could be with withdrawn or unavailable without notice
     </span>
     </p>
   </div>

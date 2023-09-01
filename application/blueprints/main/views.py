@@ -26,8 +26,8 @@ def dataset(name):
     breadcrumbs = {
         "items": [
             {"text": "Datasets", "href": "/dataset"},
-            {"text": dataset.name, "href": "/dataset"},
-            {"text": "Records", "href": "/dataset"},
+            {"text": dataset.name, "href": "/dataset/" + name},
+            {"text": "Records", "href": "/dataset/" + name},
         ]
     }
     return render_template("entries.html", dataset=dataset, breadcrumbs=breadcrumbs)
@@ -49,14 +49,15 @@ def add_entry(dataset):
 
 @main.route("/dataset/<string:dataset>/schema")
 def schema(dataset):
+    ds = Dataset.query.get(dataset)
     breadcrumbs = {
         "items": [
             {"text": "Datasets", "href": "/dataset"},
-            {"text": dataset, "href": "/dataset"},
+            {"text": ds.name, "href": "/dataset/" + dataset},
             {"text": "Schema", "href": "/" + dataset + "/schema"},
         ]
     }
-    return render_template("schema.html", breadcrumbs=breadcrumbs)
+    return render_template("schema.html", dataset=ds, breadcrumbs=breadcrumbs)
 
 
 # will give a file download

@@ -81,6 +81,16 @@
     </span>
     </p>
   </div>
+  {% if not isHomepage %}
+  {{ govukBreadcrumbs(breadcrumbs | default({
+    'items': [
+      {
+        'text': "Home",
+        'href': "/dataset"
+      }
+    ]
+  })) }}
+  {% endif %}
 {% endblock beforeContent %}
 
 {% block content %}

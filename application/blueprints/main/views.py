@@ -17,13 +17,20 @@ def index():
 @login_required
 def datasets():
     ds = db.session.query(Dataset).all()
-    return render_template("datasets.html", datasets=ds)
+    return render_template("datasets.html", datasets=ds, isHomepage=True)
 
 
 @main.route("/dataset/<string:name>")
 def dataset(name):
     dataset = Dataset.query.get(name)
-    return render_template("entries.html", dataset=dataset)
+    breadcrumbs = {
+        "items": [
+            {"text": "Datasets", "href": "/dataset"},
+            {"text": dataset.name, "href": "/dataset"},
+            {"text": "Records", "href": "/dataset"},
+        ]
+    }
+    return render_template("entries.html", dataset=dataset, breadcrumbs=breadcrumbs)
 
 
 @main.route("/dataset/<string:dataset>/add", methods=["GET", "POST"])
@@ -42,7 +49,14 @@ def add_entry(dataset):
 
 @main.route("/dataset/<string:dataset>/schema")
 def schema(dataset):
-    return render_template("schema.html")
+    breadcrumbs = {
+        "items": [
+            {"text": "Datasets", "href": "/dataset"},
+            {"text": dataset, "href": "/dataset"},
+            {"text": "Schema", "href": "/" + dataset + "/schema"},
+        ]
+    }
+    return render_template("schema.html", breadcrumbs=breadcrumbs)
 
 
 # will give a file download

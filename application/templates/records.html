@@ -7,20 +7,22 @@
     <span class="govuk-caption-l">{{ dataset.name }}</span>
     <h1 class="govuk-heading-l">{{ dataset.entries | length }} records</h1>
   </div>
-  <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
-    {{
-      buttonMenu({
-        "text": "blah",
-        "items": [
-          {
-            "element": "a",
-            "text": "Add record",
-            "href": url_for("main.add_record", dataset=dataset.dataset),
-          },
-        ]
-      })
-    }}
-  </div>
+  {% if session["user"] %}
+    <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+      {{
+        buttonMenu({
+          "text": "blah",
+          "items": [
+            {
+              "element": "a",
+              "text": "Add record",
+              "href": url_for("main.add_record", dataset=dataset.dataset),
+            },
+          ]
+        })
+      }}
+    </div>
+  {% endif %}
 </div>
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
@@ -33,11 +35,11 @@
             {% for field in dataset.fields %}
             <th scope="col" class="govuk-table__header">{{field.field}}</th>
             {% endfor %}
-            {# start -- if logged in ---------------------- #}
-            <th scope="col" class="govuk-table__header">
-              <span class="govuk-visually-hidden">Action</span>
-            </th>
-            {# end ---- if logged in ---------------------- #}
+            {% if session["user"] %}
+              <th scope="col" class="govuk-table__header">
+                <span class="govuk-visually-hidden">Action</span>
+              </th>
+            {% endif %}
           </tr>
         </thead>
         <tbody class="govuk-table__body">
@@ -46,7 +48,7 @@
             {% for field in dataset.fields %}
               <td class="govuk-table__cell">{{entry.data[field.field]}}</td>
             {% endfor %}
-            {# start -- if logged in ---------------------- #}
+            {% if session["user"] %}
             <td class="govuk-table__cell">
               {{
                 buttonMenu({
@@ -60,7 +62,7 @@
                 })
               }}
             </td>
-            {# end ---- if logged in ---------------------- #}
+            {% endif %}
           </tr>
           {% endfor %}
         </tbody>

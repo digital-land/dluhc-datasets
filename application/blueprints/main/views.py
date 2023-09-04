@@ -14,7 +14,6 @@ def index():
 
 
 @main.route("/dataset")
-@login_required
 def datasets():
     ds = db.session.query(Dataset).all()
     return render_template("datasets.html", datasets=ds, isHomepage=True)
@@ -34,6 +33,7 @@ def dataset(name):
 
 
 @main.route("/dataset/<string:dataset>/add", methods=["GET", "POST"])
+@login_required
 def add_record(dataset):
     ds = Dataset.query.get(dataset)
     builder = FormBuilder(ds.fields)

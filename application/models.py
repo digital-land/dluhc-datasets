@@ -1,7 +1,7 @@
 import datetime
 from typing import List, Optional
 
-from sqlalchemy import ForeignKey, Text
+from sqlalchemy import ForeignKey, Text, event
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -41,6 +41,10 @@ class Dataset(DateModel):
 
     entries: Mapped[List["Entry"]] = relationship("Entry", back_populates="dataset")
 
+    last_updated: Mapped[Optional[datetime.date]] = mapped_column(
+        db.Date, default=db.func.current_date()
+    )
+
     def __repr__(self):
         return f"<Dataset(id={self.name}, name={self.name}, fields={self.fields})>"
 
@@ -71,3 +75,8 @@ class Field(DateModel):
 
     def __repr__(self):
         return f"<Field(name={self.name})>"
+
+
+@event.listens_for(Dataset.entries, "append")
+def receive_append(target, value, initiator):
+    target.last_updated = datetime.date.today()

@@ -15,7 +15,7 @@ def index():
 
 @main.route("/dataset")
 def datasets():
-    ds = db.session.query(Dataset).all()
+    ds = db.session.query(Dataset).order_by(Dataset.dataset).all()
     return render_template("datasets.html", datasets=ds, isHomepage=True)
 
 

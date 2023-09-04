@@ -30,6 +30,8 @@ $app-images-path: "/statics/images/";
     @include govuk-font(19)
   }
   th {
-    @include govuk-font(16, bold, true)
+    @include govuk-font(16, bold, true);
+    padding-top: 1em;
+    padding-bottom: 1em;
   }
 }

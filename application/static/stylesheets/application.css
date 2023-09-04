@@ -7372,7 +7372,9 @@
     font-weight: 700;
     font-size: 14px;
     font-size: 0.875rem;
-    line-height: 1.14286; }
+    line-height: 1.14286;
+    padding-top: 1em;
+    padding-bottom: 1em; }
     @media print {
       .app-data-table th {
         font-family: sans-serif; } }

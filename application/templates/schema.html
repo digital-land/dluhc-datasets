@@ -11,11 +11,23 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-three-quarters">
     <h2 class="govuk-heading-m">Fields</h2>
-    <ul class="govuk-list govuk-list--bullet">
+
+    <dl class="govuk-summary-list">
       {% for field in dataset.fields %}
-        <li>{{field.field}}</li>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          <code>{{field.field}}</code>
+        </dt>
+        <dd class="govuk-summary-list__value">
+          <span class="govuk-hint">
+            {{ field.name }} - {{ field.notes }}
+          </span>
+        </dd>
+      </div>
       {% endfor %}
-    </ul>
+    </dl>
+
+    <p class="govuk-body"><a href="/dataset/{{dataset.dataset}}">View records</a></p>
   </div>
 </div>
 {% endblock content %}

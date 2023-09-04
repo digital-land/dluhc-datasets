@@ -26,7 +26,7 @@ def dataset(name):
         "items": [
             {"text": "Datasets", "href": "/dataset"},
             {"text": dataset.name, "href": f"/dataset/{name}"},
-            {"text": "Records", "href": "/dataset/{name}"},
+            {"text": "Records"},
         ]
     }
     return render_template("records.html", dataset=dataset, breadcrumbs=breadcrumbs)

@@ -7336,3 +7336,57 @@
   margin: 0 1em 0 0; }
   .app-list--inline > li:last-child {
     margin-right: 0; }
+
+.app-data-table {
+  table-layout: fixed;
+  border-collapse: collapse; }
+  .app-data-table thead tr {
+    background-color: #f3f2f1; }
+  .app-data-table th, .app-data-table td {
+    padding: 0.35em;
+    font-family: "GDS Transport", arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 400;
+    font-size: 16px;
+    font-size: 1rem;
+    line-height: 1.25; }
+    @media print {
+      .app-data-table th, .app-data-table td {
+        font-family: sans-serif; } }
+    @media (min-width: 40.0625em) {
+      .app-data-table th, .app-data-table td {
+        font-size: 19px;
+        font-size: 1.1875rem;
+        line-height: 1.31579; } }
+    @media print {
+      .app-data-table th, .app-data-table td {
+        font-size: 14pt;
+        line-height: 1.15; } }
+  .app-data-table th {
+    font-family: "GDS Transport", arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-feature-settings: "tnum" 1;
+    font-feature-settings: "tnum" 1;
+    font-weight: 700;
+    font-size: 14px;
+    font-size: 0.875rem;
+    line-height: 1.14286; }
+    @media print {
+      .app-data-table th {
+        font-family: sans-serif; } }
+    @supports (font-variant-numeric: tabular-nums) {
+      .app-data-table th {
+        -webkit-font-feature-settings: normal;
+        font-feature-settings: normal;
+        font-variant-numeric: tabular-nums; } }
+    @media (min-width: 40.0625em) {
+      .app-data-table th {
+        font-size: 16px;
+        font-size: 1rem;
+        line-height: 1.25; } }
+    @media print {
+      .app-data-table th {
+        font-size: 14pt;
+        line-height: 1.2; } }

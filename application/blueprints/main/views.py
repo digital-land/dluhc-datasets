@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, redirect, render_template, url_for
 
 from application.extensions import db
 from application.forms import FormBuilder
-from application.models import Dataset
+from application.models import Dataset, Entry
 from application.utils import login_required
 
 main = Blueprint("main", __name__)
@@ -26,25 +26,35 @@ def dataset(name):
     breadcrumbs = {
         "items": [
             {"text": "Datasets", "href": "/dataset"},
-            {"text": dataset.name, "href": "/dataset/" + name},
-            {"text": "Records", "href": "/dataset/" + name},
+            {"text": dataset.name, "href": f"/dataset/{name}"},
+            {"text": "Records", "href": "/dataset/{name}"},
         ]
     }
-    return render_template("entries.html", dataset=dataset, breadcrumbs=breadcrumbs)
+    return render_template("records.html", dataset=dataset, breadcrumbs=breadcrumbs)
 
 
 @main.route("/dataset/<string:dataset>/add", methods=["GET", "POST"])
-def add_entry(dataset):
+def add_record(dataset):
     ds = Dataset.query.get(dataset)
-    builder = FormBuilder()
-    for field in ds.fields:
-        builder.with_field(field.field, field.datatype)
+    builder = FormBuilder(ds.fields)
     form = builder.build()
-    if request.method == "POST":
-        # do something with form
-        return render_template("add_entry.html", dataset=ds, form=form)
-    else:
-        return render_template("add_entry.html", dataset=ds, form=form)
+    form_fields = builder.form_fields()
+    if form.validate_on_submit():
+        last_entry = (
+            db.session.query(Entry)
+            .filter_by(dataset_id=dataset)
+            .order_by(Entry.id.desc())
+            .first()
+        )
+        next_id = last_entry.id + 1 if last_entry else 0
+        entry = Entry(id=next_id, dataset=ds, data=form.data)
+        ds.entries.append(entry)
+        db.session.add(ds)
+        db.session.commit()
+        return redirect(url_for("main.dataset", name=dataset))
+    return render_template(
+        "add_record.html", dataset=ds, form=form, form_fields=form_fields
+    )
 
 
 @main.route("/dataset/<string:dataset>/schema")

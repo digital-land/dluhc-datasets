@@ -1,5 +1,5 @@
-from wtforms import DateField, Field, IntegerField, StringField, URLField
-from wtforms.form import Form
+from flask_wtf import FlaskForm
+from wtforms import Field, StringField, URLField
 from wtforms.validators import ValidationError
 from wtforms.widgets import TextInput
 
@@ -20,26 +20,28 @@ class CurieField(Field):
 class FormBuilder:
     field_types = {
         "curie": CurieField,
-        "datetime": DateField,
-        "integer": IntegerField,
         "string": StringField,
         "text": StringField,
         "url": URLField,
     }
 
-    def with_field(self, name, datatype):
-        field = FormBuilder.field_types.get(datatype)
-        self.fields.append((name.lower(), field))
-
     def build(self):
-        class TheForm(Form):
+        class TheForm(FlaskForm):
             pass
 
-        for name, field in self.fields:
-            setattr(TheForm, name, field())
+        for field in self.fields:
+            form_field = self.field_types.get(field.datatype)
+            if form_field is not None:
+                setattr(TheForm, field.field, form_field())
 
-        self.fields = []
         return TheForm()
 
-    def __init__(self):
+    def form_fields(self):
+        return self.fields
+
+    def __init__(self, fields):
+        skip_fields = {"entity", "end-date", "start-date", "entry-date"}
         self.fields = []
+        for field in fields:
+            if field.field not in skip_fields:
+                self.fields.append(field)

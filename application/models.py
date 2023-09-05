@@ -39,7 +39,7 @@ class Dataset(DateModel):
         order_by="Field.name",
     )
 
-    entries: Mapped[List["Entry"]] = relationship("Entry", back_populates="dataset")
+    records: Mapped[List["Record"]] = relationship("Record", back_populates="dataset")
 
     last_updated: Mapped[Optional[datetime.date]] = mapped_column(
         db.Date, default=db.func.current_date()
@@ -49,18 +49,18 @@ class Dataset(DateModel):
         return f"<Dataset(id={self.name}, name={self.name}, fields={self.fields})>"
 
 
-class Entry(db.Model):
-    __tablename__ = "entry"
+class Record(db.Model):
+    __tablename__ = "record"
 
     id: Mapped[int] = mapped_column(db.BigInteger, primary_key=True)
     dataset_id: Mapped[str] = mapped_column(
         Text, ForeignKey("dataset.dataset"), primary_key=True
     )
-    dataset: Mapped["Dataset"] = relationship("Dataset", back_populates="entries")
+    dataset: Mapped["Dataset"] = relationship("Dataset", back_populates="records")
     data: Mapped[dict] = mapped_column(MutableDict.as_mutable(JSONB), nullable=False)
 
     def __repr__(self):
-        return f"<Entry(dataset={self.dataset.name}, id={self.id}, data={self.data}))>"
+        return f"<Record(dataset={self.dataset.name}, id={self.id}, data={self.data}))>"
 
 
 class Field(DateModel):
@@ -77,6 +77,6 @@ class Field(DateModel):
         return f"<Field(name={self.name})>"
 
 
-@event.listens_for(Dataset.entries, "append")
+@event.listens_for(Dataset.records, "append")
 def receive_append(target, value, initiator):
     target.last_updated = datetime.date.today()

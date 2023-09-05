@@ -2,14 +2,14 @@ from flask import Blueprint, redirect, render_template, url_for
 
 from application.extensions import db
 from application.forms import FormBuilder
-from application.models import Dataset, Entry
+from application.models import Dataset, Record
 from application.utils import login_required
 
 main = Blueprint("main", __name__)
 
 
 @main.route("/")
-def datasets():
+def index():
     ds = db.session.query(Dataset).order_by(Dataset.dataset).all()
     return render_template("datasets.html", datasets=ds, isHomepage=True)
 
@@ -19,8 +19,8 @@ def dataset(name):
     dataset = Dataset.query.get(name)
     breadcrumbs = {
         "items": [
-            {"text": "Datasets", "href": "/dataset"},
-            {"text": dataset.name, "href": f"/dataset/{name}"},
+            {"text": "Datasets", "href": url_for("main.index")},
+            {"text": dataset.name, "href": url_for("main.dataset", name=name)},
             {"text": "Records"},
         ]
     }
@@ -35,15 +35,15 @@ def add_record(dataset):
     form = builder.build()
     form_fields = builder.form_fields()
     if form.validate_on_submit():
-        last_entry = (
-            db.session.query(Entry)
+        last_record = (
+            db.session.query(Record)
             .filter_by(dataset_id=dataset)
-            .order_by(Entry.id.desc())
+            .order_by(Record.id.desc())
             .first()
         )
-        next_id = last_entry.id + 1 if last_entry else 0
-        entry = Entry(id=next_id, dataset=ds, data=form.data)
-        ds.entries.append(entry)
+        next_id = last_record.id + 1 if last_record else 0
+        record = Record(id=next_id, dataset=ds, data=form.data)
+        ds.records.append(record)
         db.session.add(ds)
         db.session.commit()
         return redirect(url_for("main.dataset", name=dataset))
@@ -55,8 +55,8 @@ def add_record(dataset):
 @main.route("/dataset/<string:dataset>/record/<int:record_id>", methods=["GET", "POST"])
 @login_required
 def edit_record(dataset, record_id):
-    record = Entry.query.filter(
-        Entry.dataset_id == dataset, Entry.id == record_id
+    record = Record.query.filter(
+        Record.dataset_id == dataset, Record.id == record_id
     ).one()
     return render_template("edit_record.html", dataset=record.dataset, record=record)
 
@@ -66,9 +66,9 @@ def schema(dataset):
     ds = Dataset.query.get(dataset)
     breadcrumbs = {
         "items": [
-            {"text": "Datasets", "href": "/dataset"},
-            {"text": ds.name, "href": {{url_for("main.dataset", name=dataset)}}},
-            {"text": "Schema", "href": {{url_for("main.schema", name=dataset)}}},
+            {"text": "Datasets", "href": url_for("main.index")},
+            {"text": ds.name, "href": url_for("main.dataset", name=dataset)},
+            {"text": "Schema"},
         ]
     }
     return render_template("schema.html", dataset=ds, breadcrumbs=breadcrumbs)

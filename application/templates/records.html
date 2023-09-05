@@ -5,7 +5,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-three-quarters">
     <span class="govuk-caption-l">{{ dataset.name }}</span>
-    <h1 class="govuk-heading-l">{{ dataset.entries | length }} records</h1>
+    <h1 class="govuk-heading-l">{{ dataset.records | length }} records</h1>
   </div>
   {% if session["user"] %}
     <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
@@ -27,7 +27,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     <hr class="govuk-section-break govuk-section-break--visible">
-    {% if dataset.entries | length > 0 %}
+    {% if dataset.records | length > 0 %}
     <section class="app-dataset-records">
       <table class="govuk-table app-data-table">
         <thead class="govuk-table__head">
@@ -43,10 +43,10 @@
           </tr>
         </thead>
         <tbody class="govuk-table__body">
-          {% for entry in dataset.entries %}
+          {% for record in dataset.records %}
           <tr class="govuk-table__row">
             {% for field in dataset.fields %}
-              <td class="govuk-table__cell">{{entry.data[field.field]}}</td>
+              <td class="govuk-table__cell">{{record.data[field.field]}}</td>
             {% endfor %}
             {% if session["user"] %}
             <td class="govuk-table__cell">
@@ -57,7 +57,7 @@
                       "element": "a",
                       "text": "Edit",
                       "classes": "govuk-button--secondary",
-                      "href": url_for("main.edit_record", dataset=dataset.dataset, record_id=entry.id),
+                      "href": url_for("main.edit_record", dataset=dataset.dataset, record_id=record.id),
                     }
                   ]
                 })
@@ -68,7 +68,7 @@
           {% endfor %}
         </tbody>
       </table>
-      <p class="govuk-body"><a href="{{dataset.dataset}}/schema">View schema</a></p>
+      <p class="govuk-body"><a href="{{url_for('main.schema', dataset=dataset.dataset)}}">View schema</a></p>
     </section>
     {% else %}
       {{

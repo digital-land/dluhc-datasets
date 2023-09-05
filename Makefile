@@ -62,3 +62,8 @@ make drop::
 
 upgrade::
 	flask db upgrade
+
+reset::
+	flask data drop
+	flask db upgrade
+	flask data load

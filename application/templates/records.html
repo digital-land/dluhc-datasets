@@ -56,7 +56,8 @@
                     {
                       "element": "a",
                       "text": "Edit",
-                      "classes": "govuk-button--secondary"
+                      "classes": "govuk-button--secondary",
+                      "href": url_for("main.edit_record", dataset=dataset.dataset, record_id=entry.id),
                     }
                   ]
                 })

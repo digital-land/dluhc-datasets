@@ -9,11 +9,6 @@ main = Blueprint("main", __name__)
 
 
 @main.route("/")
-def index():
-    return render_template("index.html")
-
-
-@main.route("/dataset")
 def datasets():
     ds = db.session.query(Dataset).order_by(Dataset.dataset).all()
     return render_template("datasets.html", datasets=ds, isHomepage=True)
@@ -57,14 +52,23 @@ def add_record(dataset):
     )
 
 
+@main.route("/dataset/<string:dataset>/record/<int:record_id>", methods=["GET", "POST"])
+@login_required
+def edit_record(dataset, record_id):
+    record = Entry.query.filter(
+        Entry.dataset_id == dataset, Entry.id == record_id
+    ).one()
+    return render_template("edit_record.html", dataset=record.dataset, record=record)
+
+
 @main.route("/dataset/<string:dataset>/schema")
 def schema(dataset):
     ds = Dataset.query.get(dataset)
     breadcrumbs = {
         "items": [
             {"text": "Datasets", "href": "/dataset"},
-            {"text": ds.name, "href": "/dataset/" + dataset},
-            {"text": "Schema", "href": "/" + dataset + "/schema"},
+            {"text": ds.name, "href": {{url_for("main.dataset", name=dataset)}}},
+            {"text": "Schema", "href": {{url_for("main.schema", name=dataset)}}},
         ]
     }
     return render_template("schema.html", dataset=ds, breadcrumbs=breadcrumbs)

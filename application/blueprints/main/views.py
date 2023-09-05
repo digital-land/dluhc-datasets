@@ -58,7 +58,27 @@ def edit_record(dataset, record_id):
     record = Record.query.filter(
         Record.dataset_id == dataset, Record.id == record_id
     ).one()
-    return render_template("edit_record.html", dataset=record.dataset, record=record)
+    builder = FormBuilder(record.dataset.fields)
+    form = builder.build()
+    form_fields = builder.form_fields()
+
+    if form.validate_on_submit():
+        record.data = form.data
+        db.session.add(record)
+        db.session.commit()
+        return redirect(url_for("main.dataset", name=dataset))
+
+    else:
+        for field in form_fields:
+            form[field.field].data = record.data.get(field.field, None)
+
+        return render_template(
+            "edit_record.html",
+            dataset=record.dataset,
+            record=record,
+            form=form,
+            form_fields=form_fields,
+        )
 
 
 @main.route("/dataset/<string:dataset>/schema")

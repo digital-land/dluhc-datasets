@@ -5,6 +5,20 @@
   <div class="govuk-grid-column-three-quarters">
     <h1 class="govuk-heading-l">DLUHC Dataset Editor</h1>
   </div>
-  <p>Edit record will be here</p>
 </div>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-three-quarters">
+    <form method="POST" action="{{ url_for('main.edit_record', dataset=dataset.dataset, record_id=record.id) }}">
+      <div class="govuk-form-group">
+        {% for field in form_fields %}
+        <label class="govuk-label" for="{{field.field}}">
+          {{form[field.field].label }}
+        </label>
+        {{ form[field.field] }}
+        {% endfor %}
+      </div>
+      {{ form.csrf_token }}
+      <input type="submit" value="Edit">
+    </form>
+  </div>
 {% endblock content %}

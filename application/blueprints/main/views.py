@@ -82,6 +82,7 @@ def add_record(dataset):
 )
 @login_required
 def edit_record(dataset, record_id):
+    ds = Dataset.query.get(dataset)
     record = Record.query.filter(
         Record.dataset_id == dataset, Record.id == record_id
     ).one()
@@ -99,12 +100,21 @@ def edit_record(dataset, record_id):
         for field in form_fields:
             form[field.field].data = record.data.get(field.field, None)
 
+        breadcrumbs = {
+            "items": [
+                {"text": "Datasets", "href": url_for("main.index")},
+                {"text": ds.name, "href": url_for("main.dataset", name=dataset)},
+                {"text": "Edit record"},
+            ]
+        }
+
         return render_template(
             "edit_record.html",
             dataset=record.dataset,
             record=record,
             form=form,
             form_fields=form_fields,
+            breadcrumbs=breadcrumbs,
         )
 
 

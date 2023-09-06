@@ -13,14 +13,14 @@
     <h2 class="govuk-heading-m">Fields</h2>
 
     <dl class="govuk-summary-list">
-      {% for field in dataset.fields %}
+      {% for field in dataset.sorted_fields() %}
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
           <code>{{field.field}}</code>
         </dt>
         <dd class="govuk-summary-list__value">
           <span class="govuk-hint">
-            {{ field.name }}{% if field.description %} - {{field.description}}{% endif %}{% if field.notes %} - {{field.notes}}{% endif %}
+            {{ field.name }}{% if field.description %} - {{field.description}}{% endif %}{% if field.notes %} - {{field.notes }}{% endif %}
           </span>
         </dd>
       </div>

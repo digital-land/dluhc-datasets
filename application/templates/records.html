@@ -32,7 +32,7 @@
       <table class="govuk-table app-data-table">
         <thead class="govuk-table__head">
           <tr class="govuk-table__row">
-            {% for field in dataset.fields %}
+            {% for field in dataset.sorted_fields() %}
             <th scope="col" class="govuk-table__header">{{field.field | capitalize}}</th>
             {% endfor %}
             {% if session["user"] %}

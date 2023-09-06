@@ -34,7 +34,7 @@ class FormBuilder:
         return TheForm()
 
     def form_fields(self):
-        return self.fields
+        return sorted(self.fields)
 
     def __init__(self, fields):
         skip_fields = {"entity", "end-date", "start-date", "entry-date"}

@@ -37,7 +37,6 @@ class Dataset(DateModel):
         "Field",
         secondary=dataset_field,
         back_populates="datasets",
-        order_by="Field.name",
     )
 
     records: Mapped[List["Record"]] = relationship("Record", back_populates="dataset")
@@ -45,6 +44,9 @@ class Dataset(DateModel):
     last_updated: Mapped[Optional[datetime.date]] = mapped_column(
         db.Date, default=db.func.current_date()
     )
+
+    def sorted_fields(self):
+        return sorted(self.fields)
 
     def __repr__(self):
         return f"<Dataset(id={self.name}, name={self.name}, fields={self.fields})>"

@@ -52,7 +52,9 @@ def add_record(dataset):
     )
 
 
-@main.route("/dataset/<string:dataset>/record/<int:record_id>", methods=["GET", "POST"])
+@main.route(
+    "/dataset/<string:dataset>/record/<int:record_id>/edit", methods=["GET", "POST"]
+)
 @login_required
 def edit_record(dataset, record_id):
     record = Record.query.filter(

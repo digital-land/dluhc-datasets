@@ -95,16 +95,32 @@ class Field(DateModel):
             "prefix",
         ]:
             return True
-        else:
-            if other.field not in ["entity", "name", "prefix", "reference"]:
+
+        if self.field not in [
+            "entity",
+            "name",
+            "prefix",
+            "reference",
+        ] and other.field not in ["entity", "name", "prefix", "reference"]:
+            if self.datatype == "datetime" and other.datatype != "datetime":
+                return False
+
+            if self.datatype == "datetime" and other.datatype == "datetime":
+                prefix = self.field.split("-")[0]
+                other_prefix = other.field.split("-")[0]
+                if prefix == "entry" and other_prefix != "entry":
+                    return True
+                if prefix == "start" and other_prefix != "entry":
+                    return True
+                if prefix == "end" and other_prefix not in ["entry", "start"]:
+                    return False
+
+            if self.datatype != "datetime" and other.datatype != "datetime":
                 return self.field < other.field
 
-        # if self.datatype == "datetime" and other.datatype != "datetime":
-        #     return True
-        # if self.datatype != "datetime" and other.datatype == "datetime":
-        #     prefix = self.field.split("-")[0]
-        #     other_prefix = other.field.split("-")[0]
-        #     return prefix < other_prefix
+            if self.datatype != "datetime" and other.datatype == "datetime":
+                return True
+
         return False
 
 

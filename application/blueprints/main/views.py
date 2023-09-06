@@ -1,4 +1,7 @@
-from flask import Blueprint, redirect, render_template, url_for
+import io
+from csv import DictWriter
+
+from flask import Blueprint, abort, make_response, redirect, render_template, url_for
 
 from application.extensions import db
 from application.forms import FormBuilder
@@ -118,7 +121,21 @@ def schema(dataset):
     return render_template("schema.html", dataset=ds, breadcrumbs=breadcrumbs)
 
 
-# will give a file download
-# @main.route("/dataset/<string:dataset>.csv")
-# def csv(dataset):
-#     pass
+@main.route("/dataset/<string:dataset>.csv")
+def csv(dataset):
+    ds = Dataset.query.get(dataset)
+    if ds is not None:
+        output = io.StringIO()
+        headers = [field.field for field in ds.sorted_fields()]
+        writer = DictWriter(output, headers)
+        writer.writeheader()
+        for record in ds.records:
+            writer.writerow(record.data)
+            csv_output = output.getvalue().encode("utf-8")
+
+        response = make_response(csv_output)
+        response.headers["Content-Disposition"] = f"attachment; filename={dataset}.csv"
+        response.headers["Content-Type"] = "text/csv; charset=utf-8"
+        return response
+    else:
+        abort(404)

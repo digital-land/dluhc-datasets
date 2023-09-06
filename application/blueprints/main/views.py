@@ -126,8 +126,8 @@ def csv(dataset):
     ds = Dataset.query.get(dataset)
     if ds is not None:
         output = io.StringIO()
-        headers = [field.field for field in ds.sorted_fields()]
-        writer = DictWriter(output, headers)
+        fieldnames = [field.field for field in ds.sorted_fields()]
+        writer = DictWriter(output, fieldnames)
         writer.writeheader()
         for record in ds.records:
             writer.writerow(record.data)

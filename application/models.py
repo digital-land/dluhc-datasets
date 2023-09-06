@@ -1,4 +1,5 @@
 import datetime
+from functools import total_ordering
 from typing import List, Optional
 
 from sqlalchemy import ForeignKey, Text, event
@@ -63,6 +64,7 @@ class Record(db.Model):
         return f"<Record(dataset={self.dataset.name}, id={self.id}, data={self.data}))>"
 
 
+@total_ordering
 class Field(DateModel):
     __tablename__ = "field"
 
@@ -76,6 +78,34 @@ class Field(DateModel):
 
     def __repr__(self):
         return f"<Field(name={self.name})>"
+
+    def __eq__(self, other):
+        return self.field == other.field
+
+    def __lt__(self, other):
+        if self.field == "entity":
+            return True
+        if self.field == "name" and other.field != "entity":
+            return True
+        if self.field == "prefix" and other.field not in ["entity", "name"]:
+            return True
+        if self.field == "reference" and other.field not in [
+            "entity",
+            "name",
+            "prefix",
+        ]:
+            return True
+        else:
+            if other.field not in ["entity", "name", "prefix", "reference"]:
+                return self.field < other.field
+
+        # if self.datatype == "datetime" and other.datatype != "datetime":
+        #     return True
+        # if self.datatype != "datetime" and other.datatype == "datetime":
+        #     prefix = self.field.split("-")[0]
+        #     other_prefix = other.field.split("-")[0]
+        #     return prefix < other_prefix
+        return False
 
 
 @event.listens_for(Dataset.records, "append")

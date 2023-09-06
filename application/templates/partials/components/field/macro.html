@@ -1,0 +1,38 @@
+{%- from 'govuk_frontend_jinja/components/input/macro.html' import govukInput -%}
+{%- from 'govuk_frontend_jinja/components/textarea/macro.html' import govukTextarea -%}
+
+{% macro appField(field, hasError) %}
+  {% if hasError == True %}
+    {% set _errorMessage = { "text" : "Error" } %}
+  {% else %}
+    {% set _errorMessage = False %}
+  {% endif %}
+  {% if field.datatype %}
+    {% if field.datatype == 'text' %}
+      {{
+        govukTextarea({
+          "label": {
+            "text": field.name,
+          },
+          "id": field.field,
+          "name": field.field,
+          "errorMessage": _errorMessage,
+        })
+      }}
+    {% else %}
+      {{
+        govukInput({
+          "label": {
+            "text": field.name,
+            "classes": "govuk-label",
+          },
+          "id": field.field,
+          "name": field.field,
+          "errorMessage": _errorMessage
+        })
+      }}
+    {% endif %}
+  {% else %}
+    {% raw %}You didn't tell me the fieldtype{% endraw %}
+  {% endif %}
+{% endmacro %}

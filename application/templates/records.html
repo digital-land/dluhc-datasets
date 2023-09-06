@@ -45,7 +45,7 @@
         <tbody class="govuk-table__body">
           {% for record in dataset.records %}
           <tr class="govuk-table__row">
-            {% for field in dataset.fields %}
+            {% for field in dataset.sorted_fields() %}
               <td class="govuk-table__cell">{{record.data[field.field]}}</td>
             {% endfor %}
             {% if session["user"] %}

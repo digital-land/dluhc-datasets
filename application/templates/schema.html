@@ -20,7 +20,7 @@
         </dt>
         <dd class="govuk-summary-list__value">
           <span class="govuk-hint">
-            {{ field.name }} - {{ field.notes }}
+            {{ field.name }}{% if field.description %} - {{field.description}}{% endif %}{% if field.notes %} - {{field.notes}}{% endif %}
           </span>
         </dd>
       </div>

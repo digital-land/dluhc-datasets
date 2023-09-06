@@ -1,27 +1,21 @@
 from flask_wtf import FlaskForm
-from wtforms import Field, StringField, URLField
+from wtforms import StringField, TextAreaField, URLField
 from wtforms.validators import ValidationError
-from wtforms.widgets import TextInput
 
 
 # change to a regex validator
 def curie_check(form, field):
     if len(field.data.split(":")) != 2:
-        raise ValidationError("curie should be in the format {namespace}:{identifier}")
-
-
-class CurieField(Field):
-    widget = TextInput()
-
-    def __init__(self, **kwargs):
-        super(CurieField, self).__init__(validators=[curie_check], **kwargs)
+        raise ValidationError(
+            f"{field.name} is a curie and should be in the format 'namespace:identifier'"
+        )
 
 
 class FormBuilder:
     field_types = {
-        "curie": CurieField,
+        "curie": StringField,
         "string": StringField,
-        "text": StringField,
+        "text": TextAreaField,
         "url": URLField,
     }
 
@@ -32,7 +26,10 @@ class FormBuilder:
         for field in self.fields:
             form_field = self.field_types.get(field.datatype)
             if form_field is not None:
-                setattr(TheForm, field.field, form_field())
+                if field.datatype == "curie":
+                    setattr(TheForm, field.field, form_field(validators=[curie_check]))
+                else:
+                    setattr(TheForm, field.field, form_field())
 
         return TheForm()
 

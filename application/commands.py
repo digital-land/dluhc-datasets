@@ -60,7 +60,10 @@ def load_db():
                         datasette_url=datasette_url, field=field
                     )
                     resp = requests.get(field_query)
-                    f.datatype = resp.json()[field]["datatype"]
+                    data = resp.json()
+                    f.datatype = data[field]["datatype"]
+                    if data[field].get("description"):
+                        f.description = data[field]["description"]
                     db.session.add(f)
                     db.session.commit()
                     print(f"field {f.field} with name {f.name} added")

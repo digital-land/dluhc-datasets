@@ -11,6 +11,13 @@
     <p class="govuk-body"><a href="{{ url_for('main.dataset', name=dataset.dataset) }}"">{{ dataset.name }}</a></p>
   </div>
 </div>
+{% if error_list %}
+  {{ govukErrorSummary({
+      "titleText": "There is a problem",
+      "errorList": error_list
+    })
+  }}
+{% endif %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-three-quarters">
   <form method="POST" action="{{ url_for('main.add_record', dataset=dataset.dataset) }}">

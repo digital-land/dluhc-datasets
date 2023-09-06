@@ -72,6 +72,7 @@ class Field(DateModel):
     datasets: Mapped[List["Dataset"]] = relationship(
         "Dataset", secondary=dataset_field, back_populates="fields"
     )
+    description: Mapped[Optional[str]] = mapped_column(Text)
 
     def __repr__(self):
         return f"<Field(name={self.name})>"

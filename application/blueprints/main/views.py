@@ -47,8 +47,21 @@ def add_record(dataset):
         db.session.add(ds)
         db.session.commit()
         return redirect(url_for("main.dataset", name=dataset))
+
+    if form.errors:
+        error_list = [
+            {"href": f"#{field}", "text": ",".join(errors)}
+            for field, errors in form.errors.items()
+        ]
+    else:
+        error_list = None
+
     return render_template(
-        "add_record.html", dataset=ds, form=form, form_fields=form_fields
+        "add_record.html",
+        dataset=ds,
+        form=form,
+        form_fields=form_fields,
+        error_list=error_list,
     )
 
 

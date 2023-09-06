@@ -2,7 +2,7 @@ import pytest
 from wtforms import StringField, URLField
 from wtforms.form import Form
 
-from application.forms import CurieField, FormBuilder
+from application.forms import FormBuilder
 from application.models import Field
 
 
@@ -28,7 +28,7 @@ def test_form_builder(app):
         builder = FormBuilder(fields)
         form = builder.build()
         assert isinstance(form, Form)
-        assert isinstance(form.organisation, CurieField)
+        assert isinstance(form.organisation, StringField)
         assert isinstance(form.prefix, StringField)
         assert isinstance(form.notes, StringField)
         assert isinstance(form["documentation-url"], URLField)
@@ -54,5 +54,5 @@ def test_form_with_curie_field_fails_validation_of_invalid_input(app):
         assert form.errors.get("organisation")
         assert (
             form.errors.get("organisation")[0]
-            == "curie should be in the format {namespace}:{identifier}"
+            == "organisation is a curie and should be in the format 'namespace:identifier'"
         )

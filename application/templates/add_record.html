@@ -19,20 +19,6 @@
   <form method="POST" action="{{ url_for('main.add_record', dataset=dataset.dataset) }}">
     <div class="govuk-form-group">
       {% for field in form_fields %}
-        {% if form.errors[field.field] %}
-        {% set classes = 'govuk-input--error' %}
-        {% else %}
-        {% set classes = '' %}
-        {% endif %}
-        {{ govukInput({
-            "label": {
-              "text": field.name,
-              "classes": classes.
-            },
-            "id": field.field,
-            "name": field.field
-            })
-        }}
         {{ appField(field, True if form.errors[field.field] else False) }}
       {% endfor %}
       {{ form.csrf_token }}

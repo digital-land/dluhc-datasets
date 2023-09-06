@@ -56,12 +56,21 @@ def add_record(dataset):
     else:
         error_list = None
 
+    breadcrumbs = {
+        "items": [
+            {"text": "Datasets", "href": url_for("main.index")},
+            {"text": ds.name, "href": url_for("main.dataset", name=dataset)},
+            {"text": "Add a record"},
+        ]
+    }
+
     return render_template(
         "add_record.html",
         dataset=ds,
         form=form,
         form_fields=form_fields,
         error_list=error_list,
+        breadcrumbs=breadcrumbs,
     )
 
 

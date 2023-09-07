@@ -17,6 +17,11 @@ def index():
     return render_template("datasets.html", datasets=ds, isHomepage=True)
 
 
+@main.route("/support")
+def support():
+    return render_template("support.html")
+
+
 @main.route("/dataset/<string:name>")
 def dataset(name):
     dataset = Dataset.query.get(name)

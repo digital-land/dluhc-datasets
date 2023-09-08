@@ -7314,7 +7314,7 @@ p + .govuk-heading-s,
     margin-right: 0; }
   .app-button-menu__toggle-button:after {
     background-repeat: no-repeat;
-    background-image: url(/statics/images/icon-arrow-white-down.svg);
+    background-image: url(/static/images/icon-arrow-white-down.svg);
     content: '';
     display: inline-block;
     height: 5px;
@@ -7323,34 +7323,34 @@ p + .govuk-heading-s,
     vertical-align: middle; }
 
 .app-button-menu__toggle-button:focus:after {
-  background-image: url(/statics/images/icon-arrow-black-down.svg); }
+  background-image: url(/static/images/icon-arrow-black-down.svg); }
 
 .app-button-menu__toggle-button[aria-expanded="true"]:focus:after {
-  background-image: url(/statics/images/icon-arrow-black-up.svg); }
+  background-image: url(/static/images/icon-arrow-black-up.svg); }
 
 .app-button-menu__toggle-button:hover:after {
-  background-image: url(/statics/images/icon-arrow-white-down.svg); }
+  background-image: url(/static/images/icon-arrow-white-down.svg); }
 
 .app-button-menu__toggle-button[aria-expanded="true"]:hover:after {
-  background-image: url(/statics/images/icon-arrow-white-up.svg); }
+  background-image: url(/static/images/icon-arrow-white-up.svg); }
 
 .app-button-menu__toggle-button[aria-expanded="true"]:after {
-  background-image: url(/statics/images/icon-arrow-white-up.svg); }
+  background-image: url(/static/images/icon-arrow-white-up.svg); }
 
 .app-button-menu__toggle-button--secondary {
   margin-bottom: 5px;
   margin-right: 0; }
   .app-button-menu__toggle-button--secondary:after {
-    background-image: url(/statics/images/icon-arrow-black-down.svg); }
+    background-image: url(/static/images/icon-arrow-black-down.svg); }
 
 .app-button-menu__toggle-button--secondary[aria-expanded="true"]:after {
-  background-image: url(/statics/images/icon-arrow-black-up.svg); }
+  background-image: url(/static/images/icon-arrow-black-up.svg); }
 
 .app-button-menu__toggle-button--secondary:hover:after {
-  background-image: url(/statics/images/icon-arrow-black-down.svg); }
+  background-image: url(/static/images/icon-arrow-black-down.svg); }
 
 .app-button-menu__toggle-button--secondary[aria-expanded="true"]:hover:after {
-  background-image: url(/statics/images/icon-arrow-black-up.svg); }
+  background-image: url(/static/images/icon-arrow-black-up.svg); }
 
 /* MENU ITEM */
 .app-button-menu__item {

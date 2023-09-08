@@ -145,7 +145,7 @@ def schema(dataset):
 @main.route("/dataset/<string:dataset>.csv")
 def csv(dataset):
     ds = Dataset.query.get(dataset)
-    if ds is not None:
+    if ds is not None and ds.records:
         output = io.StringIO()
         fieldnames = [field.field for field in ds.sorted_fields()]
         writer = DictWriter(output, fieldnames)

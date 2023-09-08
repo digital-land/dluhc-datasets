@@ -12,8 +12,8 @@
     "watch:images": "npx chokidar './assets/images/**/*.{png,ico,svg,jpg,jpeg,webp}' -c 'npm run copy:images'",
     "nps": "nps -c ./node_modules/digital-land-frontend/package-scripts.js",
     "copy:images_shared": "npm run nps copy.images",
-    "copy:images_local": "npx copyfiles src/images/**/*.{png,ico,svg,jpg,jpeg,webp} application/static/images -u 2",
-    "copy:images": "run-s copy:images_shared copy:images_local",
+    "copy:images_local": "npx copyfiles src/images/**/*.{png,ico,svg,jpg,jpeg,webp} application/static -u 2",
+    "copy:images": "run-s copy:images_*",
     "copyjs": "rsync -ar src/javascripts/ application/static/javascripts",
     "postinstall": "npm run copyjs && npm run nps copy.javascripts && npm run nps build.stylesheets && npm run nps build.javascripts",
     "start": "run-p watch flask"

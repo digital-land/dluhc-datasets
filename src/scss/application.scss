@@ -1,5 +1,9 @@
 // import all digital land and GOVUK Frontend scss
 $app-images-path: "/statics/images/";
+// $govuk-font-family: "HelveticaNeue", "Helvetica Neue", "Arial", "Helvetica", sans-serif;
+$govuk-assets-path: "/static/images/govuk/assets/";
+$govuk-global-styles: true;
+$govuk-new-link-styles: true;
 
 @import "digital-land-frontend/dl-frontend";
 

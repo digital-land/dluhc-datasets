@@ -51,7 +51,7 @@
       {# <a href="#" class="govuk-header__link govuk-header__service-name">
         Dataset manager
       </a> #}
-      <nav aria-label="Menu" class="govuk-header__navigation">
+      <nav aria-label="Menu" class="govuk-header__navigation govuk-header__navigation--end">
         <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide menu" hidden>Menu</button>
         <ul id="navigation" class="govuk-header__navigation-list">
           <li class="govuk-header__navigation-item">
@@ -63,6 +63,17 @@
             <a class="govuk-header__link" href="/support">
               Support
             </a>
+          </li>
+          <li class="govuk-header__navigation-item">
+            {% if session["user"] %}
+            <a class="govuk-header__link" href="#">
+              Sign out
+            </a>
+            {% else %}
+            <a class="govuk-header__link" href="#">
+              Sign in
+            </a>
+            {% endif %}
           </li>
         </ul>
       </nav>

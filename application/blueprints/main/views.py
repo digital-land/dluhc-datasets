@@ -19,7 +19,13 @@ def index():
 
 @main.route("/support")
 def support():
-    return render_template("support.html")
+    breadcrumbs = {
+        "items": [
+            {"text": "DLUHC Datasets", "href": url_for("main.index")},
+            {"text": "Support"},
+        ]
+    }
+    return render_template("support.html", breadcrumbs=breadcrumbs)
 
 
 @main.route("/dataset/<string:name>")

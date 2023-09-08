@@ -11,7 +11,7 @@ auth = Blueprint("auth", __name__, url_prefix="/auth")
 
 @auth.get("/login")
 def login():
-    session["next"] = _make_next_url_safe(request.args.get("next", None))
+    session["next"] = _make_next_url_safe(request.args.get("next", "/"))
     auth_url = url_for("auth.authorize", _external=True)
     return oauth.github.authorize_redirect(auth_url)
 

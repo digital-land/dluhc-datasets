@@ -1,0 +1,88 @@
+.app-data-table {
+  table-layout:fixed;
+  border-collapse: collapse;
+  thead {
+    tr {
+      background-color: govuk-colour('light-grey');
+    }
+  }
+  th, td {
+    padding: 0.35em;
+    @include govuk-font(19)
+  }
+  th {
+    @include govuk-font(19, bold, true);
+    padding-top: 1em;
+    padding-bottom: 1em;
+  }
+}
+
+.app-table {
+  background-color: transparent;
+  border-collapse: collapse;
+  width: 100%;
+  th, td {
+    @include govuk-font(19)
+  }
+  th {
+    @include govuk-font(19, bold, true);
+  }
+  tbody {
+    td, th {
+      @include govuk-responsive-padding(2, 'top');
+      @include govuk-responsive-padding(2, 'bottom');
+    }
+  }
+}
+
+@include govuk-media-query($until: tablet) {
+  .app-table--responsive {
+    thead {
+      clip: rect(0 0 0 0);
+      -webkit-clip-path: inset(50%);
+      clip-path: inset(50%);
+      height: 1px;
+      overflow: hidden;
+      position: absolute;
+      width: 1px;
+      white-space: nowrap;
+    }
+    tr {
+      display: block;
+      border: 1px solid $govuk-border-colour;
+      &:not(:last-child) {
+        margin-bottom: 1em;
+      }
+    }
+    td {
+      -webkit-column-gap: 3.16vw;
+      -moz-column-gap: 3.16vw;
+      column-gap: 3.16vw;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+    }
+
+    tbody {
+      td {
+        &:before {
+          content: attr(data-label);
+          float: left;
+          font-weight: 700;
+        }
+      }
+      th {
+        display: block;
+        border-top: 0;
+      }
+      th,
+      td,
+      td:last-child {
+            @include govuk-responsive-padding(2, 'top');
+            @include govuk-responsive-padding(2, 'bottom');
+            @include govuk-responsive-padding(4, 'left');
+            @include govuk-responsive-padding(4, 'right');
+            text-align: left;
+        }
+    }
+  }
+}

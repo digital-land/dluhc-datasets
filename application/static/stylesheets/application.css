@@ -7421,12 +7421,6 @@ p + .govuk-heading-s,
 .app-button-menu [aria-expanded="false"] + [role=menu] {
   display: none; }
 
-.app-list--inline > li {
-  display: inline-block;
-  margin: 0 1em 0 0; }
-  .app-list--inline > li:last-child {
-    margin-right: 0; }
-
 .app-data-table {
   table-layout: fixed;
   border-collapse: collapse; }
@@ -7460,9 +7454,9 @@ p + .govuk-heading-s,
     -webkit-font-feature-settings: "tnum" 1;
     font-feature-settings: "tnum" 1;
     font-weight: 700;
-    font-size: 14px;
-    font-size: 0.875rem;
-    line-height: 1.14286;
+    font-size: 16px;
+    font-size: 1rem;
+    line-height: 1.25;
     padding-top: 1em;
     padding-bottom: 1em; }
     @media print {
@@ -7475,10 +7469,118 @@ p + .govuk-heading-s,
         font-variant-numeric: tabular-nums; } }
     @media (min-width: 40.0625em) {
       .app-data-table th {
-        font-size: 16px;
-        font-size: 1rem;
-        line-height: 1.25; } }
+        font-size: 19px;
+        font-size: 1.1875rem;
+        line-height: 1.31579; } }
     @media print {
       .app-data-table th {
         font-size: 14pt;
-        line-height: 1.2; } }
+        line-height: 1.15; } }
+
+.app-table {
+  background-color: transparent;
+  border-collapse: collapse;
+  width: 100%; }
+  .app-table th, .app-table td {
+    font-family: "GDS Transport", arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 400;
+    font-size: 16px;
+    font-size: 1rem;
+    line-height: 1.25; }
+    @media print {
+      .app-table th, .app-table td {
+        font-family: sans-serif; } }
+    @media (min-width: 40.0625em) {
+      .app-table th, .app-table td {
+        font-size: 19px;
+        font-size: 1.1875rem;
+        line-height: 1.31579; } }
+    @media print {
+      .app-table th, .app-table td {
+        font-size: 14pt;
+        line-height: 1.15; } }
+  .app-table th {
+    font-family: "GDS Transport", arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-feature-settings: "tnum" 1;
+    font-feature-settings: "tnum" 1;
+    font-weight: 700;
+    font-size: 16px;
+    font-size: 1rem;
+    line-height: 1.25; }
+    @media print {
+      .app-table th {
+        font-family: sans-serif; } }
+    @supports (font-variant-numeric: tabular-nums) {
+      .app-table th {
+        -webkit-font-feature-settings: normal;
+        font-feature-settings: normal;
+        font-variant-numeric: tabular-nums; } }
+    @media (min-width: 40.0625em) {
+      .app-table th {
+        font-size: 19px;
+        font-size: 1.1875rem;
+        line-height: 1.31579; } }
+    @media print {
+      .app-table th {
+        font-size: 14pt;
+        line-height: 1.15; } }
+  .app-table tbody td, .app-table tbody th {
+    padding-top: 10px;
+    padding-bottom: 10px; }
+
+@media (max-width: 40.0525em) {
+  .app-table--responsive thead {
+    clip: rect(0 0 0 0);
+    -webkit-clip-path: inset(50%);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    width: 1px;
+    white-space: nowrap; }
+  .app-table--responsive tr {
+    display: block;
+    border: 1px solid #b1b4b6; }
+    .app-table--responsive tr:not(:last-child) {
+      margin-bottom: 1em; }
+  .app-table--responsive td {
+    -webkit-column-gap: 3.16vw;
+    -moz-column-gap: 3.16vw;
+    column-gap: 3.16vw;
+    display: grid;
+    grid-template-columns: 1fr 2fr; }
+  .app-table--responsive tbody td:before {
+    content: attr(data-label);
+    float: left;
+    font-weight: 700; }
+  .app-table--responsive tbody th {
+    display: block;
+    border-top: 0; }
+  .app-table--responsive tbody th,
+  .app-table--responsive tbody td,
+  .app-table--responsive tbody td:last-child {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    text-align: left; } }
+  @media (max-width: 40.0525em) and (min-width: 40.0625em) {
+    .app-table--responsive tbody th,
+    .app-table--responsive tbody td,
+    .app-table--responsive tbody td:last-child {
+      padding-left: 20px; } }
+  @media (max-width: 40.0525em) and (min-width: 40.0625em) {
+    .app-table--responsive tbody th,
+    .app-table--responsive tbody td,
+    .app-table--responsive tbody td:last-child {
+      padding-right: 20px; } }
+
+.app-list--inline > li {
+  display: inline-block;
+  margin: 0 1em 0 0; }
+  .app-list--inline > li:last-child {
+    margin-right: 0; }

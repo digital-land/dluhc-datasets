@@ -7,41 +7,38 @@
     <p class="govuk-body-l">Datasets managed by the Planning Data Service within the Department for Levelling Up, Housing and Communities.</p>
   </div>
   <div class="govuk-grid-column-full">
-    <table class="govuk-table">
-      <thead class="govuk-table__head">
-        <tr class="govuk-table__row">
+    <table class="app-table app-table--responsive">
+      <thead>
+        <tr>
           <th scope="col" class="govuk-table__header">Dataset</th>
           <th scope="col" class="govuk-table__header govuk-table__header--numeric">Total records</th>
           <th scope="col" class="govuk-table__header govuk-table__header--numeric">Last updated</th>
           <th scope="col" class="govuk-table__header govuk-table__header--numeric"><span class="govuk-visually-hidden">Schema</span></th>
-          <th scope="col" class="govuk-table__header govuk-table__header--numeric"><span class="govuk-visually-hidden">Download</span></th>
+          <th scope="col" class="govuk-table__header"><span><span class="govuk-visually-hidden">Download</span></span></th>
         </tr>
       </thead>
-      <tbody class="govuk-table__body">
+      <tbody>
         {% for dataset in datasets %}
         {% set total_records = dataset.records | length %}
-        <tr class="govuk-table__row">
+        <tr>
           <th scope="row" class="govuk-table__header">
             <a href="{{url_for('main.dataset', name=dataset.dataset)}}">{{ dataset.name }}</a>
           </th>
-          <td class="govuk-table__cell govuk-table__cell--numeric">
-            {{ total_records }}
+          <td data-label="Total records" class="govuk-table__cell govuk-table__cell--numeric">{{ total_records }}</td>
+          <td data-label="Last updated" class="govuk-table__cell govuk-table__cell--numeric">{{dataset.last_updated.strftime("%d/%m/%Y")}}</td>
+          <td data-label="Schema" class="govuk-table__cell govuk-table__cell--numeric">
+            <a href="{{url_for('main.schema', dataset=dataset.dataset)}}"><span class="govuk-visually-hidden">View </span>Schema</a>
           </td>
-          <td class="govuk-table__cell govuk-table__cell--numeric">
-            {{dataset.last_updated.strftime("%d/%m/%Y")}}
-          </td>
-          <td class="govuk-table__cell govuk-table__cell--numeric">
-            <a href="{{url_for('main.schema', dataset=dataset.dataset)}}" class="govuk-!-font-size-16"><span class="govuk-visually-hidden">View </span>Schema</a>
-          </td>
-          <td class="govuk-table__cell govuk-table__cell--numeric">
+          <td {% if total_records > 0 %}data-label="Download"{% endif %}class="govuk-table__cell">
             {% if total_records > 0 %}
-              <a href="{{ url_for('main.csv', dataset=dataset.dataset) }}" class="govuk-!-font-size-16">Download</a>
+              <a href="{{ url_for('main.csv', dataset=dataset.dataset) }}">Download</a>
             {% endif %}
           </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+
   </div>
 </div>
 {% endblock content %}

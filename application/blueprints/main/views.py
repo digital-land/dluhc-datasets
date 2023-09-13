@@ -56,7 +56,10 @@ def add_record(dataset):
             .first()
         )
         next_id = last_record.id + 1 if last_record else 0
-        record = Record(id=next_id, dataset=ds, data=form.data)
+        data = form.data
+        # set prefix to as it is not in form
+        data["prefix"] = ds.dataset
+        record = Record(id=next_id, dataset=ds, data=data)
         ds.records.append(record)
         db.session.add(ds)
         db.session.commit()

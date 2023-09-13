@@ -37,7 +37,7 @@ class FormBuilder:
         return sorted(self.fields)
 
     def __init__(self, fields):
-        skip_fields = {"entity", "end-date", "start-date", "entry-date"}
+        skip_fields = {"entity", "end-date", "start-date", "entry-date", "prefix"}
         self.fields = []
         for field in fields:
             if field.field not in skip_fields:

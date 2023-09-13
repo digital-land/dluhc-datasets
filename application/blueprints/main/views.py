@@ -99,21 +99,18 @@ def edit_record(dataset, record_id):
     form_fields = builder.form_fields()
 
     if form.validate_on_submit():
-        new_data = form.data
-        old_data = record.data
+        # capture current record data before updating
+        current_version = record.data.copy()
 
-        # set prefix to as it is not in form
-        new_data["prefix"] = old_data["prefix"]
+        # update record data
+        for key, value in form.data.items():
+            record.data[key] = value
 
-        # end old record
-        old_data["end-date"] = datetime.datetime.today().strftime("%Y-%m-%d")
+        # end current version and store data
+        current_version["end-date"] = datetime.datetime.today().strftime("%Y-%m-%d")
+        version = RecordVersion(record_id=record.id, data=current_version)
 
-        previous_version = RecordVersion(record_id=record.id, data=old_data)
-
-        # update record to new data and store previous version
-        record.data = new_data
-        record.versions.append(previous_version)
-
+        record.versions.append(version)
         db.session.add(record)
         db.session.commit()
         return redirect(url_for("main.dataset", name=dataset))

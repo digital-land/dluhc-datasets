@@ -1,8 +1,9 @@
 import datetime
+import uuid
 from functools import total_ordering
 from typing import List, Optional
 
-from sqlalchemy import ForeignKey, Text, event
+from sqlalchemy import UUID, ForeignKey, Text, event
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -39,7 +40,9 @@ class Dataset(DateModel):
         back_populates="datasets",
     )
 
-    records: Mapped[List["Record"]] = relationship("Record", back_populates="dataset")
+    records: Mapped[List["Record"]] = relationship(
+        "Record", back_populates="dataset", order_by="Record.row_id"
+    )
 
     last_updated: Mapped[Optional[datetime.date]] = mapped_column(
         db.Date, default=db.func.current_date()
@@ -55,15 +58,36 @@ class Dataset(DateModel):
 class Record(db.Model):
     __tablename__ = "record"
 
-    id: Mapped[int] = mapped_column(db.BigInteger, primary_key=True)
-    dataset_id: Mapped[str] = mapped_column(
-        Text, ForeignKey("dataset.dataset"), primary_key=True
-    )
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    row_id: Mapped[int] = mapped_column(db.Integer, nullable=False)
+    dataset_id: Mapped[str] = mapped_column(Text, ForeignKey("dataset.dataset"))
     dataset: Mapped["Dataset"] = relationship("Dataset", back_populates="records")
     data: Mapped[dict] = mapped_column(MutableDict.as_mutable(JSONB), nullable=False)
 
+    end_date: Mapped[Optional[datetime.date]] = mapped_column(db.Date)
+
+    versions: Mapped[List["RecordVersion"]] = relationship(
+        "RecordVersion",
+        back_populates="record",
+        order_by="desc(RecordVersion.end_date)",
+        cascade="all, delete-orphan",
+    )
+
     def __repr__(self):
-        return f"<Record(dataset={self.dataset.name}, id={self.id}, data={self.data}))>"
+        return f"<Record(dataset={self.dataset.name}, row_id={self.row_id}, data={self.data}))>"
+
+
+class RecordVersion(db.Model):
+    __tablename__ = "record_version"
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    record_id: Mapped[int] = mapped_column(UUID, ForeignKey("record.id"))
+
+    record: Mapped["Record"] = relationship("Record", back_populates="versions")
+    data: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    end_date: Mapped[datetime.datetime] = mapped_column(
+        db.DateTime, nullable=False, default=datetime.datetime.utcnow
+    )
 
 
 @total_ordering

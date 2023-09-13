@@ -84,8 +84,8 @@ def load_db():
             dataset = Dataset.query.get(dataset_name)
             with open(os.path.join(data_dir, f), newline="") as csvfile:
                 reader = csv.DictReader(csvfile)
-                for row_num, row in enumerate(reader):
-                    record = Record(id=row_num, data=row)
+                for row_id, row in enumerate(reader):
+                    record = Record(row_id=row_id, data=row)
                     dataset.records.append(record)
                 try:
                     db.session.add(dataset)

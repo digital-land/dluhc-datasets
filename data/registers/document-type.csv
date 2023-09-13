@@ -1,8 +1,8 @@
-end-date,entity,entry-date,name,notes,prefix,reference,start-date
-,,2021-04-23,Area appraisal,,document-type,area-appraisal,
-,,2021-04-23,Notice,,document-type,notice,
-,,2021-04-23,Article 4 document,,document-type,article-4-document,
-,,2021-04-23,Authoritative boundary,,document-type,authoritative-boundary,
-,,2021-04-23,Extension report,,document-type,extension-report,
-,,2021-04-23,Designation report,,document-type,designation-report,
-,,2021-04-23,Guidance,,document-type,guidance,
+end-date,entity,entry-date,name,notes,description,prefix,reference,start-date
+,,2021-04-23,Area appraisal,,,document-type,area-appraisal,
+,,2021-04-23,Notice,,,document-type,notice,
+,,2021-04-23,Article 4 document,,,document-type,article-4-document,
+,,2021-04-23,Authoritative boundary,,,document-type,authoritative-boundary,
+,,2021-04-23,Extension report,,,document-type,extension-report,
+,,2021-04-23,Designation report,,,document-type,designation-report,
+,,2021-04-23,Guidance,,,document-type,guidance,

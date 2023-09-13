@@ -1,6 +1,6 @@
-reference,end-date,entity,entry-date,name,notes,prefix,start-date
-secured,,,2019-03-27,Secured,,contribution-funding-status,2019-03-27
-received,,,2019-03-27,Received,,contribution-funding-status,2019-03-27
-allocated,,,2019-03-27,Allocated,,contribution-funding-status,2019-03-27
-transferred,,,2019-03-27,Transferred,,contribution-funding-status,2019-03-27
-spent,,,2019-03-27,Spent,,contribution-funding-status,2019-03-27
+reference,end-date,entity,entry-date,name,notes,description,prefix,start-date
+secured,,,2019-03-27,Secured,,,contribution-funding-status,2019-03-27
+received,,,2019-03-27,Received,,,contribution-funding-status,2019-03-27
+allocated,,,2019-03-27,Allocated,,,contribution-funding-status,2019-03-27
+transferred,,,2019-03-27,Transferred,,,contribution-funding-status,2019-03-27
+spent,,,2019-03-27,Spent,,,contribution-funding-status,2019-03-27

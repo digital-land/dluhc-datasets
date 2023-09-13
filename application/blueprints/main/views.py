@@ -1,3 +1,4 @@
+import datetime
 import io
 from csv import DictWriter
 
@@ -5,7 +6,7 @@ from flask import Blueprint, abort, make_response, redirect, render_template, ur
 
 from application.extensions import db
 from application.forms import FormBuilder
-from application.models import Dataset, Record
+from application.models import Dataset, Record, RecordVersion
 from application.utils import login_required
 
 main = Blueprint("main", __name__)
@@ -49,17 +50,10 @@ def add_record(dataset):
     form = builder.build()
     form_fields = builder.form_fields()
     if form.validate_on_submit():
-        last_record = (
-            db.session.query(Record)
-            .filter_by(dataset_id=dataset)
-            .order_by(Record.id.desc())
-            .first()
-        )
-        next_id = last_record.id + 1 if last_record else 0
         data = form.data
         # set prefix to as it is not in form
         data["prefix"] = ds.dataset
-        record = Record(id=next_id, dataset=ds, data=data)
+        record = Record(dataset=ds, data=data)
         ds.records.append(record)
         db.session.add(ds)
         db.session.commit()
@@ -92,7 +86,7 @@ def add_record(dataset):
 
 
 @main.route(
-    "/dataset/<string:dataset>/record/<int:record_id>/edit", methods=["GET", "POST"]
+    "/dataset/<string:dataset>/record/<string:record_id>/edit", methods=["GET", "POST"]
 )
 @login_required
 def edit_record(dataset, record_id):
@@ -105,10 +99,21 @@ def edit_record(dataset, record_id):
     form_fields = builder.form_fields()
 
     if form.validate_on_submit():
-        data = form.data
+        new_data = form.data
+        old_data = record.data
+
         # set prefix to as it is not in form
-        data["prefix"] = record.data["prefix"]
-        record.data = data
+        new_data["prefix"] = old_data["prefix"]
+
+        # end old record
+        old_data["end-date"] = datetime.datetime.today().strftime("%Y-%m-%d")
+
+        previous_version = RecordVersion(record_id=record.id, data=old_data)
+
+        # update record to new data and store previous version
+        record.data = new_data
+        record.versions.append(previous_version)
+
         db.session.add(record)
         db.session.commit()
         return redirect(url_for("main.dataset", name=dataset))

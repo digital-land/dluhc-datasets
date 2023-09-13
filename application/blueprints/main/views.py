@@ -105,7 +105,10 @@ def edit_record(dataset, record_id):
     form_fields = builder.form_fields()
 
     if form.validate_on_submit():
-        record.data = form.data
+        data = form.data
+        # set prefix to as it is not in form
+        data["prefix"] = record.data["prefix"]
+        record.data = data
         db.session.add(record)
         db.session.commit()
         return redirect(url_for("main.dataset", name=dataset))

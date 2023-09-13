@@ -9,7 +9,7 @@ import requests
 from flask.cli import AppGroup
 
 from application.extensions import db
-from application.models import Dataset, Field, Record, dataset_field
+from application.models import Dataset, Field, Record, RecordVersion, dataset_field
 
 data_cli = AppGroup("data")
 
@@ -103,6 +103,7 @@ def load_db():
 @data_cli.command("drop")
 def drop_data():
     db.session.query(dataset_field).delete()
+    RecordVersion.query.delete()
     Record.query.delete()
     Dataset.query.delete()
     Field.query.delete()

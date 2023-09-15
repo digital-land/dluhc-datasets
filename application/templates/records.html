@@ -3,20 +3,25 @@
 {% block content %}
 
 <div class="govuk-grid-row">
-  <div class="govuk-grid-column-three-quarters">
+  <div class="govuk-grid-column-one-half">
     <span class="govuk-caption-l">{{ dataset.name }}</span>
     <h1 class="govuk-heading-l">{{ dataset.records | length }} records</h1>
   </div>
   {% if session["user"] %}
-    <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+    <div class="govuk-grid-column-one-half govuk-!-text-align-right">
       {{
         buttonMenu({
-          "text": "blah",
           "items": [
             {
               "element": "a",
               "text": "Add record",
               "href": url_for("main.add_record", dataset=dataset.dataset),
+            },
+            {
+              "element": "a",
+              "text": "Delete dataset",
+              "href": url_for("main.add_record", dataset=dataset.dataset),
+              "classes": 'govuk-button--warning'
             },
           ]
         })
@@ -26,30 +31,29 @@
 </div>
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    <hr class="govuk-section-break govuk-section-break--visible">
     {% if dataset.records | length > 0 %}
-    <section class="app-dataset-records">
-      <table class="govuk-table app-data-table">
-        <thead class="govuk-table__head">
-          <tr class="govuk-table__row">
+    <section class="app-table-container govuk-!-margin-bottom-6">
+      <table class="app-data-table">
+        <thead class="app-data-table__head">
+          <tr class="app-data-table__row">
             {% for field in dataset.sorted_fields() %}
-            <th scope="col" class="govuk-table__header">{{field.field | capitalize}}</th>
+            <th scope="col" class="app-data-table__header">{{field.field | capitalize}}</th>
             {% endfor %}
             {% if session["user"] %}
-              <th scope="col" class="govuk-table__header">
+              <th scope="col" class="app-data-table__header app-data-table__header--ui">
                 <span class="govuk-visually-hidden">Action</span>
               </th>
             {% endif %}
           </tr>
         </thead>
-        <tbody class="govuk-table__body">
+        <tbody class="app-data-table__body">
           {% for record in dataset.records %}
-          <tr class="govuk-table__row">
+          <tr class="app-data-table__row">
             {% for field in dataset.sorted_fields() %}
-              <td class="govuk-table__cell">{{record.data[field.field]}}</td>
+              <td class="app-data-table__cell">{{record.data[field.field]}}</td>
             {% endfor %}
             {% if session["user"] %}
-            <td class="govuk-table__cell">
+            <td class="app-data-table__cell app-data-table__cell--ui">
               {{
                 buttonMenu({
                   "items": [
@@ -68,8 +72,8 @@
           {% endfor %}
         </tbody>
       </table>
-      <p class="govuk-body"><a href="{{url_for('main.schema', dataset=dataset.dataset)}}">View schema</a></p>
     </section>
+      <p class="govuk-body"><a href="{{url_for('main.schema', dataset=dataset.dataset)}}">View schema</a></p>
     {% else %}
       {{
         govukInsetText({

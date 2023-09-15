@@ -109,3 +109,27 @@ def drop_data():
     Field.query.delete()
     db.session.commit()
     print("data dropped")
+
+
+@data_cli.command("check")
+def check_dataset_fields():
+    for dataset in Dataset.query.all():
+        schema_url = specfication_markdown_url.format(
+            base_url=base_url, dataset=dataset.dataset
+        )
+        markdown = requests.get(schema_url)
+        if markdown.status_code == 200:
+            front = frontmatter.loads(markdown.text)
+            print(f"\n{dataset.dataset} fields")
+            dataset_fields = set([field.field for field in dataset.fields])
+            specfication_fields = set([field["field"] for field in front["fields"]])
+
+            print(f"dataset \t {sorted(dataset_fields)}")
+            print(f"specification \t {sorted(specfication_fields)}")
+
+            if dataset_fields != specfication_fields:
+                print(f"missing fields {specfication_fields - dataset_fields}")
+                print(f"extra fields {dataset_fields - specfication_fields}")
+            else:
+                print(f"{dataset.dataset} has all fields in specification")
+                print("\n")

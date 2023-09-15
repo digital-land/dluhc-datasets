@@ -1,19 +1,68 @@
+.app-table-container {
+  overflow-x: scroll;
+  width: 100%;
+  border: 1px solid govuk-colour('light-grey')
+}
+
 .app-data-table {
-  table-layout:fixed;
+  // table-layout:fixed;
   border-collapse: collapse;
-  thead {
-    tr {
-      background-color: govuk-colour('light-grey');
-    }
-  }
-  th, td {
-    padding: 0.35em;
-    @include govuk-font(19)
-  }
-  th {
-    @include govuk-font(19, bold, true);
+  border: 0;
+  &__header {
+    background-color: govuk-colour('light-grey');
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
     padding-top: 1em;
     padding-bottom: 1em;
+    vertical-align: middle;
+    text-align-last: left;
+    box-shadow: 0 0 0 1px white;
+  }
+  thead {
+    tr:first-child {
+      td, th {
+        &:not(.app-data-table__header--ui) {
+          border-top-width: 2px;
+        }
+      }
+    }
+  }
+  tbody {
+    tr:first-child {
+      td, th {
+        &:not(.app-data-table__cell--ui) {
+          border-top-width: 2px;
+        }
+      }
+    }
+    tr:last-child {
+      td, th {
+        &:not(.app-data-table__cell--ui) {
+          border-bottom-width: 2px;
+        }
+      }
+    }
+  }
+  &__header, &__cell {
+    @include govuk-responsive-padding(3);
+    border: 1px solid $govuk-border-colour;
+    vertical-align: top;
+    &:first-child {
+      border-left-width: 2px;
+    }
+    &:last-child {
+      border-left-width: 2px;
+    }
+    &--ui{
+      border-width: 0;
+      background: 0;
+      box-shadow: none;
+      @include govuk-responsive-padding(3, 'left');
+      @include govuk-responsive-padding(3, 'right');
+    }
+  }
+  &__cell {
+    font-family: 'Courier New', Courier, monospace;
   }
 }
 

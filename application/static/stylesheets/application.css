@@ -7446,6 +7446,8 @@ p + .govuk-heading-s,
     padding-bottom: 1em;
     vertical-align: middle;
     text-align-last: left; }
+  .app-data-table thead tr:first-child td.app-data-table__header--ui, .app-data-table thead tr:first-child th.app-data-table__header--ui {
+    background: none; }
   .app-data-table thead tr:first-child td:not(.app-data-table__header--ui), .app-data-table thead tr:first-child th:not(.app-data-table__header--ui) {
     border-top-width: 2px; }
   .app-data-table tbody tr:first-child td:not(.app-data-table__cell--ui), .app-data-table tbody tr:first-child th:not(.app-data-table__cell--ui) {

@@ -38,6 +38,9 @@
   thead {
     tr:first-child {
       td, th {
+        &.app-data-table__header--ui {
+          background: none;
+        }
         &:not(.app-data-table__header--ui) {
           border-top-width: 2px;
         }

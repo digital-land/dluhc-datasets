@@ -1,13 +1,31 @@
 .app-table-container {
   overflow-x: scroll;
   width: 100%;
-  border: 1px solid govuk-colour('light-grey')
+  border: 1px solid rgb(169, 169, 169);
+  background-image:
+
+    /* Shadows */
+    linear-gradient(to right, white, white),
+    linear-gradient(to right, white, white),
+
+/* Shadow covers */
+    linear-gradient(to right, rgba(0,0,0,.25), rgba(255,255,255,0)),
+    linear-gradient(to left, rgba(0,0,0,.25), rgba(255,255,255,0));
+
+  background-position: left center, right center, left center, right center;
+	background-repeat: no-repeat;
+	background-color: white;
+	background-size: 20px 100%, 20px 100%, 10px 100%, 10px 100%;
+
+	/* Opera doesn't support this in the shorthand */
+	background-attachment: local, local, scroll, scroll;
 }
 
 .app-data-table {
-  // table-layout:fixed;
   border-collapse: collapse;
-  border: 0;
+  border-spacing: 0;
+  border-style: solid;
+  border: 1px solid govuk-colour('light-grey');
   &__header {
     background-color: govuk-colour('light-grey');
     font-family: Arial, Helvetica, sans-serif;
@@ -16,7 +34,6 @@
     padding-bottom: 1em;
     vertical-align: middle;
     text-align-last: left;
-    box-shadow: 0 0 0 1px white;
   }
   thead {
     tr:first-child {
@@ -55,14 +72,14 @@
     }
     &--ui{
       border-width: 0;
-      background: 0;
-      box-shadow: none;
       @include govuk-responsive-padding(3, 'left');
       @include govuk-responsive-padding(3, 'right');
     }
   }
   &__cell {
     font-family: 'Courier New', Courier, monospace;
+    &--ui {
+    }
   }
 }
 

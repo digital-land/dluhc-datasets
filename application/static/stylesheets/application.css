@@ -7421,9 +7421,12 @@ p + .govuk-heading-s,
 .app-button-menu [aria-expanded="false"] + [role=menu] {
   display: none; }
 
+html, body {
+  overflow-x: hidden;
+  width: 100%; }
+
 .app-table-container {
-  overflow-x: scroll;
-  width: 100%;
+  overflow-x: auto;
   border: 1px solid darkgray;
   background-image: linear-gradient(to right, white, white), linear-gradient(to right, white, white), linear-gradient(to right, rgba(0, 0, 0, 0.25), rgba(255, 255, 255, 0)), linear-gradient(to left, rgba(0, 0, 0, 0.25), rgba(255, 255, 255, 0));
   background-position: left center, right center, left center, right center;
@@ -7455,44 +7458,39 @@ p + .govuk-heading-s,
 
 .app-data-table {
   border-collapse: collapse;
-  table-layout: fixed;
   border-style: solid;
   border: 1px solid #f3f2f1; }
   .app-data-table__header {
     background-color: #f3f2f1;
     font-family: Arial, Helvetica, sans-serif;
     font-weight: bold;
-    padding-top: 1em;
-    padding-bottom: 1em;
     vertical-align: middle;
-    text-align-last: left; }
+    text-align: left; }
   .app-data-table thead tr:first-child td.app-data-table__header--ui, .app-data-table thead tr:first-child th.app-data-table__header--ui {
     background: none; }
   .app-data-table thead tr:first-child td:not(.app-data-table__header--ui), .app-data-table thead tr:first-child th:not(.app-data-table__header--ui) {
-    border-top-width: 2px; }
+    border-top-width: 2px;
+    min-width: 20ch; }
   .app-data-table tbody tr:first-child td:not(.app-data-table__cell--ui), .app-data-table tbody tr:first-child th:not(.app-data-table__cell--ui) {
     border-top-width: 2px; }
   .app-data-table tbody tr:last-child td:not(.app-data-table__cell--ui), .app-data-table tbody tr:last-child th:not(.app-data-table__cell--ui) {
     border-bottom-width: 2px; }
   .app-data-table__header, .app-data-table__cell {
-    padding: 15px;
     border: 1px solid #b1b4b6;
-    max-width: 100%;
-    white-space: nowrap;
-    vertical-align: top; }
+    padding: 15px; }
     .app-data-table__header:first-child, .app-data-table__cell:first-child {
       border-left-width: 2px; }
     .app-data-table__header:last-child, .app-data-table__cell:last-child {
       border-left-width: 2px; }
     .app-data-table__header--ui, .app-data-table__cell--ui {
-      border-width: 0;
-      padding-left: 15px;
-      padding-right: 15px; }
+      border-width: 0; }
+  .app-data-table__header, .app-data-table__cell--ui {
+    white-space: nowrap;
+    vertical-align: top; }
   .app-data-table__cell {
-    font-family: 'Courier New', Courier, monospace; }
+    font-family: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro","Fira Mono", "Droid Sans Mono", "Courier New", monospace; }
     .app-data-table__cell--ui {
-      padding-top: 0;
-      padding-bottom: 0; }
+      padding: 0 5px; }
 
 .app-table {
   background-color: transparent;

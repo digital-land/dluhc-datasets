@@ -57,7 +57,7 @@
                   "items": [
                     {
                       "element": "a",
-                      "text": "Edit",
+                      "text": "Edit row " + (loop.index | string),
                       "classes": "govuk-button--secondary",
                       "href": url_for("main.edit_record", dataset=dataset.dataset, record_id=record.id),
                     }

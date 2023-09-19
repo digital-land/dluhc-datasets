@@ -7431,11 +7431,31 @@ p + .govuk-heading-s,
   background-color: white;
   background-size: 20px 100%, 20px 100%, 10px 100%, 10px 100%;
   /* Opera doesn't support this in the shorthand */
-  background-attachment: local, local, scroll, scroll; }
+  background-attachment: local, local, scroll, scroll;
+  scrollbar-width: thin;
+  scrollbar-color: #8A8A8A #DFE9EB;
+  /* Chrome, Edge and Safari */ }
+  .app-table-container::-webkit-scrollbar {
+    height: 10px;
+    width: 10px; }
+  .app-table-container::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background-color: #DFE9EB; }
+  .app-table-container::-webkit-scrollbar-track:hover {
+    background-color: #B8C0C2; }
+  .app-table-container::-webkit-scrollbar-track:active {
+    background-color: #B8C0C2; }
+  .app-table-container::-webkit-scrollbar-thumb {
+    border-radius: 0px;
+    background-color: #b1b4b6; }
+  .app-table-container::-webkit-scrollbar-thumb:hover {
+    background-color: #5F5F5F; }
+  .app-table-container::-webkit-scrollbar-thumb:active {
+    background-color: #474D54; }
 
 .app-data-table {
   border-collapse: collapse;
-  border-spacing: 0;
+  table-layout: fixed;
   border-style: solid;
   border: 1px solid #f3f2f1; }
   .app-data-table__header {
@@ -7457,6 +7477,8 @@ p + .govuk-heading-s,
   .app-data-table__header, .app-data-table__cell {
     padding: 15px;
     border: 1px solid #b1b4b6;
+    max-width: 100%;
+    white-space: nowrap;
     vertical-align: top; }
     .app-data-table__header:first-child, .app-data-table__cell:first-child {
       border-left-width: 2px; }
@@ -7468,6 +7490,9 @@ p + .govuk-heading-s,
       padding-right: 15px; }
   .app-data-table__cell {
     font-family: 'Courier New', Courier, monospace; }
+    .app-data-table__cell--ui {
+      padding-top: 0;
+      padding-bottom: 0; }
 
 .app-table {
   background-color: transparent;

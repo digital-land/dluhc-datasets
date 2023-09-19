@@ -15,3 +15,4 @@ is-safe-url
 flask-talisman
 flask-debugtoolbar
 Flask-WTF
+sentry-sdk[flask]

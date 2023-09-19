@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import os
+
 from flask import Flask
 from flask.cli import load_dotenv
 
@@ -71,6 +73,14 @@ def register_extensions(app):
         api_base_url="https://api.github.com/",
         client_kwargs={"scope": "user:email read:org"},
     )
+
+    if os.environ.get("SENTRY_DSN") is not None:
+        import sentry_sdk
+        from sentry_sdk.integrations.flask import FlaskIntegration
+
+        sentry_sdk.init(
+            dsn=os.environ.get("SENTRY_DSN"), integrations=[FlaskIntegration()]
+        )
 
 
 def register_templates(app):

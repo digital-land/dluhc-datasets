@@ -4,21 +4,53 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <span class="govuk-caption-l">{{ dataset.name }}</span>
-    <h1 class="govuk-heading-l">{{ dataset.records | length }} records</h1>
+    <span class="govuk-caption-l">{{ 'Dataset' }}</span>
+    <span class="govuk-heading-l">{{ dataset.name }}</span>
+    {# <span class="govuk-caption-l">{{ dataset.name }}</span>
+    <h1 class="govuk-heading-l">{{ dataset.records | length }} records</h1> #}
   </div>
 </div>
 <div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
+  <div class="govuk-grid-column-full">
+    {% set blah = url_for("main.dataset", name=dataset.name) %}
+    {{
+        appSectionNavigation({
+            "classes": "govuk-!-margin-bottom-6",
+            "id": "section-menu",
+            "currentPath": url_for("main.dataset", name=dataset.dataset),
+            "itemsList": [
+                {
+                    "title": "Records",
+                    "url": url_for("main.dataset", name=dataset.dataset)
+                },
+                {
+                    "title": "Schema",
+                    "url": url_for('main.schema', name=dataset.dataset)
+                },
+                {
+                    "title": "History",
+                    "url": url_for("main.history", name=dataset.dataset)
+                }
+            ]
+        })
+    }}
+
+  </div>
+</div>
+<div class="app-grid-row app-grid-row--space-between govuk-!-margin-bottom-3">
+  <div class="app-grid-column">
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-1">{{ dataset.records | length }} records</h2>
+  </div>
+  <div class="app-grid-column">
     {% if session["user"] %}
       {{
         buttonMenu({
-          "classes": "govuk-!-margin-bottom-3",
+          "classes": "govuk-!-margin-bottom-0",
           "items": [
             {
               "element": "a",
               "text": "Add record",
-              "href": url_for("main.add_record", dataset=dataset.dataset),
+              "href": url_for("main.add_record", name=dataset.dataset),
             }
           ]
         })
@@ -58,9 +90,9 @@
                   "items": [
                     {
                       "element": "a",
-                      "text": "Edit row " + (loop.index | string),
+                      "text": "Edit",
                       "classes": "govuk-button--secondary",
-                      "href": url_for("main.edit_record", dataset=dataset.dataset, record_id=record.id),
+                      "href": url_for("main.edit_record", name=dataset.dataset, record_id=record.id),
                     }
                   ]
                 })
@@ -72,7 +104,7 @@
         </tbody>
       </table>
     </section>
-    <p class="govuk-body"><a href="{{url_for('main.schema', dataset=dataset.dataset)}}">View schema</a></p>
+    <p class="govuk-hint govuk-!-margin-top-3">This dataset was last updated 01st January 2023</p>
     {% else %}
       {{
         govukInsetText({

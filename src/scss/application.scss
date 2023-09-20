@@ -8,6 +8,7 @@ $govuk-new-link-styles: true;
 // components
 @import "components/button-menu";
 @import "components/table";
+@import "components/section-nav";
 
 // app specific component scss
 .app-list--inline {
@@ -17,5 +18,13 @@ $govuk-new-link-styles: true;
     &:last-child {
       margin-right: 0;
     }
+  }
+}
+
+.app-grid-row {
+  &--space-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 }

@@ -1,0 +1,73 @@
+.app-section-nav {
+  &:not(&--vertical) {
+    border-bottom: 1px solid $govuk-border-colour;
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__sub {
+    padding-bottom: 0.5rem;
+    padding-top: 0.5rem;
+  }
+
+  &__link {
+    text-decoration: none;
+    &:hover {
+      // color: var(--app-color-text-link-hover);
+      // text-decoration: underline solid var(--app-color-text-link-hover) 2px;
+    }
+  }
+
+  &__item {
+    @include govuk-font(19);
+    padding: 0;
+    &--active {
+      border-left: 4px solid #000;
+      font-weight: bold;
+      margin-left: -18px;
+      padding-left: 14px;
+      a {
+        color: $govuk-link-colour;
+      }
+    }
+    & {
+      margin-bottom: 0.3rem;
+    }
+  }
+
+  &__sub-items {
+    a {
+      color: $govuk-link-colour;
+    }
+  }
+
+  &:not(&--vertical) & {
+    &__item {
+      border: none;
+      border-bottom: 4px solid transparent;
+      display: inline-block;
+      margin: 0 1rem 0 0;
+      text-align: center;
+      &--active,
+      &:hover {
+        border-color: $govuk-link-colour;
+        margin: 0 1rem 0 0;
+        padding: 0;
+        a {
+          color: $govuk-link-colour;
+        }
+      }
+    }
+
+    &__link {
+      text-decoration: none;
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+}

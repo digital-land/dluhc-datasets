@@ -27,11 +27,11 @@
           <td data-label="Total records" class="govuk-table__cell govuk-table__cell--numeric">{{ total_records }}</td>
           <td data-label="Last updated" class="govuk-table__cell govuk-table__cell--numeric">{{dataset.last_updated.strftime("%d/%m/%Y")}}</td>
           <td data-label="Schema" class="govuk-table__cell govuk-table__cell--numeric">
-            <a href="{{url_for('main.schema', dataset=dataset.dataset)}}"><span class="govuk-visually-hidden">View </span>Schema</a>
+            <a href="{{url_for('main.schema', name=dataset.dataset)}}"><span class="govuk-visually-hidden">View </span>Schema</a>
           </td>
           <td {% if total_records > 0 %}data-label="Download"{% endif %}class="govuk-table__cell">
             {% if total_records > 0 %}
-              <a href="{{ url_for('main.csv', dataset=dataset.dataset) }}">Download</a>
+              <a href="{{ url_for('main.csv', name=dataset.dataset) }}">Download</a>
             {% endif %}
           </td>
         </tr>

@@ -121,7 +121,10 @@ html, body {
   &__cell {
     font-family: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro","Fira Mono", "Droid Sans Mono", "Courier New", monospace;
     &--ui {
-      padding: 0 5px;
+      padding-top: 0;
+      padding-bottom: 0;
+      @include govuk-responsive-padding(4, 'left');
+      @include govuk-responsive-padding(4, 'right');
     }
   }
 }

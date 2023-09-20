@@ -22,7 +22,7 @@ class Config:
 
 
 class DevelopmentConfig(Config):
-    DEBUG = False
+    DEBUG = True
     ENV = "development"
     WTF_CSRF_ENABLED = False
     SQLALCHEMY_RECORD_QUERIES = True

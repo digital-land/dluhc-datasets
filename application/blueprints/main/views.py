@@ -69,7 +69,16 @@ def add_record(name):
         data = form.data
         # set prefix to as it is not in form
         data["prefix"] = dataset.dataset
-        record = Record(dataset=dataset, data=data)
+
+        last_record = (
+            db.session.query(Record)
+            .filter_by(dataset_id=dataset.dataset)
+            .order_by(Record.row_id.desc())
+            .first()
+        )
+        next_id = last_record.row_id + 1 if last_record else 0
+
+        record = Record(row_id=next_id, data=data)
         dataset.records.append(record)
         db.session.add(dataset)
         db.session.commit()

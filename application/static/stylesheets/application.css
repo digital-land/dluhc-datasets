@@ -7443,7 +7443,7 @@ html, body {
     width: 10px; }
   .app-table-container::-webkit-scrollbar-track {
     border-radius: 5px;
-    background-color: #DFE9EB; }
+    background-color: #e8e8e8; }
   .app-table-container::-webkit-scrollbar-track:hover {
     background-color: #B8C0C2; }
   .app-table-container::-webkit-scrollbar-track:active {
@@ -7469,8 +7469,7 @@ html, body {
   .app-data-table thead tr:first-child td.app-data-table__header--ui, .app-data-table thead tr:first-child th.app-data-table__header--ui {
     background: none; }
   .app-data-table thead tr:first-child td:not(.app-data-table__header--ui), .app-data-table thead tr:first-child th:not(.app-data-table__header--ui) {
-    border-top-width: 2px;
-    min-width: 20ch; }
+    border-top-width: 2px; }
   .app-data-table tbody tr:first-child td:not(.app-data-table__cell--ui), .app-data-table tbody tr:first-child th:not(.app-data-table__cell--ui) {
     border-top-width: 2px; }
   .app-data-table tbody tr:last-child td:not(.app-data-table__cell--ui), .app-data-table tbody tr:last-child th:not(.app-data-table__cell--ui) {

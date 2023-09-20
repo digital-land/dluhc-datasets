@@ -49,7 +49,7 @@
           {% for record in dataset.records %}
           <tr class="app-data-table__row">
             {% for field in dataset.sorted_fields() %}
-              <td class="app-data-table__cell">{{record.data[field.field]}}</td>
+              <td class="app-data-table__cell">{{record.data[field.field] | replace('-','&#8209;') | safe }}</td>
             {% endfor %}
             {% if session["user"] %}
             <td class="app-data-table__cell app-data-table__cell--ui">

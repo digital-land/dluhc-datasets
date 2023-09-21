@@ -1,44 +1,87 @@
-{% extends 'layouts/base.html' %}
+{% extends 'layouts/dataset.html' %}
 
-{% block content %}
+{% block content_primary %}
 
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
-    <span class="govuk-caption-l">{{ 'Dataset' }}</span>
-    <span class="govuk-heading-l">{{ dataset.name }}</span>
-    {# <span class="govuk-caption-l">{{ dataset.name }}</span>
-    <h1 class="govuk-heading-l">{{ dataset.records | length }} records</h1> #}
-  </div>
-</div>
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-full">
-    {{
-        appSectionNavigation({
-            "classes": "govuk-!-margin-bottom-6",
-            "id": "section-menu",
-            "currentPath": url_for("main.dataset", id=dataset.dataset),
-            "itemsList": [
-                {
-                    "title": "Records",
-                    "url": url_for("main.dataset", id=dataset.dataset)
-                },
-                {
-                    "title": "Schema",
-                    "url": url_for('main.schema', id=dataset.dataset)
-                },
-                {
-                    "title": "History",
-                    "url": url_for("main.history", id=dataset.dataset)
-                }
-            ]
-        })
-    }}
+<table class="govuk-table">
+  <caption class="govuk-table__caption govuk-table__caption--m">21 September 2023</caption>
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header govuk-!-width-one-third">Event</th>
+      <th scope="col" class="govuk-table__header govuk-!-width-one-third">Description</th>
+      <th scope="col" class="govuk-table__header govuk-!-width-one-third govuk-!-text-align-right">Action</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">
+        {{ govukTag({ "text": "Ended record", "classes": "govuk-tag--red" }) }}
+      </td>
+      <td class="govuk-table__cell govuk-!-width-one-third">Added new provision reason</td>
+      <td class="govuk-table__cell govuk-!-width-one-third govuk-!-text-align-right">
+        <a href="#">View record</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<table class="govuk-table">
+  <caption class="govuk-table__caption govuk-table__caption--m">18 September 2023</caption>
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header govuk-!-width-one-third">Event</th>
+      <th scope="col" class="govuk-table__header govuk-!-width-one-third">Description</th>
+      <th scope="col" class="govuk-table__header govuk-!-width-one-third govuk-!-text-align-right">Action</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">
+        {{ govukTag({ "text": "Edited record" }) }}
+      </td>
+      <td class="govuk-table__cell">Updated name field</td>
+      <td class="govuk-table__cell  govuk-!-text-align-right">
+        <a href="#">View record</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<table class="govuk-table">
+  <caption class="govuk-table__caption govuk-table__caption--m">20 September 2023</caption>
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header govuk-!-width-one-third">Event</th>
+      <th scope="col" class="govuk-table__header govuk-!-width-one-third">Description</th>
+      <th scope="col" class="govuk-table__header govuk-!-width-one-third govuk-!-text-align-right">Action</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">
+        {{ govukTag({ "text": "New record", "classes": "govuk-tag--green" }) }}
+      </td>
+      <td class="govuk-table__cell">Added new provision reason</td>
+      <td class="govuk-table__cell  govuk-!-text-align-right">
+        <a href="#">View record</a>
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">
+        {{ govukTag({ "text": "New record", "classes": "govuk-tag--green" }) }}
+      </td>
+      <td class="govuk-table__cell">Added new provision reason</td>
+      <td class="govuk-table__cell  govuk-!-text-align-right">
+        <a href="#">View record</a>
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">
+        {{ govukTag({ "text": "New record", "classes": "govuk-tag--green" }) }}
+      </td>
+      <td class="govuk-table__cell">Added new provision reason</td>
+      <td class="govuk-table__cell  govuk-!-text-align-right">
+        <a href="#">View record</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
-  </div>
-</div>
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-full">
-    <p>dkjdjdkj</p>
-  </div>
-</div>
-{% endblock content %}
+{% endblock content_primary %}

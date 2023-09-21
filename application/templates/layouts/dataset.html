@@ -1,0 +1,32 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <span class="govuk-caption-l">{{ page.caption }}</span>
+    <span class="govuk-heading-l">{{ page.title }}</span>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    {{
+        appSectionNavigation({
+            "classes": "govuk-!-margin-bottom-6",
+            "id": "section-menu",
+            "currentPath": sub_navigation.currentPath,
+            "itemsList": sub_navigation.itemsList
+        })
+    }}
+
+  </div>
+</div>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+    {% block content_primary %}{% endblock content_primary %}
+
+  </div>
+</div>
+{% endblock content %}

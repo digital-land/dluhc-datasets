@@ -39,7 +39,22 @@ def dataset(id):
             {"text": "Records"},
         ]
     }
-    return render_template("records.html", dataset=dataset, breadcrumbs=breadcrumbs)
+    sub_navigation = {
+        "currentPath": url_for("main.dataset", id=dataset.dataset),
+        "itemsList": [
+            {"title": "Records", "url": url_for("main.dataset", id=dataset.dataset)},
+            {"title": "Schema", "url": url_for("main.schema", id=dataset.dataset)},
+            {"title": "History", "url": url_for("main.history", id=dataset.dataset)},
+        ],
+    }
+    page = {"title": dataset.name, "caption": "Dataset"}
+    return render_template(
+        "records.html",
+        dataset=dataset,
+        breadcrumbs=breadcrumbs,
+        sub_navigation=sub_navigation,
+        page=page,
+    )
 
 
 @main.route("/dataset/<string:id>/history")
@@ -55,7 +70,22 @@ def history(id):
             {"text": "History"},
         ]
     }
-    return render_template("history.html", dataset=dataset, breadcrumbs=breadcrumbs)
+    sub_navigation = {
+        "currentPath": url_for("main.history", id=dataset.dataset),
+        "itemsList": [
+            {"title": "Records", "url": url_for("main.dataset", id=dataset.dataset)},
+            {"title": "Schema", "url": url_for("main.schema", id=dataset.dataset)},
+            {"title": "History", "url": url_for("main.history", id=dataset.dataset)},
+        ],
+    }
+    page = {"title": dataset.name, "caption": "Dataset"}
+    return render_template(
+        "history.html",
+        dataset=dataset,
+        breadcrumbs=breadcrumbs,
+        sub_navigation=sub_navigation,
+        page=page,
+    )
 
 
 @main.route("/dataset/<string:id>/add", methods=["GET", "POST"])
@@ -181,7 +211,22 @@ def schema(id):
             {"text": "Schema"},
         ]
     }
-    return render_template("schema.html", dataset=dataset, breadcrumbs=breadcrumbs)
+    sub_navigation = {
+        "currentPath": url_for("main.schema", id=dataset.dataset),
+        "itemsList": [
+            {"title": "Records", "url": url_for("main.dataset", id=dataset.dataset)},
+            {"title": "Schema", "url": url_for("main.schema", id=dataset.dataset)},
+            {"title": "History", "url": url_for("main.history", id=dataset.dataset)},
+        ],
+    }
+    page = {"title": dataset.name, "caption": "Dataset"}
+    return render_template(
+        "schema.html",
+        dataset=dataset,
+        breadcrumbs=breadcrumbs,
+        sub_navigation=sub_navigation,
+        page=page,
+    )
 
 
 @main.route("/dataset/<string:id>.csv")

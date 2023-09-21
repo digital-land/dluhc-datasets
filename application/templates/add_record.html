@@ -19,7 +19,11 @@
   <form method="POST" action="{{ url_for('main.add_record', id=dataset.dataset) }}">
     <div class="govuk-form-group">
       {% for field in form_fields %}
-        {{ appField(field, True if form.errors[field.field] else False) }}
+        {% if field.field == 'reference' %}
+          {{ appField(field, True if form.errors[field.field] else False, disabled=False, hint='You can override the suggested reference') }}
+        {% else %}
+          {{ appField(field, True if form.errors[field.field] else False) }}
+        {% endif %}
       {% endfor %}
       {{ form.csrf_token }}
     </div>

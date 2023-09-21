@@ -11,7 +11,25 @@
     <form method="POST" action="{{ url_for('main.edit_record', id=dataset.dataset, record_id=record.id) }}">
       <div class="govuk-form-group">
         {% for field in form_fields %}
-          {{ appField(field, True if form.errors[field.field] else False, record.data.get(field.field, '')) }}
+          {% if field.field == 'reference' %}
+          {{
+            appField(
+              field,
+              True if form.errors[field.field] else False,
+              record.data.get(field.field, ''),
+              True,
+              "This field is not editable"
+            )
+          }}
+          {% else %}
+          {{
+            appField(
+              field,
+              True if form.errors[field.field] else False,
+              record.data.get(field.field, '')
+            )
+          }}
+          {% endif %}
         {% endfor %}
         {{ form.csrf_token }}
       </div>

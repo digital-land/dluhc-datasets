@@ -17,7 +17,15 @@ base_url = "https://raw.githubusercontent.com/digital-land"
 specfication_markdown_url = "{base_url}/specification/main/content/dataset/{dataset}.md"
 
 datasette_url = "https://datasette.planning.data.gov.uk/digital-land"
-datasette_query = "{datasette_url}/field.json?field__exact={field}&_shape=object"
+field_query = "{datasette_url}/field.json?field__exact={field}&_shape=object"
+fields_query = f"{datasette_url}/field.json?_shape=array"
+dataset_query_part = (
+    "dataset__not=category&realm__exact=dataset&typology__exact=category&_shape=array"
+)
+dataset_query = f"{datasette_url}/dataset.json?{dataset_query_part}"
+dataset_field_query = (
+    "{datasette_url}/dataset_field.json?dataset__exact={dataset}&_shape=array"
+)
 
 
 @data_cli.command("load")
@@ -25,6 +33,19 @@ def load_db():
     print("loading db")
 
     data_dir = os.path.join(Path(__file__).parent.parent, "data", "registers")
+
+    fields = requests.get(fields_query).json()
+    for field in fields:
+        f = Field.query.get(field["field"])
+        if f is None:
+            f = Field(
+                field=field["field"],
+                name=field["name"],
+                datatype=field["datatype"],
+                description=field["description"],
+            )
+            db.session.add(f)
+            db.session.commit()
 
     for filename in os.listdir(data_dir):
         if filename.endswith(".csv"):
@@ -56,10 +77,8 @@ def load_db():
                 if f is None:
                     human_readable = field.replace("-", " ").capitalize()
                     f = Field(field=field, name=human_readable)
-                    field_query = datasette_query.format(
-                        datasette_url=datasette_url, field=field
-                    )
-                    resp = requests.get(field_query)
+                    query = field_query.format(datasette_url=datasette_url, field=field)
+                    resp = requests.get(query)
                     data = resp.json()
                     f.datatype = data[field]["datatype"]
                     if data[field].get("description"):
@@ -133,3 +152,32 @@ def check_dataset_fields():
             else:
                 print(f"{dataset.dataset} has all fields in specification")
                 print("\n")
+
+
+@data_cli.command("check-for-new-datasets")
+def check_for_new_datasets():
+    resp = requests.get(dataset_query)
+    data = resp.json()
+    database_datasets = set([dataset.dataset for dataset in Dataset.query.all()])
+    new_datasets = [
+        dataset for dataset in data if dataset["dataset"] not in database_datasets
+    ]
+    for dataset in new_datasets:
+        dataset = Dataset(dataset=dataset["dataset"], name=dataset["name"])
+        db.session.add(dataset)
+        db.session.commit()
+        print(f"dataset {dataset.dataset} with name {dataset.name} added")
+        print(f"get fields for {dataset.dataset}")
+        fields = requests.get(
+            dataset_field_query.format(datasette_url=datasette_url, dataset=dataset)
+        ).json()
+        for field in fields:
+            f = Field.query.get(field["field"])
+            if f is None:
+                print("Something went wrong, field not found in database")
+                continue
+            dataset.fields.append(f)
+            db.session.add(dataset)
+            db.session.commit()
+
+    print("new datasets added to database")

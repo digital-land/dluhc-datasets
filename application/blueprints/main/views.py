@@ -29,28 +29,28 @@ def support():
     return render_template("support.html", breadcrumbs=breadcrumbs)
 
 
-@main.route("/dataset/<string:name>")
-def dataset(name):
-    dataset = Dataset.query.get(name)
+@main.route("/dataset/<string:id>")
+def dataset(id):
+    dataset = Dataset.query.get(id)
     breadcrumbs = {
         "items": [
             {"text": "Datasets", "href": url_for("main.index")},
-            {"text": dataset.name, "href": url_for("main.dataset", name=name)},
+            {"text": dataset.name, "href": url_for("main.dataset", id=id)},
             {"text": "Records"},
         ]
     }
     return render_template("records.html", dataset=dataset, breadcrumbs=breadcrumbs)
 
 
-@main.route("/dataset/<string:name>/history")
-def history(name):
-    dataset = Dataset.query.get(name)
+@main.route("/dataset/<string:id>/history")
+def history(id):
+    dataset = Dataset.query.get(id)
     breadcrumbs = {
         "items": [
             {"text": "Datasets", "href": url_for("main.index")},
             {
                 "text": dataset.name,
-                "href": url_for("main.dataset", name=dataset.dataset),
+                "href": url_for("main.dataset", id=dataset.dataset),
             },
             {"text": "History"},
         ]
@@ -58,10 +58,10 @@ def history(name):
     return render_template("history.html", dataset=dataset, breadcrumbs=breadcrumbs)
 
 
-@main.route("/dataset/<string:name>/add", methods=["GET", "POST"])
+@main.route("/dataset/<string:id>/add", methods=["GET", "POST"])
 @login_required
-def add_record(name):
-    dataset = Dataset.query.get(name)
+def add_record(id):
+    dataset = Dataset.query.get(id)
     builder = FormBuilder(dataset.fields)
     form = builder.build()
     form_fields = builder.form_fields()
@@ -82,7 +82,7 @@ def add_record(name):
         dataset.records.append(record)
         db.session.add(dataset)
         db.session.commit()
-        return redirect(url_for("main.dataset", name=dataset.dataset))
+        return redirect(url_for("main.dataset", id=dataset.dataset))
 
     if form.errors:
         error_list = [
@@ -97,7 +97,7 @@ def add_record(name):
             {"text": "Datasets", "href": url_for("main.index")},
             {
                 "text": dataset.name,
-                "href": url_for("main.dataset", name=dataset.dataset),
+                "href": url_for("main.dataset", id=dataset.dataset),
             },
             {"text": "Add a record"},
         ]
@@ -114,11 +114,11 @@ def add_record(name):
 
 
 @main.route(
-    "/dataset/<string:name>/record/<string:record_id>/edit", methods=["GET", "POST"]
+    "/dataset/<string:id>/record/<string:record_id>/edit", methods=["GET", "POST"]
 )
 @login_required
-def edit_record(name, record_id):
-    dataset = Dataset.query.get(name)
+def edit_record(id, record_id):
+    dataset = Dataset.query.get(id)
     record = Record.query.filter(
         Record.dataset_id == dataset.dataset, Record.id == record_id
     ).one()
@@ -141,7 +141,7 @@ def edit_record(name, record_id):
         record.versions.append(version)
         db.session.add(record)
         db.session.commit()
-        return redirect(url_for("main.dataset", name=dataset.dataset))
+        return redirect(url_for("main.dataset", id=dataset.dataset))
 
     else:
         for field in form_fields:
@@ -152,7 +152,7 @@ def edit_record(name, record_id):
                 {"text": "Datasets", "href": url_for("main.index")},
                 {
                     "text": dataset.name,
-                    "href": url_for("main.dataset", name=dataset.dataset),
+                    "href": url_for("main.dataset", id=dataset.dataset),
                 },
                 {"text": "Edit record"},
             ]
@@ -168,27 +168,25 @@ def edit_record(name, record_id):
         )
 
 
-@main.route("/dataset/<string:name>/schema")
-def schema(name):
-    dataset = Dataset.query.get(name)
+@main.route("/dataset/<string:id>/schema")
+def schema(id):
+    dataset = Dataset.query.get(id)
     breadcrumbs = {
         "items": [
             {"text": "Datasets", "href": url_for("main.index")},
             {
                 "text": dataset.name,
-                "href": url_for("main.dataset", name=dataset.dataset),
+                "href": url_for("main.dataset", id=dataset.dataset),
             },
             {"text": "Schema"},
         ]
     }
-    return render_template(
-        "schema.html", dataset=dataset.dataset, breadcrumbs=breadcrumbs
-    )
+    return render_template("schema.html", dataset=dataset, breadcrumbs=breadcrumbs)
 
 
-@main.route("/dataset/<string:name>.csv")
-def csv(name):
-    dataset = Dataset.query.get(name)
+@main.route("/dataset/<string:id>.csv")
+def csv(id):
+    dataset = Dataset.query.get(id)
     if dataset is not None and dataset.records:
         output = io.StringIO()
         fieldnames = [field.field for field in dataset.sorted_fields()]

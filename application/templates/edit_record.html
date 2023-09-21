@@ -8,7 +8,7 @@
 </div>
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-three-quarters">
-    <form method="POST" action="{{ url_for('main.edit_record', name=dataset.dataset, record_id=record.id) }}">
+    <form method="POST" action="{{ url_for('main.edit_record', id=dataset.dataset, record_id=record.id) }}">
       <div class="govuk-form-group">
         {% for field in form_fields %}
           {{ appField(field, True if form.errors[field.field] else False, record.data.get(field.field, '')) }}

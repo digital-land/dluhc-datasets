@@ -12,24 +12,24 @@
 </div>
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    {% set blah = url_for("main.dataset", name=dataset.name) %}
+    {% set blah = url_for("main.dataset", id=dataset.name) %}
     {{
         appSectionNavigation({
             "classes": "govuk-!-margin-bottom-6",
             "id": "section-menu",
-            "currentPath": url_for("main.dataset", name=dataset.dataset),
+            "currentPath": url_for("main.dataset", id=dataset.dataset),
             "itemsList": [
                 {
                     "title": "Records",
-                    "url": url_for("main.dataset", name=dataset.dataset)
+                    "url": url_for("main.dataset", id=dataset.dataset)
                 },
                 {
                     "title": "Schema",
-                    "url": url_for('main.schema', name=dataset.dataset)
+                    "url": url_for('main.schema', id=dataset.dataset)
                 },
                 {
                     "title": "History",
-                    "url": url_for("main.history", name=dataset.dataset)
+                    "url": url_for("main.history", id=dataset.dataset)
                 }
             ]
         })
@@ -50,7 +50,7 @@
             {
               "element": "a",
               "text": "Add record",
-              "href": url_for("main.add_record", name=dataset.dataset),
+              "href": url_for("main.add_record", id=dataset.dataset),
             }
           ]
         })
@@ -92,7 +92,7 @@
                       "element": "a",
                       "text": "Edit",
                       "classes": "govuk-button--secondary",
-                      "href": url_for("main.edit_record", name=dataset.dataset, record_id=record.id),
+                      "href": url_for("main.edit_record", id=dataset.dataset, record_id=record.id),
                     }
                   ]
                 })

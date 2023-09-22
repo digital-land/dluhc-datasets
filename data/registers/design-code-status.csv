@@ -1,1 +1,5 @@
-end-date,entity,entry-date,name,notes,prefix,reference,start-date
+entity,prefix,reference,name,description,notes,entry-date,start-date,end-date
+622000,design-code-status,proposed,Proposed,,,,,
+622001,design-code-status,draft,Draft,,,,,
+622002,design-code-status,adopted,Adopted,,,,,
+622003,design-code-status,withdrawn,Withdrawn,,,,,

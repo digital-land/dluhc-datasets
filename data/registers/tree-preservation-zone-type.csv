@@ -1,0 +1,4 @@
+entity,name,notes,prefix,reference,entry-date,start-date,end-date
+entity,Area,,tree-preservation-zone-type,area,2023-09-11,2023-09-11,
+entity,Group,,tree-preservation-zone-type,group,2023-09-11,2023-09-11,
+entity,Woodland,,tree-preservation-zone-type,woodland,2023-09-11,2023-09-11,

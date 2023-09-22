@@ -19,9 +19,7 @@ specfication_markdown_url = "{base_url}/specification/main/content/dataset/{data
 datasette_url = "https://datasette.planning.data.gov.uk/digital-land"
 field_query = "{datasette_url}/field.json?field__exact={field}&_shape=object"
 fields_query = f"{datasette_url}/field.json?_shape=array"
-dataset_query_part = (
-    "dataset__not=category&realm__exact=dataset&typology__exact=category&_shape=array"
-)
+dataset_query_part = "dataset__not=category&phase__not=discovery&realm__exact=dataset&typology__exact=category&_shape=array"  # noqa
 dataset_query = f"{datasette_url}/dataset.json?{dataset_query_part}"
 dataset_field_query = (
     "{datasette_url}/dataset_field.json?dataset__exact={dataset}&_shape=array"
@@ -154,7 +152,7 @@ def check_dataset_fields():
                 print("\n")
 
 
-@data_cli.command("check-for-new-datasets")
+@data_cli.command("new-datasets")
 def check_for_new_datasets():
     resp = requests.get(dataset_query)
     data = resp.json()

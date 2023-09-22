@@ -1,0 +1,8 @@
+entity,prefix,reference,name,notes,entry-date,start-date,end-date
+,planning-permission-type,full-planning-permission,full planning permission,,2021-02-04,2021-02-04,
+,planning-permission-type,outline-planning-permission,outline planning permission,,2021-02-04,2021-02-04,
+,planning-permission-type,reserved-matters-approval,reserved matters approval,,2021-02-04,2021-02-04,
+,planning-permission-type,permission-in-principle,permission in principle,,2021-02-04,2021-02-04,
+,planning-permission-type,technical-details-consent,technical details consent,,2021-02-04,2021-02-04,
+,planning-permission-type,planning-permission-granted-under-an-order,planning permission granted under an order,,2021-02-04,2021-02-04,
+,planning-permission-type,other,other,,2021-02-04,2021-02-04,

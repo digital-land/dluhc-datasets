@@ -1,0 +1,12 @@
+entity,prefix,reference,name,notes,description,entry-date,start-date,end-date
+640000,design-code-category,exemplar,Office for Place exemplar,,,,,
+640001,design-code-category,context,Context,,,,,
+640002,design-code-category,identity,Identity,,,,,
+640003,design-code-category,built-form,Built form,,,,,
+640004,design-code-category,movement,Movement,,,,,
+640005,design-code-category,nature,Nature,,,,,
+640006,design-code-category,public-spaces,Public spaces,,,,,
+640007,design-code-category,uses,Uses,,,,,
+640008,design-code-category,homes-and-buildings,Homes and buildings,,,,,
+640009,design-code-category,resources,Resources,,,,,
+640010,design-code-category,lifespan,Lifespan,,,,,

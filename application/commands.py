@@ -169,13 +169,21 @@ def check_for_new_datasets():
         print(f"dataset {dataset.dataset} with name {dataset.name} added")
         print(f"get fields for {dataset.dataset}")
         fields = requests.get(
-            dataset_field_query.format(datasette_url=datasette_url, dataset=dataset)
+            dataset_field_query.format(
+                datasette_url=datasette_url, dataset=dataset.dataset
+            )
         ).json()
+        print(
+            dataset_field_query.format(
+                datasette_url=datasette_url, dataset=dataset.dataset
+            )
+        )
         for field in fields:
             f = Field.query.get(field["field"])
             if f is None:
                 print("Something went wrong, field not found in database")
                 continue
+            print(f"field {f.field} added to dataset {dataset.dataset}")
             dataset.fields.append(f)
             db.session.add(dataset)
             db.session.commit()

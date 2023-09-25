@@ -33,12 +33,23 @@
         {% endfor %}
         {{ form.csrf_token }}
       </div>
-    {{
-      govukButton({
-        "text": "Edit record",
-        "type": "submit"
-      })
-    }}
+      {{
+        buttonMenu({
+          "classes": "govuk-!-margin-bottom-0",
+          "items": [
+            {
+              "text": "Save record",
+              "type": "submit"
+            },
+            {
+              "element": "a",
+              "text": "End record",
+              "href": "./edit/end-record",
+              "classes": "govuk-button--warning"
+            }
+          ]
+        })
+      }}
     </form>
   </div>
 {% endblock content %}

@@ -198,6 +198,28 @@ def edit_record(id, record_id):
         )
 
 
+@main.route("/dataset/<string:id>/record/<string:record_id>")
+def end_record(id, record_id):
+    dataset = Dataset.query.get(id)
+    breadcrumbs = {
+        "items": [
+            {"text": "Datasets", "href": url_for("main.index")},
+            {
+                "text": dataset.name,
+                "href": url_for("main.dataset", id=dataset.dataset),
+            },
+            {"text": "View record"},
+        ]
+    }
+    page = {"title": dataset.name, "caption": "Dataset"}
+    return render_template(
+        "view_record.html",
+        dataset=dataset,
+        breadcrumbs=breadcrumbs,
+        page=page,
+    )
+
+
 @main.route("/dataset/<string:id>/schema")
 def schema(id):
     dataset = Dataset.query.get(id)

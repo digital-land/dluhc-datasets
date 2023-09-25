@@ -67,11 +67,6 @@
             </a>
           </li>
           <li class="govuk-header__navigation-item">
-            <a class="govuk-header__link" href="/support">
-              Request a dataset
-            </a>
-          </li>
-          <li class="govuk-header__navigation-item">
             {% if session["user"] %}
             <a class="govuk-header__link" href="{{url_for('auth.logout')}}">
               Sign out

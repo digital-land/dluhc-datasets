@@ -2,15 +2,12 @@
 
 {% block content_primary %}
 
-<div class="app-grid-row app-grid-row--space-between govuk-!-margin-bottom-3">
-  <div class="app-grid-column">
-    <h2 class="govuk-heading-m govuk-!-margin-bottom-1">{{ dataset.records | length }} records</h2>
-  </div>
+<div class="app-grid-row app-grid-row--space-betweenn govuk-!-margin-bottom-3">
   <div class="app-grid-column">
     {% if session["user"] %}
       {{
         buttonMenu({
-          "classes": "govuk-!-margin-bottom-0",
+          "classes": "govuk-!-margin-bottom-6",
           "items": [
             {
               "element": "a",
@@ -21,6 +18,9 @@
         })
       }}
     {% endif %}
+  </div>
+  <div class="app-grid-column">
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-1">{{ dataset.records | length }} records</h2>
   </div>
 </div>
 <div class="govuk-grid-row">
@@ -55,8 +55,14 @@
                   "items": [
                     {
                       "element": "a",
-                      "text": "Edit",
+                      "text": "Edit record",
                       "classes": "govuk-button--secondary",
+                      "href": url_for("main.edit_record", id=dataset.dataset, record_id=record.id),
+                    },
+                    {
+                      "element": "a",
+                      "text": "Archive record",
+                      "classes": "govuk-button--warning",
                       "href": url_for("main.edit_record", id=dataset.dataset, record_id=record.id),
                     }
                   ]
@@ -69,7 +75,7 @@
         </tbody>
       </table>
     </section>
-    <p class="govuk-hint govuk-!-margin-top-3">This dataset was last updated 01st January 2023</p>
+    <p class="govuk-hint govuk-!-margin-top-3">This dataset was last updated 01 January 2023</p>
     {% else %}
       {{
         govukInsetText({

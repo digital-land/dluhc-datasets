@@ -3,13 +3,14 @@
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-three-quarters">
-    <h1 class="govuk-heading-l">Edit record</h1>
-  </div>
-</div>
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-three-quarters">
     <form method="POST" action="{{ url_for('main.edit_record', id=dataset.dataset, record_id=record.id) }}">
-      <div class="govuk-form-group">
+      {% call govukFieldset({
+        "legend": {
+          "text": "Edit record",
+          "classes": "govuk-fieldset__legend--l",
+          "isPageHeading": True
+        }
+      }) %}
         {% for field in form_fields %}
           {% if field.field == 'reference' %}
           {{
@@ -18,7 +19,7 @@
               True if form.errors[field.field] else False,
               record.data.get(field.field, ''),
               True,
-              "This field is not editable"
+              "You cannot edit this field"
             )
           }}
           {% else %}
@@ -32,24 +33,95 @@
           {% endif %}
         {% endfor %}
         {{ form.csrf_token }}
-      </div>
-      {{
-        buttonMenu({
-          "classes": "govuk-!-margin-bottom-0",
-          "items": [
-            {
-              "text": "Save record",
-              "type": "submit"
-            },
-            {
-              "element": "a",
-              "text": "End record",
-              "href": "./edit/end-record",
-              "classes": "govuk-button--warning"
-            }
-          ]
+      {% endcall %}
+      {# <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--l">
+      {{ govukRadios({
+        "name": "end_record",
+        "fieldset": {
+          "legend": {
+            "text": "Do you want to archive this record?",
+            "isPageHeading": False,
+            "classes": "govuk-fieldset__legend--m"
+          }
+        },
+        "items": [
+          {
+            "value": "yes",
+            "text": "Yes"
+          },
+          {
+            "value": "no",
+            "text": "No",
+            "checked": True if end_record == 'no' else False
+          },
+        ]
+      }) }} #}
+      {# {{
+        govukWarningText({
+          "text": "Ending a record effectively removes it from the dataset"
         })
-      }}
+      }} #}
+      <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--l">
+      {% call govukFieldset({
+        "legend": {
+          "text": "Change log",
+          "classes": "govuk-fieldset__legend--m",
+          "isPageHeading": False
+        }
+      }) %}
+        {{
+          govukTextarea({
+            "label": {
+              "text": "Notes",
+            },
+            "hint": {
+              "text": "Describe the change you have made to this record",
+            },
+            "id": "edit_notes",
+            "name": "edit_notes"
+          })
+        }}
+      {% endcall %}
+      <div class="govuk-form-row">
+        {{
+          buttonMenu({
+            "classes": "govuk-!-margin-bottom-",
+            "items": [
+              {
+                "text": "Save changes",
+                "type": "submit"
+              },
+              {
+                "text": "Cancel changes",
+                "classes": "govuk-button--secondary"
+              }
+            ]
+          })
+        }}
+      </div>
+      {# <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--l"> #}
+      {# <div class="govuk-form-row">
+        <h2 class="govuk-heading-m">End this record</h2>
+        {{
+          buttonMenu({
+            "classes": "govuk-!-margin-bottom-3",
+            "items": [
+              {
+                "element": "a",
+                "text": "End this record",
+                "href": "./edit/end-record",
+                "classes": "govuk-button--warning"
+              }
+            ]
+          })
+        }}
+        {{
+          govukDetails({
+            "summaryText": "What does to end a record mean?",
+            "text": "Ending a record means that it will no longer be in the dataset"
+          })
+        }}
+      </div> #}
     </form>
   </div>
 {% endblock content %}

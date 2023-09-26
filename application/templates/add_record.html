@@ -21,7 +21,7 @@
       {% for field in form_fields %}
         {% set _hint = '' %}
         {% if field.field == 'reference' %}
-          {% set _hint = 'You can override the suggested reference' %}
+          {% set _hint = 'You can change this suggestion' %}
         {% endif %}
           {{ appField(field, True if form.errors[field.field] else False, hint=_hint) }}
       {% endfor %}

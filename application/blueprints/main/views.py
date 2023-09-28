@@ -140,7 +140,11 @@ def add_record(id):
 
         notes = f"Added record {record.data['prefix']}:{record.data['reference']}"
         change_log = ChangeLog(
-            change_type=ChangeType.ADD, data=data, record_id=record.id, notes=notes
+            change_type=ChangeType.ADD,
+            data=data,
+            record_id=record.id,
+            notes=notes,
+            dataset_id=dataset.dataset,
         )
         db.session.add(change_log)
         db.session.commit()

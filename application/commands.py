@@ -126,6 +126,7 @@ def load_db():
                             change_type=ChangeType.ADD,
                             data=row,
                             notes=notes,
+                            dataset_id=dataset.dataset,
                             record_id=record.id,
                         )
                         db.session.add(change_log)

@@ -10,40 +10,16 @@
   <div class="govuk-grid-column-three-quarters">
     <dl class="govuk-summary-list app-summary-list">
 
-      {# This gets looped out for each column/field in the record #}
+      {% for name, value in record.data.items() %}
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key app-summary-list__key">
-          Field name
+          {{name}}
         </dt>
         <dd class="govuk-summary-list__value">
-          <p class="govuk-body">Field value</p>
+          <p class="govuk-body">{{value}}</p>
         </dd>
       </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key app-summary-list__key">
-          Field name
-        </dt>
-        <dd class="govuk-summary-list__value">
-          <p class="govuk-body">Field value</p>
-        </dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key app-summary-list__key">
-          Field name
-        </dt>
-        <dd class="govuk-summary-list__value">
-          <p class="govuk-body">Field value</p>
-        </dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key app-summary-list__key">
-          Field name
-        </dt>
-        <dd class="govuk-summary-list__value">
-          <p class="govuk-body">Field value</p>
-        </dd>
-      </div>
-
+      {% endfor %}
     </dl>
   </div>
   <div class="govuk-grid-column-two-thirds">
@@ -53,7 +29,8 @@
         "items": [
           {
             "text": "Edit this record",
-            "type": "submit"
+            "type": "submit",
+            "href": url_for('main.edit_record', id=record.dataset_id, record_id=record.id)
           }
         ]
       })

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, URLField
-from wtforms.validators import ValidationError
+from wtforms.validators import DataRequired, ValidationError
 
 
 # change to a regex validator
@@ -31,14 +31,18 @@ class FormBuilder:
                 else:
                     setattr(TheForm, field.field, form_field())
 
+        if self.include_edit_notes:
+            setattr(TheForm, "edit_notes", TextAreaField(validators=[DataRequired()]))
+
         return TheForm()
 
     def form_fields(self):
         return sorted(self.fields)
 
-    def __init__(self, fields):
+    def __init__(self, fields, include_edit_notes=False):
         skip_fields = {"entity", "end-date", "start-date", "entry-date", "prefix"}
         self.fields = []
+        self.include_edit_notes = include_edit_notes
         for field in fields:
             if field.field not in skip_fields:
                 self.fields.append(field)

@@ -1,9 +1,12 @@
 import datetime
 import uuid
+from enum import Enum
 from functools import total_ordering
 from typing import List, Optional
 
-from sqlalchemy import UUID, ForeignKey, Text, event
+from sqlalchemy import UUID
+from sqlalchemy import Enum as ENUM
+from sqlalchemy import ForeignKey, Text, event
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -21,11 +24,37 @@ dataset_field = db.Table(
 class DateModel(db.Model):
     __abstract__ = True
 
-    entry_date: Mapped[Optional[datetime.date]] = mapped_column(
-        db.Date, default=db.func.current_date()
+    entry_date: Mapped[datetime.date] = mapped_column(
+        db.Date, default=datetime.datetime.today
     )
     start_date: Mapped[Optional[datetime.date]] = mapped_column(db.Date)
     end_date: Mapped[Optional[datetime.date]] = mapped_column(db.Date)
+
+
+class ChangeType(Enum):
+    ADD = "ADD"
+    EDIT = "EDIT"
+    ARCHIVE = "ARCHIVE"
+
+
+class ChangeLog(db.Model):
+    __tablename__ = "change_log"
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    dataset_id: Mapped[str] = mapped_column(Text, ForeignKey("dataset.dataset"))
+    dataset: Mapped["Dataset"] = relationship("Dataset", back_populates="change_log")
+
+    change_type: Mapped[ChangeType] = mapped_column(ENUM(ChangeType), nullable=False)
+
+    created_date: Mapped[datetime.date] = mapped_column(
+        db.Date, default=datetime.datetime.today
+    )
+    data: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
+    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    record_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("record.id")
+    )
 
 
 class Dataset(DateModel):
@@ -44,8 +73,12 @@ class Dataset(DateModel):
         "Record", back_populates="dataset", order_by="Record.row_id"
     )
 
+    change_log: Mapped[List["ChangeLog"]] = relationship(
+        "ChangeLog", back_populates="dataset", order_by="ChangeLog.created_date"
+    )
+
     last_updated: Mapped[Optional[datetime.date]] = mapped_column(
-        db.Date, default=db.func.current_date()
+        db.Date, default=datetime.datetime.today
     )
 
     def sorted_fields(self):
@@ -55,7 +88,7 @@ class Dataset(DateModel):
         return f"<Dataset(id={self.name}, name={self.name}, fields={self.fields})>"
 
 
-class Record(db.Model):
+class Record(DateModel):
     __tablename__ = "record"
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -64,30 +97,8 @@ class Record(db.Model):
     dataset: Mapped["Dataset"] = relationship("Dataset", back_populates="records")
     data: Mapped[dict] = mapped_column(MutableDict.as_mutable(JSONB), nullable=False)
 
-    end_date: Mapped[Optional[datetime.date]] = mapped_column(db.Date)
-
-    versions: Mapped[List["RecordVersion"]] = relationship(
-        "RecordVersion",
-        back_populates="record",
-        order_by="desc(RecordVersion.end_date)",
-        cascade="all, delete-orphan",
-    )
-
     def __repr__(self):
         return f"<Record(dataset={self.dataset.name}, row_id={self.row_id}, data={self.data}))>"
-
-
-class RecordVersion(db.Model):
-    __tablename__ = "record_version"
-
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    record_id: Mapped[int] = mapped_column(UUID, ForeignKey("record.id"))
-
-    record: Mapped["Record"] = relationship("Record", back_populates="versions")
-    data: Mapped[dict] = mapped_column(JSONB, nullable=False)
-    end_date: Mapped[datetime.datetime] = mapped_column(
-        db.DateTime, nullable=False, default=datetime.datetime.utcnow
-    )
 
 
 @total_ordering
@@ -97,7 +108,7 @@ class Field(DateModel):
     field: Mapped[str] = mapped_column(Text, primary_key=True)
     name: Mapped[str] = mapped_column(Text, nullable=False)
     datatype: Mapped[str] = mapped_column(Text, nullable=False)
-    datasets: Mapped[List["Dataset"]] = relationship(
+    datasets: Mapped[List[Dataset]] = relationship(
         "Dataset", secondary=dataset_field, back_populates="fields"
     )
     description: Mapped[Optional[str]] = mapped_column(Text)
@@ -153,3 +164,21 @@ class Field(DateModel):
 @event.listens_for(Dataset.records, "append")
 def receive_append(target, value, initiator):
     target.last_updated = datetime.date.today()
+
+
+@event.listens_for(Record, "before_insert")
+def receive_before_insert(mapper, connection, target):
+    start_date = target.data.get("start-date", None)
+    end_date = target.data.get("end-date", None)
+    if start_date:
+        try:
+            target.start_date = datetime.datetime.strptime(
+                start_date, "%Y-%m-%d"
+            ).date()
+        except Exception:
+            target.start_date = None
+    if end_date:
+        try:
+            target.end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+        except Exception:
+            target.end_date = None

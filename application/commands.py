@@ -9,7 +9,14 @@ import requests
 from flask.cli import AppGroup
 
 from application.extensions import db
-from application.models import Dataset, Field, Record, RecordVersion, dataset_field
+from application.models import (
+    ChangeLog,
+    ChangeType,
+    Dataset,
+    Field,
+    Record,
+    dataset_field,
+)
 
 data_cli = AppGroup("data")
 
@@ -107,6 +114,24 @@ def load_db():
                 try:
                     db.session.add(dataset)
                     db.session.commit()
+                    for record in dataset.records:
+                        try:
+                            notes = f"Added record {record.data['prefix']}:{record.data['reference']}"
+                        except KeyError:
+                            notes = f"Added record {record.data}"
+                            print(
+                                f"Could not find prefix or reference in data for {dataset_name}"
+                            )
+                        dataset.change_log.append(
+                            ChangeLog(
+                                change_type=ChangeType.ADD,
+                                data=row,
+                                notes=notes,
+                                record_id=record.id,
+                            )
+                        )
+                    db.session.add(dataset)
+                    db.session.commit()
                 except Exception as e:
                     print(f"error adding file {file}")
                     print(e)
@@ -120,7 +145,7 @@ def load_db():
 @data_cli.command("drop")
 def drop_data():
     db.session.query(dataset_field).delete()
-    RecordVersion.query.delete()
+    ChangeLog.query.delete()
     Record.query.delete()
     Dataset.query.delete()
     Field.query.delete()

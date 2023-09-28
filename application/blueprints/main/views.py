@@ -1,12 +1,14 @@
 import datetime
 import io
+from collections import OrderedDict
 from csv import DictWriter
 
 from flask import Blueprint, abort, make_response, redirect, render_template, url_for
+from sqlalchemy import desc
 
 from application.extensions import db
 from application.forms import FormBuilder
-from application.models import Dataset, Record, RecordVersion
+from application.models import ChangeLog, ChangeType, Dataset, Record
 from application.utils import login_required
 
 main = Blueprint("main", __name__)
@@ -79,9 +81,24 @@ def history(id):
         ],
     }
     page = {"title": dataset.name, "caption": "Dataset"}
+
+    changes_by_date = OrderedDict()
+
+    changes = (
+        ChangeLog.query.filter(ChangeLog.dataset_id == dataset.dataset)
+        .order_by(desc(ChangeLog.created_date), ChangeLog.change_type)
+        .all()
+    )
+
+    for change in changes:
+        if change.created_date not in changes_by_date.keys():
+            changes_by_date[change.created_date] = []
+        changes_by_date[change.created_date].append(change)
+
     return render_template(
         "history.html",
         dataset=dataset,
+        changes_by_date=changes_by_date,
         breadcrumbs=breadcrumbs,
         sub_navigation=sub_navigation,
         page=page,
@@ -110,6 +127,7 @@ def add_record(id):
 
         record = Record(row_id=next_id, data=data)
         dataset.records.append(record)
+        dataset.change_log.append(ChangeLog(change_type=ChangeType.ADD, data=data))
         db.session.add(dataset)
         db.session.commit()
         return redirect(url_for("main.dataset", id=dataset.dataset))
@@ -143,6 +161,13 @@ def add_record(id):
     )
 
 
+@main.route("/dataset/<string:id>/record/<string:record_id>", methods=["GET"])
+@login_required
+def get_record(id, record_id):
+    record = Record.query.filter(Record.dataset_id == id, Record.id == record_id).one()
+    return render_template("view_record.html", record=record)
+
+
 @main.route(
     "/dataset/<string:id>/record/<string:record_id>/edit", methods=["GET", "POST"]
 )
@@ -152,24 +177,33 @@ def edit_record(id, record_id):
     record = Record.query.filter(
         Record.dataset_id == dataset.dataset, Record.id == record_id
     ).one()
-    builder = FormBuilder(record.dataset.fields)
+    builder = FormBuilder(record.dataset.fields, include_edit_notes=True)
     form = builder.build()
     form_fields = builder.form_fields()
 
     if form.validate_on_submit():
-        # capture current record data before updating
-        current_version = record.data.copy()
+        # capture current record data as "previous" before updating
+        previous = record.data.copy()
+        reference = previous["reference"]
 
         # update record data
         for key, value in form.data.items():
             record.data[key] = value
 
-        # end current version and store data
-        current_version["end-date"] = datetime.datetime.today().strftime("%Y-%m-%d")
-        version = RecordVersion(record_id=record.id, data=current_version)
+        # set existing reference as it is not in form.data
+        record.data["reference"] = reference
 
-        record.versions.append(version)
-        db.session.add(record)
+        # end current version and create log entry
+        previous["end-date"] = datetime.datetime.today().strftime("%Y-%m-%d")
+        edit_notes = f"Updated {record.data['prefix']}:{record.data['reference']}. {form.edit_notes.data}"
+        change_log = ChangeLog(
+            change_type=ChangeType.EDIT,
+            data={"from": previous, "to": record.data},
+            notes=edit_notes,
+            record_id=record.id,
+        )
+        dataset.change_log.append(change_log)
+        db.session.add(dataset)
         db.session.commit()
         return redirect(url_for("main.dataset", id=dataset.dataset))
 
@@ -198,7 +232,7 @@ def edit_record(id, record_id):
         )
 
 
-@main.route("/dataset/<string:id>/record/<string:record_id>")
+@main.route("/dataset/<string:id>/record/<string:record_id>/archive")
 def end_record(id, record_id):
     dataset = Dataset.query.get(id)
     breadcrumbs = {

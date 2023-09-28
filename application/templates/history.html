@@ -2,8 +2,9 @@
 
 {% block content_primary %}
 
+{% for change_date, changes in changes_by_date.items() %}
 <table class="govuk-table">
-  <caption class="govuk-table__caption govuk-table__caption--m">21 September 2023</caption>
+  <caption class="govuk-table__caption govuk-table__caption--m">{{change_date.strftime("%d %B %Y")}}</caption>
   <thead class="govuk-table__head">
     <tr class="govuk-table__row">
       <th scope="col" class="govuk-table__header govuk-!-width-one-third"><span class="govuk-visually-hidden">Event</span></th>
@@ -12,76 +13,25 @@
     </tr>
   </thead>
   <tbody class="govuk-table__body">
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">
-        {{ govukTag({ "text": "Archived record", "classes": "govuk-tag--red" }) }}
-      </td>
-      <td class="govuk-table__cell govuk-!-width-one-third">Added new provision reason</td>
-      <td class="govuk-table__cell govuk-!-width-one-third govuk-!-text-align-right">
-        <a href="#">View record</a>
-      </td>
-    </tr>
+    {% for change in changes %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">
+          {% if change.change_type.name == "ADD" %}
+            {{ govukTag({ "text": "New record", "classes": "govuk-tag--green" }) }}
+          {% elif change.change_type.name == "EDIT" %}
+            {{ govukTag({ "text": "Edited record" }) }}
+          {% elif change.change_type.name == "ARCHIVED" %}
+            {{ govukTag({ "text": "Archived record", "classes": "govuk-tag--red" }) }}
+          {% endif %}
+        </td>
+        <td class="govuk-table__cell govuk-!-width-one-third">{% if change.notes %}{{change.notes}}{% endif %}</td>
+        <td class="govuk-table__cell govuk-!-width-one-third govuk-!-text-align-right">
+          <a href="{{ url_for('main.get_record', id=change.dataset_id, record_id=change.record_id) }}">View record</a>
+        </td>
+      </tr>
+    {% endfor %}
   </tbody>
 </table>
-<table class="govuk-table">
-  <caption class="govuk-table__caption govuk-table__caption--m">18 September 2023</caption>
-  <thead class="govuk-table__head">
-    <tr class="govuk-table__row">
-      <th scope="col" class="govuk-table__header govuk-!-width-one-third"><span class="govuk-visually-hidden">Event</span></th>
-      <th scope="col" class="govuk-table__header govuk-!-width-one-third">Change notes</th>
-      <th scope="col" class="govuk-table__header govuk-!-width-one-third govuk-!-text-align-right"><span class="govuk-visually-hidden">Action</span></th>
-    </tr>
-  </thead>
-  <tbody class="govuk-table__body">
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">
-        {{ govukTag({ "text": "Edited record" }) }}
-      </td>
-      <td class="govuk-table__cell">Updated name field</td>
-      <td class="govuk-table__cell  govuk-!-text-align-right">
-        <a href="#">View record</a>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<table class="govuk-table">
-  <caption class="govuk-table__caption govuk-table__caption--m">20 September 2023</caption>
-  <thead class="govuk-table__head">
-    <tr class="govuk-table__row">
-      <th scope="col" class="govuk-table__header govuk-!-width-one-third"><span class="govuk-visually-hidden">Event</span></th>
-      <th scope="col" class="govuk-table__header govuk-!-width-one-third">Change notes</th>
-      <th scope="col" class="govuk-table__header govuk-!-width-one-third govuk-!-text-align-right"><span class="govuk-visually-hidden">Action</span></th>
-    </tr>
-  </thead>
-  <tbody class="govuk-table__body">
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">
-        {{ govukTag({ "text": "New record", "classes": "govuk-tag--green" }) }}
-      </td>
-      <td class="govuk-table__cell">Added new provision reason</td>
-      <td class="govuk-table__cell  govuk-!-text-align-right">
-        <a href="#">View record</a>
-      </td>
-    </tr>
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">
-        {{ govukTag({ "text": "New record", "classes": "govuk-tag--green" }) }}
-      </td>
-      <td class="govuk-table__cell">Added new provision reason</td>
-      <td class="govuk-table__cell  govuk-!-text-align-right">
-        <a href="#">View record</a>
-      </td>
-    </tr>
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">
-        {{ govukTag({ "text": "New record", "classes": "govuk-tag--green" }) }}
-      </td>
-      <td class="govuk-table__cell">Added new provision reason</td>
-      <td class="govuk-table__cell  govuk-!-text-align-right">
-        <a href="#">View record</a>
-      </td>
-    </tr>
-  </tbody>
-</table>
+{% endfor %}
 
 {% endblock content_primary %}

@@ -23,7 +23,7 @@ charset-normalizer==3.2.0
     # via requests
 click==8.1.7
     # via flask
-cryptography==41.0.3
+cryptography==41.0.4
     # via authlib
 digital-land-frontend @ git+https://github.com/digital-land/digital-land-frontend.git
     # via -r requirements/requirements.in
@@ -52,8 +52,6 @@ flask-wtf==1.1.1
     # via -r requirements/requirements.in
 govuk-frontend-jinja==2.7.0
     # via digital-land-frontend
-greenlet==2.0.2
-    # via sqlalchemy
 gunicorn==21.2.0
     # via -r requirements/requirements.in
 idna==3.4
@@ -102,7 +100,7 @@ typing-extensions==4.8.0
     # via
     #   alembic
     #   sqlalchemy
-urllib3==2.0.4
+urllib3==2.0.5
     # via
     #   requests
     #   sentry-sdk

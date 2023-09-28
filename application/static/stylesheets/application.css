@@ -7470,6 +7470,8 @@ html, body {
     background: none; }
   .app-data-table thead tr:first-child td:not(.app-data-table__header--ui), .app-data-table thead tr:first-child th:not(.app-data-table__header--ui) {
     border-top-width: 2px; }
+  .app-data-table tbody tr:hover {
+    background: rgba(243, 242, 241, 0.5); }
   .app-data-table tbody tr:first-child td:not(.app-data-table__cell--ui), .app-data-table tbody tr:first-child th:not(.app-data-table__cell--ui) {
     border-top-width: 2px; }
   .app-data-table tbody tr:last-child td:not(.app-data-table__cell--ui), .app-data-table tbody tr:last-child th:not(.app-data-table__cell--ui) {
@@ -7487,6 +7489,7 @@ html, body {
     white-space: nowrap;
     vertical-align: top; }
   .app-data-table__cell {
+    vertical-align: top;
     font-family: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro","Fira Mono", "Droid Sans Mono", "Courier New", monospace; }
     .app-data-table__cell--ui {
       padding-top: 0;

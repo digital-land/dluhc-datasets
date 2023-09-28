@@ -85,6 +85,11 @@ html, body {
     }
   }
   tbody {
+    tr {
+      &:hover {
+        background: rgba(govuk-colour("light-grey"),0.5);
+      }
+    }
     tr:first-child {
       td, th {
         &:not(.app-data-table__cell--ui) {
@@ -119,6 +124,7 @@ html, body {
     vertical-align: top;
   }
   &__cell {
+    vertical-align: top;
     font-family: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro","Fira Mono", "Droid Sans Mono", "Courier New", monospace;
     &--ui {
       padding-top: 0;

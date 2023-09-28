@@ -127,6 +127,8 @@ def add_record(id):
 
         record = Record(row_id=next_id, data=data)
         dataset.records.append(record)
+        db.session.add(dataset)
+        db.session.commit()
         dataset.change_log.append(ChangeLog(change_type=ChangeType.ADD, data=data))
         db.session.add(dataset)
         db.session.commit()

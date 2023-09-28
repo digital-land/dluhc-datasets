@@ -48,7 +48,7 @@
             {% for field in dataset.sorted_fields() %}
               <td class="app-data-table__cell">{{record.data[field.field] | replace('-','&#8209;') | safe }}</td>
             {% endfor %}
-            {% if session["user"] %}
+            {% if session["user"]  and not record.end_date %}
             <td class="app-data-table__cell app-data-table__cell--ui">
               {{
                 buttonMenu({
@@ -63,7 +63,7 @@
                       "element": "a",
                       "text": "Archive record",
                       "classes": "govuk-button--warning",
-                      "href": url_for("main.edit_record", id=dataset.dataset, record_id=record.id),
+                      "href": url_for("main.archive_record", id=dataset.dataset, record_id=record.id),
                     }
                   ]
                 })

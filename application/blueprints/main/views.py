@@ -3,7 +3,15 @@ import io
 from collections import OrderedDict
 from csv import DictWriter
 
-from flask import Blueprint, abort, make_response, redirect, render_template, url_for
+from flask import (
+    Blueprint,
+    abort,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from sqlalchemy import desc
 
 from application.extensions import db
@@ -129,9 +137,14 @@ def add_record(id):
         dataset.records.append(record)
         db.session.add(dataset)
         db.session.commit()
-        dataset.change_log.append(ChangeLog(change_type=ChangeType.ADD, data=data))
-        db.session.add(dataset)
+
+        notes = f"Added record {record.data['prefix']}:{record.data['reference']}"
+        change_log = ChangeLog(
+            change_type=ChangeType.ADD, data=data, record_id=record.id, notes=notes
+        )
+        db.session.add(change_log)
         db.session.commit()
+
         return redirect(url_for("main.dataset", id=dataset.dataset))
 
     if form.errors:
@@ -234,25 +247,32 @@ def edit_record(id, record_id):
         )
 
 
-@main.route("/dataset/<string:id>/record/<string:record_id>/archive")
-def end_record(id, record_id):
-    dataset = Dataset.query.get(id)
-    breadcrumbs = {
-        "items": [
-            {"text": "Datasets", "href": url_for("main.index")},
-            {
-                "text": dataset.name,
-                "href": url_for("main.dataset", id=dataset.dataset),
-            },
-            {"text": "View record"},
-        ]
-    }
-    page = {"title": dataset.name, "caption": "Dataset"}
-    return render_template(
-        "view_record.html",
-        dataset=dataset,
-        breadcrumbs=breadcrumbs,
-        page=page,
+@main.route(
+    "/dataset/<string:id>/record/<string:record_id>/archive", methods=["GET", "POST"]
+)
+def archive_record(id, record_id):
+    record = Record.query.filter(Record.dataset_id == id, Record.id == record_id).one()
+
+    if request.method == "GET":
+        return render_template("confirmation.html", record=record)
+
+    record.data["end-date"] = datetime.datetime.today().strftime("%Y-%m-%d")
+    record.end_date = datetime.datetime.today()
+
+    change_log = ChangeLog(
+        change_type=ChangeType.ARCHIVE,
+        data=record.data,
+        dataset_id=record.dataset_id,
+        notes=f"Archived {record.data['prefix']}:{record.data['reference']}",
+        record_id=record.id,
+    )
+
+    db.session.add(record)
+    db.session.add(change_log)
+    db.session.commit()
+
+    return redirect(
+        url_for("main.get_record", id=record.dataset_id, record_id=record.id)
     )
 
 

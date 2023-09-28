@@ -9,8 +9,23 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-three-quarters">
     {{ govukWarningText({
-      "text": "Archiving this record will remove it from the dataset",
+      "text": "Archiving this record sets its end date indicating it is no longer in use. This action can't be undone.",
       "iconFallbackText": "Warning"
     }) }}
   </div>
+</div>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-three-quarters">
+    <form action="{{url_for('main.archive_record', id=record.dataset_id, record_id=record.id)}}" method="POST">
+        {{
+        govukButton({
+          "text": "Archive record",
+          "type": "submit",
+          "classes": "govuk-button--warning",
+          })
+        }}
+      </form>
+  </div>
+</div>
+
 {% endblock content %}

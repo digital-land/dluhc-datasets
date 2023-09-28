@@ -20,7 +20,7 @@
             {{ govukTag({ "text": "New record", "classes": "govuk-tag--green" }) }}
           {% elif change.change_type.name == "EDIT" %}
             {{ govukTag({ "text": "Edited record" }) }}
-          {% elif change.change_type.name == "ARCHIVED" %}
+          {% elif change.change_type.name == "ARCHIVE" %}
             {{ govukTag({ "text": "Archived record", "classes": "govuk-tag--red" }) }}
           {% endif %}
         </td>

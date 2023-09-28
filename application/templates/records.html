@@ -75,7 +75,7 @@
         </tbody>
       </table>
     </section>
-    <p class="govuk-hint govuk-!-margin-top-3">This dataset was last updated {{max_entry_date}}</p>
+    <p class="govuk-hint govuk-!-margin-top-3">This dataset was last updated on {{dataset.last_updated.strftime("%d %B %Y")}}</p>
     {% else %}
       {{
         govukInsetText({

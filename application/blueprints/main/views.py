@@ -254,7 +254,7 @@ def archive_record(id, record_id):
     record = Record.query.filter(Record.dataset_id == id, Record.id == record_id).one()
 
     if request.method == "GET":
-        return render_template("confirmation.html", record=record)
+        return render_template("archive_record.html", record=record)
 
     record.data["end-date"] = datetime.datetime.today().strftime("%Y-%m-%d")
     record.end_date = datetime.datetime.today()

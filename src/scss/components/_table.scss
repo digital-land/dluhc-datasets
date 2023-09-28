@@ -87,7 +87,7 @@ html, body {
   tbody {
     tr {
       &:hover {
-        background: rgba(govuk-colour("light-grey"),0.5);
+        background: rgba(govuk-colour("light-grey"),0.3);
       }
     }
     tr:first-child {

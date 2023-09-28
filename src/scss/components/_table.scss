@@ -92,15 +92,15 @@ html, body {
     }
     tr:first-child {
       td, th {
+        border-top-width: 2px;
         &:not(.app-data-table__cell--ui) {
-          border-top-width: 2px;
         }
       }
     }
     tr:last-child {
       td, th {
+        border-bottom-width: 2px;
         &:not(.app-data-table__cell--ui) {
-          border-bottom-width: 2px;
         }
       }
     }
@@ -113,9 +113,6 @@ html, body {
     }
     &:last-child {
       border-left-width: 2px;
-    }
-    &--ui{
-      border-width: 0;
     }
   }
   &__header,

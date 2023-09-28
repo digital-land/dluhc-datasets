@@ -7472,9 +7472,9 @@ html, body {
     border-top-width: 2px; }
   .app-data-table tbody tr:hover {
     background: rgba(243, 242, 241, 0.5); }
-  .app-data-table tbody tr:first-child td:not(.app-data-table__cell--ui), .app-data-table tbody tr:first-child th:not(.app-data-table__cell--ui) {
+  .app-data-table tbody tr:first-child td, .app-data-table tbody tr:first-child th {
     border-top-width: 2px; }
-  .app-data-table tbody tr:last-child td:not(.app-data-table__cell--ui), .app-data-table tbody tr:last-child th:not(.app-data-table__cell--ui) {
+  .app-data-table tbody tr:last-child td, .app-data-table tbody tr:last-child th {
     border-bottom-width: 2px; }
   .app-data-table__header, .app-data-table__cell {
     border: 1px solid #b1b4b6;
@@ -7483,8 +7483,6 @@ html, body {
       border-left-width: 2px; }
     .app-data-table__header:last-child, .app-data-table__cell:last-child {
       border-left-width: 2px; }
-    .app-data-table__header--ui, .app-data-table__cell--ui {
-      border-width: 0; }
   .app-data-table__header, .app-data-table__cell--ui {
     white-space: nowrap;
     vertical-align: top; }

@@ -1,6 +1,15 @@
 {% extends 'layouts/base.html' %}
 
 {% block content %}
+
+{% if error_list %}
+  {{ govukErrorSummary({
+    "titleText": "There is a problem",
+    "errorList": error_list
+    })
+  }}
+{% endif %}
+
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-three-quarters">
     <form method="POST" action="{{ url_for('main.edit_record', id=dataset.dataset, record_id=record.id) }}">
@@ -16,18 +25,18 @@
           {{
             appField(
               field,
-              True if form.errors[field.field] else False,
-              record.data.get(field.field, ''),
-              True,
-              "You cannot edit this field"
+              has_error = True if form.errors[field.field] else False,
+              value = record.data.get(field.field, ''),
+              disabled = True,
+              hint = "You cannot edit this field"
             )
           }}
           {% else %}
           {{
             appField(
               field,
-              True if form.errors[field.field] else False,
-              record.data.get(field.field, '')
+              has_error = True if form.errors[field.field] else False,
+              value = form[field.field].data if form[field.field].data else record.data.get(field.field, '')
             )
           }}
           {% endif %}

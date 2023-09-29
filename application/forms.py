@@ -28,6 +28,10 @@ class FormBuilder:
             if form_field is not None:
                 if field.datatype == "curie":
                     setattr(TheForm, field.field, form_field(validators=[curie_check]))
+                elif field.field == "name":
+                    setattr(
+                        TheForm, field.field, form_field(validators=[DataRequired()])
+                    )
                 else:
                     setattr(TheForm, field.field, form_field())
 

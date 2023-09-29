@@ -122,15 +122,17 @@ def load_db():
                             print(
                                 f"Could not find prefix or reference in data for {dataset_name}"
                             )
-                        change_log = ChangeLog(
-                            change_type=ChangeType.ADD,
-                            data=row,
-                            notes=notes,
-                            dataset_id=dataset.dataset,
-                            record_id=record.id,
-                        )
-                        db.session.add(change_log)
-                        db.session.commit()
+                        # skip organisation dataset as no prefix or reference
+                        if dataset_name != "organisation-dataset":
+                            change_log = ChangeLog(
+                                change_type=ChangeType.ADD,
+                                data=row,
+                                notes=notes,
+                                dataset_id=dataset.dataset,
+                                record_id=record.id,
+                            )
+                            db.session.add(change_log)
+                            db.session.commit()
                 except Exception as e:
                     print(f"error adding file {file}")
                     print(e)

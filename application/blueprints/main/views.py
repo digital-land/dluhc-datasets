@@ -153,7 +153,7 @@ def add_record(id):
 
     if form.errors:
         error_list = [
-            {"href": f"#{field}", "text": ",".join(errors)}
+            {"href": f"#{field}", "text": ",".join(errors), "field": field}
             for field, errors in form.errors.items()
         ]
     else:
@@ -227,9 +227,6 @@ def edit_record(id, record_id):
         return redirect(url_for("main.dataset", id=dataset.dataset))
 
     else:
-        for field in form_fields:
-            form[field.field].data = record.data.get(field.field, None)
-
         breadcrumbs = {
             "items": [
                 {"text": "Datasets", "href": url_for("main.index")},
@@ -241,6 +238,17 @@ def edit_record(id, record_id):
             ]
         }
 
+        if form.errors:
+            error_list = [
+                {"href": f"#{field}", "text": ",".join(errors)}
+                for field, errors in form.errors.items()
+            ]
+        else:
+            for field in form_fields:
+                form[field.field].data = record.data.get(field.field, None)
+
+            error_list = None
+
         return render_template(
             "edit_record.html",
             dataset=record.dataset,
@@ -248,6 +256,7 @@ def edit_record(id, record_id):
             form=form,
             form_fields=form_fields,
             breadcrumbs=breadcrumbs,
+            error_list=error_list,
         )
 
 

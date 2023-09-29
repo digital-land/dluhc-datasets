@@ -153,7 +153,10 @@ def add_record(id):
 
     if form.errors:
         error_list = [
-            {"href": f"#{field}", "text": ",".join(errors), "field": field}
+            {
+                "href": f"#{field}",
+                "text": f"Error with '{form[field].name}'. {''.join(errors)}",
+            }
             for field, errors in form.errors.items()
         ]
     else:
@@ -240,7 +243,10 @@ def edit_record(id, record_id):
 
         if form.errors:
             error_list = [
-                {"href": f"#{field}", "text": ",".join(errors)}
+                {
+                    "href": f"#{field}",
+                    "text": f"{''.join(errors)} {form[field].label.text}",
+                }
                 for field, errors in form.errors.items()
             ]
         else:

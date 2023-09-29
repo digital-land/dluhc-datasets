@@ -2,7 +2,7 @@
 {%- from 'govuk_frontend_jinja/components/textarea/macro.html' import govukTextarea -%}
 
 {% macro appField(field, has_error=False, value='', disabled=False, hint='') %}
-  {% if hasError == True %}
+  {% if has_error == True %}
     {% set _errorMessage = { "text" : "Error" } %}
   {% else %}
     {% set _errorMessage = False %}

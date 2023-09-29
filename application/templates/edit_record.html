@@ -51,11 +51,17 @@
           "isPageHeading": False
         }
       }) %}
+        {% if form.errors.get('edit_notes') %}
+          {% set _errorMessage = { "text" : ','.join(form.errors['edit_notes']) } %}
+        {% else %}
+          {% set _errorMessage = False %}
+        {% endif %}
         {{
           govukTextarea({
             "label": {
               "text": "Notes",
             },
+            "errorMessage": _errorMessage,
             "hint": {
               "text": "Describe the change you have made to this record",
             },

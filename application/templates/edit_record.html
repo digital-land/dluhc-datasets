@@ -25,7 +25,7 @@
           {{
             appField(
               field,
-              has_error = True if form.errors[field.field] else False,
+              error_message = ' '.join(form.errors[field.field]) if form.errors[field.field] else '',
               value = record.data.get(field.field, ''),
               disabled = True,
               hint = "You cannot edit this field"
@@ -35,7 +35,7 @@
           {{
             appField(
               field,
-              has_error = True if form.errors[field.field] else False,
+              error_message = ' '.join(form.errors[field.field]) if form.errors[field.field] else '',
               value = form[field.field].data if form[field.field].data else record.data.get(field.field, '')
             )
           }}
@@ -52,7 +52,7 @@
         }
       }) %}
         {% if form.errors.get('edit_notes') %}
-          {% set _errorMessage = { "text" : ','.join(form.errors['edit_notes']) } %}
+          {% set _errorMessage = { "text" : ' '.join(form.errors['edit_notes']) } %}
         {% else %}
           {% set _errorMessage = False %}
         {% endif %}

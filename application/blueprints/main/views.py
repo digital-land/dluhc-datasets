@@ -155,7 +155,7 @@ def add_record(id):
         error_list = [
             {
                 "href": f"#{field}",
-                "text": f"Error with '{form[field].name}'. {''.join(errors)}",
+                "text": f"{' '.join(errors)} {form[field].label.text}",
             }
             for field, errors in form.errors.items()
         ]
@@ -245,7 +245,7 @@ def edit_record(id, record_id):
             error_list = [
                 {
                     "href": f"#{field}",
-                    "text": f"{''.join(errors)} {form[field].label.text}",
+                    "text": f"{' '.join(errors)} {form[field].label.text}",
                 }
                 for field, errors in form.errors.items()
             ]

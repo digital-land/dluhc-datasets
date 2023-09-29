@@ -24,7 +24,12 @@
           {% set _hint = 'You can change this suggestion' %}
         {% endif %}
         {% if form.errors %}
-          {{ appField(field, has_error=True if form.errors[field.field] else False, value=form[field.field].data, hint=_hint) }}
+          {% if form.errors[field.field] %}
+            {% set error_message = ' '.join(form.errors[field.field]) %}
+          {% else %}
+            {% set error_message = None %}
+          {% endif %}
+          {{ appField(field, error_message=error_message, value=form[field.field].data, hint=_hint) }}
         {% else %}
           {{ appField(field, hint=_hint) }}
         {% endif %}

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, URLField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms.validators import URL, DataRequired, ValidationError
 
 
 # change to a regex validator
@@ -32,6 +32,8 @@ class FormBuilder:
                     setattr(
                         TheForm, field.field, form_field(validators=[DataRequired()])
                     )
+                elif "url" in field.field:
+                    setattr(TheForm, field.field, form_field(validators=[URL()]))
                 else:
                     setattr(TheForm, field.field, form_field())
 

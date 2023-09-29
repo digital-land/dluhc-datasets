@@ -1,11 +1,10 @@
 {% extends 'layouts/dataset.html' %}
 
 {% block content_primary %}
-
 {% if changes_by_date.items() | length > 0 %}
-  {% for change_date, changes in changes_by_date.items() %}}
+  {% for change_date, changes in changes_by_date.items() %}
   <table class="govuk-table">
-    <caption class="govuk-table__caption govuk-table__caption--m">{{change_date.strftime("%d %B %Y")}}</caption>
+    <caption class="govuk-table__caption govuk-table__caption--m">{{ change_date.strftime("%d %B %Y") }}</caption>
     <thead class="govuk-table__head">
       <tr class="govuk-table__row">
         <th scope="col" class="govuk-table__header govuk-!-width-one-third"><span class="govuk-visually-hidden">Event</span></th>

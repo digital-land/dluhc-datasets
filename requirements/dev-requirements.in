@@ -4,4 +4,3 @@ flake8
 pre-commit
 black
 isort
-flask-debugtoolbar

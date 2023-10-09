@@ -52,6 +52,8 @@ flask-wtf==1.1.1
     # via -r requirements/requirements.in
 govuk-frontend-jinja==2.7.0
     # via digital-land-frontend
+greenlet==3.0.0
+    # via sqlalchemy
 gunicorn==21.2.0
     # via -r requirements/requirements.in
 idna==3.4

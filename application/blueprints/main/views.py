@@ -133,6 +133,9 @@ def add_record(id):
         )
         next_id = last_record.row_id + 1 if last_record else 0
 
+        if "csrf_token" in data:
+            del data["csrf_token"]
+
         record = Record(row_id=next_id, data=data)
         dataset.records.append(record)
         db.session.add(dataset)
@@ -210,7 +213,8 @@ def edit_record(id, record_id):
 
         # update record data
         for key, value in form.data.items():
-            record.data[key] = value
+            if key != "csrf_token":
+                record.data[key] = value
 
         # set existing reference as it is not in form.data
         record.data["reference"] = reference

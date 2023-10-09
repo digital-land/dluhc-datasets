@@ -1,0 +1,16 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-three-quarters">
+    <h1 class="govuk-heading-l">How we add datasets</h1>
+    <p class="govuk-body">The list of datasets is controlled by the <a href="https://github.com/digital-land/specification" class="govuk-link">specification repository</a>.</p>
+
+    <p class="govuk-body">This application regularly checks the specification, looks at the defined datasets and filters on <code class="app-code-block">realm=dataset</code> and <code class="app-code-block">typology=category</code>.</p>
+
+    <p class="govuk-body">All datasets meeting this criteria are added to the application. At this point we can work on the individual records.</p>
+
+    <p class="govuk-body">Last updated: 2023-10-09</a></p>
+  </div>
+</div>
+{% endblock content %}

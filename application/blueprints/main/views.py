@@ -39,6 +39,17 @@ def support():
     return render_template("support.html", breadcrumbs=breadcrumbs)
 
 
+@main.route("/how-we-add-datasets")
+def how_we_add_datasets():
+    breadcrumbs = {
+        "items": [
+            {"text": "DLUHC Datasets", "href": url_for("main.index")},
+            {"text": "How we add datasets"},
+        ]
+    }
+    return render_template("how-we-add-datasets.html", breadcrumbs=breadcrumbs)
+
+
 @main.route("/dataset/<string:id>")
 def dataset(id):
     dataset = Dataset.query.get(id)

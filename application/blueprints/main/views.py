@@ -224,7 +224,7 @@ def edit_record(id, record_id):
 
         # update record data
         for key, value in form.data.items():
-            if key != "csrf_token":
+            if key not in ["csrf_token", "edit_notes"]:
                 record.data[key] = value
 
         # set existing reference as it is not in form.data

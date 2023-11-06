@@ -16,3 +16,4 @@ flask-talisman
 flask-debugtoolbar
 Flask-WTF
 sentry-sdk[flask]
+govuk-frontend-wtf

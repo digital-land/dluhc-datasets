@@ -95,6 +95,7 @@ def register_templates(app):
                 {
                     "govuk_frontend_jinja": PackageLoader("govuk_frontend_jinja"),
                     "digital-land-frontend": PackageLoader("digital_land_frontend"),
+                    "govuk_frontend_wtf": PackageLoader("govuk_frontend_wtf"),
                 }
             ),
         ]

@@ -22,6 +22,24 @@ from application.utils import login_required
 main = Blueprint("main", __name__)
 
 
+def _collect_start_date(data):
+    parts = []
+    format = ""
+    if data.get("year"):
+        parts.append(data.get("year"))
+        format = "%Y"
+    if data.get("month"):
+        parts.append(data.get("month"))
+        format = f"{format}-%m"
+    if data.get("day"):
+        parts.append(data.get("day"))
+        format = f"{format}-%d"
+    if parts:
+        return "-".join(parts), format
+    else:
+        return None, None
+
+
 @main.route("/")
 def index():
     ds = db.session.query(Dataset).order_by(Dataset.dataset).all()
@@ -133,6 +151,11 @@ def add_record(id):
     form_fields = builder.form_fields()
     if form.validate_on_submit():
         data = form.data
+
+        start_date, _ = _collect_start_date(request.form)
+        if start_date:
+            data["start-date"] = start_date
+
         # set prefix to as it is not in form
         data["prefix"] = dataset.dataset
 
@@ -173,6 +196,11 @@ def add_record(id):
             }
             for field, errors in form.errors.items()
         ]
+        # if any start date fields present - bind to correct form fields
+        start_date, format = _collect_start_date(request.form)
+        if start_date:
+            start_date = datetime.datetime.strptime(start_date, format)
+            form["start-date"].data = start_date
     else:
         error_list = None
 
@@ -227,6 +255,13 @@ def edit_record(id, record_id):
             if key not in ["csrf_token", "edit_notes"]:
                 record.data[key] = value
 
+        start_date, format = _collect_start_date(request.form)
+        if start_date:
+            start_date = datetime.datetime.strptime(start_date, format)
+            if start_date != record.start_date:
+                record.start_date = start_date
+                record.data["start-date"] = start_date.strftime(format)
+
         # set existing reference as it is not in form.data
         record.data["reference"] = reference
 
@@ -264,9 +299,16 @@ def edit_record(id, record_id):
                 }
                 for field, errors in form.errors.items()
             ]
+            start_date, format = _collect_start_date(request.form)
+            if start_date != record.start_date:
+                start_date = datetime.datetime.strptime(start_date, format)
+                form["start-date"].data = start_date
         else:
             for field in form_fields:
-                form[field.field].data = record.data.get(field.field, None)
+                if field.field == "start-date":
+                    form[field.field].data = record.start_date
+                else:
+                    form[field.field].data = record.data.get(field.field, None)
 
             error_list = None
 

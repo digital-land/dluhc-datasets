@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, URLField
+from govuk_frontend_wtf.wtforms_widgets import GovDateInput
+from wtforms import DateField, StringField, TextAreaField, URLField
 from wtforms.validators import URL, DataRequired, ValidationError
 
 
@@ -17,6 +18,7 @@ class FormBuilder:
         "string": StringField,
         "text": TextAreaField,
         "url": URLField,
+        "datetime": DateField,
     }
 
     def build(self):
@@ -34,6 +36,8 @@ class FormBuilder:
                     )
                 elif "url" in field.field:
                     setattr(TheForm, field.field, form_field(validators=[URL()]))
+                elif field.datatype == "datetime":
+                    setattr(TheForm, field.field, form_field(widget=GovDateInput()))
                 else:
                     setattr(TheForm, field.field, form_field())
 
@@ -46,7 +50,7 @@ class FormBuilder:
         return sorted(self.fields)
 
     def __init__(self, fields, include_edit_notes=False):
-        skip_fields = {"entity", "end-date", "start-date", "entry-date", "prefix"}
+        skip_fields = {"entity", "end-date", "entry-date", "prefix"}
         self.fields = []
         self.include_edit_notes = include_edit_notes
         for field in fields:

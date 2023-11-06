@@ -25,6 +25,8 @@ click==8.1.7
     # via flask
 cryptography==41.0.4
     # via authlib
+deepmerge==1.1.0
+    # via govuk-frontend-wtf
 digital-land-frontend @ git+https://github.com/digital-land/digital-land-frontend.git
     # via -r requirements/requirements.in
 flask==2.3.3
@@ -35,6 +37,7 @@ flask==2.3.3
     #   flask-sqlalchemy
     #   flask-sslify
     #   flask-wtf
+    #   govuk-frontend-wtf
     #   sentry-sdk
 flask-debugtoolbar==0.13.1
     # via -r requirements/requirements.in
@@ -49,9 +52,15 @@ flask-sslify==0.1.5
 flask-talisman==1.1.0
     # via -r requirements/requirements.in
 flask-wtf==1.1.1
-    # via -r requirements/requirements.in
+    # via
+    #   -r requirements/requirements.in
+    #   govuk-frontend-wtf
 govuk-frontend-jinja==2.7.0
-    # via digital-land-frontend
+    # via
+    #   digital-land-frontend
+    #   govuk-frontend-wtf
+govuk-frontend-wtf==2.5.0
+    # via -r requirements/requirements.in
 greenlet==3.0.0
     # via sqlalchemy
 gunicorn==21.2.0
@@ -69,6 +78,7 @@ jinja2==3.1.2
     # via
     #   flask
     #   govuk-frontend-jinja
+    #   govuk-frontend-wtf
 mako==1.2.4
     # via alembic
 markupsafe==2.1.3
@@ -113,4 +123,6 @@ werkzeug==2.3.7
     #   flask
     #   flask-debugtoolbar
 wtforms==3.0.1
-    # via flask-wtf
+    # via
+    #   flask-wtf
+    #   govuk-frontend-wtf

@@ -1,5 +1,7 @@
 {%- from 'govuk_frontend_jinja/components/input/macro.html' import govukInput -%}
 {%- from 'govuk_frontend_jinja/components/textarea/macro.html' import govukTextarea -%}
+{%- from 'govuk_frontend_jinja/components/date-input/macro.html' import govukDateInput -%}
+
 
 {% macro appField(field, error_message=None, value='', disabled=False, hint='') %}
   {% if error_message %}
@@ -19,6 +21,47 @@
           "errorMessage": _errorMessage,
           "value": value,
           "disabled": disabled
+        })
+      }}
+    {% elif field.datatype == 'datetime' %}
+      {% if value and value is not string %}
+        {% set date_parts = value.strftime("%d %m %Y").split(" ") %}
+        {% set date_value = { "day": date_parts[0], "month": date_parts[1], "year": date_parts[2] } %}
+      {% else %}
+        {% set date_value = { "day": "", "month": "", "year": "" } %}
+      {% endif %}
+      {{
+        govukDateInput({
+          "id": field.field,
+          "name": field.field,
+          "fieldset": {
+            "legend": {
+              "text": field.name,
+            }
+          },
+          "hint": {
+            "text": "The date this record comes into effect"
+          },
+          "errorMessage": _errorMessage,
+          "value": value,
+          "disabled": disabled,
+          "items": [
+              {
+                "name": "day",
+                "value": date_value["day"],
+                "classes": "govuk-input--width-2",
+              },
+              {
+                "name": "month",
+                "value": date_value["month"],
+                "classes": "govuk-input--width-2",
+              },
+              {
+                "name": "year",
+                "value": date_value["year"],
+                "classes": "govuk-input--width-4",
+              },
+          ]
         })
       }}
     {% else %}

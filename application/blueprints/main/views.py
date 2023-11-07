@@ -158,6 +158,7 @@ def add_record(id):
 
         # set prefix to as it is not in form
         data["prefix"] = dataset.dataset
+        data["entry-date"] = datetime.datetime.today().strftime("%Y-%m-%d")
 
         last_record = (
             db.session.query(Record)

@@ -31,10 +31,10 @@
         <thead class="app-data-table__head">
           <tr class="app-data-table__row">
             {% for field in dataset.sorted_fields() %}
-            <th scope="col" class="app-data-table__header">
-              <span class="app-data-table__header__label">{{field.field | capitalize}}</span>
-            </th>
-            {% endfor %}
+                            <th scope="col" class="app-data-table__header">
+                <span class="app-data-table__header__label">{{field.field | capitalize}}</span>
+              </th>
+                          {% endfor %}
             {% if session["user"] %}
               <th scope="col" class="app-data-table__header app-data-table__header--ui">
                 <span class="govuk-visually-hidden">Action</span>
@@ -76,6 +76,7 @@
       </table>
     </section>
     <p class="govuk-hint govuk-!-margin-top-3">This dataset was last updated on {{dataset.last_updated.strftime("%d %B %Y")}}</p>
+    <p class="govuk-body govuk-!-margin-top-3"><a href="{{url_for('main.csv', id=dataset.dataset)}}">Download a csv file of this data</a></p>
     {% else %}
       {{
         govukInsetText({

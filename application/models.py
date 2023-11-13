@@ -94,7 +94,7 @@ class Dataset(DateModel):
             "name": self.name,
             "total_records": len(self.records),
             "last_updated": self.last_updated,
-            "data": f"{url_for('main.dataset', id=self.dataset, _external=True)}",
+            "data": f"{url_for('main.dataset_json', id=self.dataset, _external=True)}",
         }
 
 

@@ -4,6 +4,7 @@ from enum import Enum
 from functools import total_ordering
 from typing import List, Optional
 
+from flask import url_for
 from sqlalchemy import UUID
 from sqlalchemy import Enum as ENUM
 from sqlalchemy import ForeignKey, Text, event
@@ -87,6 +88,15 @@ class Dataset(DateModel):
     def __repr__(self):
         return f"<Dataset(id={self.name}, name={self.name}, fields={self.fields})>"
 
+    def to_dict(self):
+        return {
+            "dataset": self.dataset,
+            "name": self.name,
+            "total_records": len(self.records),
+            "last_updated": self.last_updated,
+            "data": f"{url_for('main.dataset', id=self.dataset, _external=True)}",
+        }
+
 
 class Record(DateModel):
     __tablename__ = "record"
@@ -112,6 +122,14 @@ class Field(DateModel):
         "Dataset", secondary=dataset_field, back_populates="fields"
     )
     description: Mapped[Optional[str]] = mapped_column(Text)
+
+    def to_dict(self):
+        return {
+            "field": self.field,
+            "name": self.name,
+            "datatype": self.datatype,
+            "description": self.description,
+        }
 
     def __repr__(self):
         return f"<Field(name={self.name})>"

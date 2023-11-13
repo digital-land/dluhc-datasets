@@ -41,9 +41,16 @@ def _collect_start_date(data):
 
 
 @main.route("/")
+@main.route("/index")
 def index():
     ds = db.session.query(Dataset).order_by(Dataset.dataset).all()
     return render_template("datasets.html", datasets=ds, isHomepage=True)
+
+
+@main.route("/index.json")
+def index_json():
+    ds = db.session.query(Dataset).order_by(Dataset.dataset).all()
+    return {"datasets": [d.to_dict() for d in ds]}
 
 
 @main.route("/support")
@@ -94,6 +101,17 @@ def dataset(id):
         sub_navigation=sub_navigation,
         page=page,
     )
+
+
+@main.route("/dataset/<string:id>.json")
+def dataset_json(id):
+    dataset = Dataset.query.get(id)
+    return {
+        "dataset": dataset.dataset,
+        "name": dataset.name,
+        "fields": [field.field for field in dataset.fields],
+        "records": [r.data for r in dataset.records],
+    }
 
 
 @main.route("/dataset/<string:id>/history")
@@ -382,6 +400,15 @@ def schema(id):
         sub_navigation=sub_navigation,
         page=page,
     )
+
+
+@main.route("/dataset/<string:id>/schema.json")
+def schema_json(id):
+    dataset = Dataset.query.get(id)
+    return {
+        "dataset": dataset.dataset,
+        "fields": [field.to_dict() for field in dataset.fields],
+    }
 
 
 @main.route("/dataset/<string:id>.csv")

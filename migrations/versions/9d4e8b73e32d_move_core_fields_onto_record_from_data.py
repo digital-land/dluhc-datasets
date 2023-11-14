@@ -5,12 +5,8 @@ Revises: ad4468dec19f
 Create Date: 2023-11-13 12:18:08.258203
 
 """
-import datetime
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.orm.session import Session
-from application.models import Record
-
 
 # revision identifiers, used by Alembic.
 revision = "9d4e8b73e32d"
@@ -27,60 +23,6 @@ def upgrade():
         batch_op.add_column(sa.Column("reference", sa.Text(), nullable=True))
         batch_op.add_column(sa.Column("description", sa.Text(), nullable=True))
         batch_op.add_column(sa.Column("notes", sa.Text(), nullable=True))
-
-    session = Session(bind=op.get_bind())
-
-    for record in session.query(Record):
-        entity = record.data.pop("entity", None)
-        if entity:
-            try:
-                entity = int(entity)
-                record.entity = entity
-            except ValueError:
-                pass
-        prefix = record.data.pop("prefix", None)
-        if prefix:
-            record.prefix = prefix
-        reference = record.data.pop("reference", None)
-        if reference:
-            record.reference = reference
-        description = record.data.pop("description", None)
-        if description:
-            record.description = description
-        notes = record.data.pop("notes", None)
-        if notes:
-            record.notes = notes
-
-        entry_date = record.data.pop("entry-date", None)
-        if entry_date and record.entry_date is None:
-            try:
-                record.entry_date = datetime.datetime.strptime(
-                    entry_date, "%Y-%m-%d"
-                ).date()
-            except Exception:
-                record.entry_date = None
-
-        start_date = record.data.pop("start-date", None)
-        if start_date and record.start_date is None:
-            try:
-                record.start_date = datetime.datetime.strptime(
-                    start_date, "%Y-%m-%d"
-                ).date()
-            except Exception:
-                record.start_date = None
-
-        end_date = record.data.pop("end-date", None)
-        if end_date and record.end_date is None:
-            try:
-                record.end_date = datetime.datetime.strptime(
-                    end_date, "%Y-%m-%d"
-                ).date()
-            except Exception:
-                record.end_date = None
-
-        session.add(record)
-        session.commit()
-
     # ### end Alembic commands ###
 
 

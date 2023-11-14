@@ -1,7 +1,4 @@
-# commands for loading csv files into database
-
 import csv
-import os
 from pathlib import Path
 
 import frontmatter
@@ -9,14 +6,7 @@ import requests
 from flask.cli import AppGroup
 
 from application.extensions import db
-from application.models import (
-    ChangeLog,
-    ChangeType,
-    Dataset,
-    Field,
-    Record,
-    dataset_field,
-)
+from application.models import Dataset, Field
 
 data_cli = AppGroup("data")
 
@@ -32,41 +22,12 @@ dataset_field_query = (
     "{datasette_url}/dataset_field.json?dataset__exact={dataset}&_shape=array"
 )
 
+dataset_editor_base_url = "https://dluhc-datasets.planning-data.dev"
 
-@data_cli.command("load")
-def load_db():
-    print("loading db")
 
-    data_dir = os.path.join(Path(__file__).parent.parent, "data", "registers")
-
-    fields = requests.get(fields_query).json()
-    for field in fields:
-        f = Field.query.get(field["field"])
-        if f is None:
-            f = Field(
-                field=field["field"],
-                name=field["name"],
-                datatype=field["datatype"],
-                description=field["description"],
-            )
-            db.session.add(f)
-            db.session.commit()
-
-    for filename in os.listdir(data_dir):
-        if filename.endswith(".csv"):
-            file = Path(filename)
-            dataset_name = file.stem
-            if not Dataset.query.get(dataset_name):
-                human_readable = dataset_name.replace("-", " ").capitalize()
-                dataset = Dataset(dataset=dataset_name, name=human_readable)
-                try:
-                    db.session.add(dataset)
-                    db.session.commit()
-                    print(f"dataset {dataset.dataset} with name {dataset.name} added")
-                except Exception as e:
-                    print(e)
-                    db.session.rollback()
-
+@data_cli.command("dataset-fields")
+def dataset_fields():
+    print("loading dataset fields")
     for dataset in Dataset.query.all():
         schema_url = specfication_markdown_url.format(
             base_url=base_url, dataset=dataset.dataset
@@ -97,61 +58,7 @@ def load_db():
         else:
             print(f"no markdown file found at {schema_url}")
 
-    for filename in os.listdir(data_dir):
-        f = Path(filename)
-        dataset_name = f.stem
-        if dataset_name not in [
-            "planning-application-category",
-            "development-plan-event",
-        ]:
-            print(f"load data for {filename}")
-            dataset = Dataset.query.get(dataset_name)
-            with open(os.path.join(data_dir, f), newline="") as csvfile:
-                reader = csv.DictReader(csvfile)
-                for row_id, row in enumerate(reader):
-                    record = Record(row_id=row_id, data=row)
-                    dataset.records.append(record)
-                try:
-                    db.session.add(dataset)
-                    db.session.commit()
-                    for record in dataset.records:
-                        try:
-                            notes = f"Added record {record.data['prefix']}:{record.data['reference']}"
-                        except KeyError:
-                            notes = f"Added record {record.data}"
-                            print(
-                                f"Could not find prefix or reference in data for {dataset_name}"
-                            )
-                        # skip organisation dataset as no prefix or reference
-                        if dataset_name != "organisation-dataset":
-                            change_log = ChangeLog(
-                                change_type=ChangeType.ADD,
-                                data=row,
-                                notes=notes,
-                                dataset_id=dataset.dataset,
-                                record_id=record.id,
-                            )
-                            db.session.add(change_log)
-                            db.session.commit()
-                except Exception as e:
-                    print(f"error adding file {file}")
-                    print(e)
-                    db.session.rollback()
-        else:
-            print(f"skipping {filename}")
-
     print("db loaded")
-
-
-@data_cli.command("drop")
-def drop_data():
-    db.session.query(dataset_field).delete()
-    ChangeLog.query.delete()
-    Record.query.delete()
-    Dataset.query.delete()
-    Field.query.delete()
-    db.session.commit()
-    print("data dropped")
 
 
 @data_cli.command("check")
@@ -213,3 +120,27 @@ def check_for_new_datasets():
             db.session.commit()
 
     print("new datasets added to database")
+
+
+@data_cli.command("backup-registers")
+def backup_registers():
+    print("backing up registers")
+    resp = requests.get(f"{dataset_editor_base_url}/index.json")
+    dataset_json = resp.json()
+    for dataset in dataset_json["datasets"]:
+        if dataset["total_records"] > 0:
+            resp = requests.get(dataset["data"])
+            data = resp.json()
+            fields = [field for field in data["fields"]]
+            dataset = data["dataset"]
+            data_dir = Path(__file__).resolve().parent.parent / "data/registers"
+            file_path = data_dir / f"{dataset}.csv"
+            try:
+                with open(file_path, "w") as csvfile:
+                    writer = csv.DictWriter(csvfile, fieldnames=fields)
+                    writer.writeheader()
+                    writer.writerows(data["records"])
+                # print(f"backed up {dataset} to {file_path}")
+            except Exception as e:
+                print(f"failed to backup {dataset} to {file_path} with error {e}")
+    print("registers backed up")

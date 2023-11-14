@@ -103,12 +103,45 @@ class Record(DateModel):
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     row_id: Mapped[int] = mapped_column(db.Integer, nullable=False)
+
+    entity: Mapped[int] = mapped_column(db.BigInteger, nullable=True)
+    prefix: Mapped[str] = mapped_column(Text, nullable=True)
+    reference: Mapped[str] = mapped_column(Text, nullable=True)
+    description: Mapped[str] = mapped_column(Text, nullable=True)
+    notes: Mapped[str] = mapped_column(Text, nullable=True)
+
+    data: Mapped[dict] = mapped_column(MutableDict.as_mutable(JSONB), nullable=False)
+
     dataset_id: Mapped[str] = mapped_column(Text, ForeignKey("dataset.dataset"))
     dataset: Mapped["Dataset"] = relationship("Dataset", back_populates="records")
-    data: Mapped[dict] = mapped_column(MutableDict.as_mutable(JSONB), nullable=False)
+
+    def get(self, field, default=None):
+        field_name = field.replace("-", "_")
+        if field_name != "dataset":
+            if hasattr(self, field_name):
+                value = getattr(self, field_name)
+                return value if value else default
+        return self.data.get(field, default)
 
     def __repr__(self):
         return f"<Record(dataset={self.dataset.name}, row_id={self.row_id}, data={self.data}))>"
+
+    def to_dict(self):
+        return {
+            "entity": self.entity,
+            "prefix": self.prefix,
+            "reference": self.reference,
+            "description": self.description,
+            "notes": self.notes,
+            "entry-date": self.entry_date.strftime("%Y-%m-%d")
+            if self.entry_date
+            else None,
+            "start-date": self.start_date.strftime("%Y-%m-%d")
+            if self.start_date
+            else None,
+            "end-date": self.end_date.strftime("%Y-%m-%d") if self.end_date else None,
+            **self.data,
+        }
 
 
 @total_ordering

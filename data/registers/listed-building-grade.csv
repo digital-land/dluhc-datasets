@@ -1,4 +1,4 @@
-end-date,entity,entry-date,reference,name,notes,description,prefix,start-date
-,700000,,I,I,,,listed-building-grade,
-,700001,,II,II,,,listed-building-grade,
-,700002,,II*,II*,,,listed-building-grade,
+description,end-date,entity,entry-date,name,notes,prefix,reference,start-date
+,,700000,,I,,listed-building-grade,I,
+,,700001,,II,,listed-building-grade,II,
+,,700002,,II*,,listed-building-grade,II*,

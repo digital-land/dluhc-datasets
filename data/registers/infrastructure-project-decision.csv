@@ -1,0 +1,5 @@
+description,end-date,entity,entry-date,name,notes,prefix,reference,start-date,organisation
+,,,,Consent granted,,infrastructure-project-decision,consent-granted,,government-organisation:EA39
+,,,,Consent rejected,,infrastructure-project-decision,consent-rejected,,government-organisation:EA39
+,,,,Withdrawn,,infrastructure-project-decision,withdrawn,,government-organisation:EA39
+,,,,Appealed,,infrastructure-project-decision,appealed,,government-organisation:EA39

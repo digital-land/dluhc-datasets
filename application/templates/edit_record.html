@@ -26,7 +26,7 @@
             appField(
               field,
               error_message = ' '.join(form.errors[field.field]) if form.errors[field.field] else '',
-              value = record.data.get(field.field, ''),
+              value = record.get(field.field, ''),
               disabled = True,
               hint = "You cannot edit this field"
             )
@@ -36,7 +36,7 @@
             appField(
               field,
               error_message = ' '.join(form.errors[field.field]) if form.errors[field.field] else '',
-              value = form[field.field].data if form[field.field].data else record.data.get(field.field, '')
+              value = form[field.field].data if form[field.field].data else record.get(field.field, '')
             )
           }}
           {% endif %}

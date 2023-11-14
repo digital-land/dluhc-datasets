@@ -110,7 +110,7 @@ def dataset_json(id):
         "dataset": dataset.dataset,
         "name": dataset.name,
         "fields": [field.field for field in dataset.fields],
-        "records": [r.data for r in dataset.records],
+        "records": [r.to_dict() for r in dataset.records],
     }
 
 
@@ -189,12 +189,21 @@ def add_record(id):
         if "csrf_token" in data:
             del data["csrf_token"]
 
-        record = Record(row_id=next_id, data=data)
+        record = Record(row_id=next_id)
+        extra_data = {}
+        for key, val in data.items():
+            if hasattr(record, key):
+                setattr(record, key, val)
+            else:
+                extra_data[key] = val
+        if extra_data:
+            record.data = extra_data
+
         dataset.records.append(record)
         db.session.add(dataset)
         db.session.commit()
 
-        notes = f"Added record {record.data['prefix']}:{record.data['reference']}"
+        notes = f"Added record {record.prefix}:{record.reference}"
         change_log = ChangeLog(
             change_type=ChangeType.ADD,
             data=data,
@@ -266,13 +275,16 @@ def edit_record(id, record_id):
 
     if form.validate_on_submit():
         # capture current record data as "previous" before updating
-        previous = record.data.copy()
+        previous = record.to_dict()
         reference = previous["reference"]
 
         # update record data
         for key, value in form.data.items():
             if key not in ["csrf_token", "edit_notes"]:
-                record.data[key] = value
+                if hasattr(record, key):
+                    setattr(record, key, value)
+                else:
+                    record.data[key] = value
 
         start_date, format = _collect_start_date(request.form)
         if start_date:
@@ -286,10 +298,12 @@ def edit_record(id, record_id):
 
         # end current version and create log entry
         previous["end-date"] = datetime.datetime.today().strftime("%Y-%m-%d")
-        edit_notes = f"Updated {record.data['prefix']}:{record.data['reference']}. {form.edit_notes.data}"
+        edit_notes = (
+            f"Updated {record.prefix}:{record.reference}. {form.edit_notes.data}"
+        )
         change_log = ChangeLog(
             change_type=ChangeType.EDIT,
-            data={"from": previous, "to": record.data},
+            data={"from": previous, "to": record.to_dict()},
             notes=edit_notes,
             record_id=record.id,
         )
@@ -420,7 +434,7 @@ def csv(id):
         writer = DictWriter(output, fieldnames)
         writer.writeheader()
         for record in dataset.records:
-            writer.writerow(record.data)
+            writer.writerow(record.to_dict())
             csv_output = output.getvalue().encode("utf-8")
 
         response = make_response(csv_output)

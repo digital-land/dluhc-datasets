@@ -1,4 +1,4 @@
-end-date,entity,entry-date,name,notes,description,reference,prefix,start-date
-,,2021-02-04,permissioned,,,permissioned,planning-permission-status,2021-02-04
-,,2021-02-04,not permissioned,,,not-permissioned,planning-permission-status,2021-02-04
-,,2021-02-04,pending decision,,,pending-decision,planning-permission-status,2021-02-04
+description,end-date,entity,entry-date,name,notes,prefix,reference,start-date
+,,,2021-02-04,permissioned,,planning-permission-status,permissioned,2021-02-04
+,,,2021-02-04,not permissioned,,planning-permission-status,not-permissioned,2021-02-04
+,,,2021-02-04,pending decision,,planning-permission-status,pending-decision,2021-02-04

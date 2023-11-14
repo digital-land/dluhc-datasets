@@ -1,0 +1,6 @@
+description,end-date,entity,entry-date,name,notes,prefix,reference,start-date,organisation
+,,,,Project acceptance letter,,infrastructure-project-document-type,project-acceptance-letter,,government-organisation:EA39
+,,,,Section 56 notice,,infrastructure-project-document-type,section-56-notice,,government-organisation:EA39
+,,,,Site visit report,,infrastructure-project-document-type,site-visit-report,,government-organisation:EA39
+,,,,Decision notice,,infrastructure-project-document-type,decision-notice,,government-organisation:EA39
+,,,,Development consent order,,infrastructure-project-document-type,development-consent-order,,government-organisation:EA39

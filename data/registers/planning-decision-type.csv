@@ -1,4 +1,4 @@
-entity,prefix,reference,name,notes,entry-date,start-date,end-date
-,planning-decision-type,planning-officer,Planning officer,,2023-08-22,,
-,planning-decision-type,committee,Committee,,2023-08-22,,
-,planning-decision-type,secretary-of-state,Secretary of State,,2023-08-22,,
+end-date,entity,entry-date,name,notes,prefix,reference,start-date
+,,2023-08-22,Planning officer,,planning-decision-type,planning-officer,
+,,2023-08-22,Committee,,planning-decision-type,committee,
+,,2023-08-22,Secretary of State,,planning-decision-type,secretary-of-state,

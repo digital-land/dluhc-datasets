@@ -22,4 +22,3 @@ planning-decision-type,,
 planning-permission-status,https://raw.githubusercontent.com/digital-land/planning-permission-status-collection/main/data/planning-permission-status.csv,Used by brownfield land in planning-status field
 provision-reason,https://raw.githubusercontent.com/digital-land/specification/main/content/provision-reason.csv,A list of the types of reason as to why an LPA needs to publish data
 article-4-direction-rule,https://raw.githubusercontent.com/digital-land/article-4-direction-collection/main/data/article-4-direction-rule.csv,
-article-4-direction-rule,http://somewhere.else.com/test.csv,test

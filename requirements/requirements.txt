@@ -18,15 +18,21 @@ certifi==2023.7.22
     #   requests
     #   sentry-sdk
 cffi==1.15.1
-    # via cryptography
+    # via
+    #   cryptography
+    #   pynacl
 charset-normalizer==3.2.0
     # via requests
 click==8.1.7
     # via flask
 cryptography==41.0.4
-    # via authlib
+    # via
+    #   authlib
+    #   pyjwt
 deepmerge==1.1.0
     # via govuk-frontend-wtf
+deprecated==1.2.14
+    # via pygithub
 digital-land-frontend @ git+https://github.com/digital-land/digital-land-frontend.git
     # via -r requirements/requirements.in
 flask==2.3.3
@@ -94,6 +100,16 @@ psycopg2-binary==2.9.7
     # via -r requirements/requirements.in
 pycparser==2.21
     # via cffi
+pygithub==2.1.1
+    # via -r requirements/requirements.in
+pyjwt[crypto]==2.8.0
+    # via
+    #   pygithub
+    #   pyjwt
+pynacl==1.5.0
+    # via pygithub
+python-dateutil==2.8.2
+    # via pygithub
 python-dotenv==1.0.0
     # via -r requirements/requirements.in
 python-frontmatter==1.0.0
@@ -101,9 +117,13 @@ python-frontmatter==1.0.0
 pyyaml==6.0.1
     # via python-frontmatter
 requests==2.31.0
-    # via -r requirements/requirements.in
+    # via
+    #   -r requirements/requirements.in
+    #   pygithub
 sentry-sdk[flask]==1.31.0
     # via -r requirements/requirements.in
+six==1.16.0
+    # via python-dateutil
 sqlalchemy==2.0.21
     # via
     #   alembic
@@ -111,9 +131,11 @@ sqlalchemy==2.0.21
 typing-extensions==4.8.0
     # via
     #   alembic
+    #   pygithub
     #   sqlalchemy
 urllib3==2.0.5
     # via
+    #   pygithub
     #   requests
     #   sentry-sdk
 validators==0.22.0
@@ -122,6 +144,8 @@ werkzeug==2.3.7
     # via
     #   flask
     #   flask-debugtoolbar
+wrapt==1.16.0
+    # via deprecated
 wtforms==3.0.1
     # via
     #   flask-wtf

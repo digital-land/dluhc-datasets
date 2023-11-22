@@ -2,11 +2,12 @@ import csv
 from pathlib import Path
 
 import frontmatter
+import github
 import requests
 from flask.cli import AppGroup
 
 from application.extensions import db
-from application.models import Dataset, Field
+from application.models import ChangeLog, ChangeType, Dataset, Field
 
 data_cli = AppGroup("data")
 
@@ -144,3 +145,93 @@ def backup_registers():
             except Exception as e:
                 print(f"failed to backup {dataset} to {file_path} with error {e}")
     print("registers backed up")
+
+
+@data_cli.command("push-registers")
+def push_registers():
+    from dotenv import dotenv_values
+
+    print("Pushing registers")
+
+    config = dotenv_values(".env")
+    app_id = int(config.get("GITHUB_APP_ID"))
+    private_key = config.get("GITHUB_APP_PRIVATE_KEY")
+    repo_name = config.get("DATASETS_REPO")
+    registers_path = config.get("DATASETS_REPO_REGISTERS_PATH")
+
+    auth = github.Auth.AppAuth(app_id, private_key)
+    gi = github.GithubIntegration(auth=auth)
+    installation_id = gi.get_installations()[0].id
+    gh = gi.get_github_for_installation(installation_id)
+    repo = gh.get_repo(repo_name)
+
+    datasets = Dataset.query.all()
+    for dataset in datasets:
+        updates = ChangeLog.query.filter(
+            ChangeLog.dataset_id == dataset.dataset,
+            ChangeLog.pushed_to_github.isnot(None),
+            ChangeLog.pushed_to_github.is_(False),
+            ChangeLog.change_type == ChangeType.EDIT,
+        ).all()
+        additions = ChangeLog.query.filter(
+            ChangeLog.dataset_id == dataset.dataset,
+            ChangeLog.pushed_to_github.isnot(None),
+            ChangeLog.pushed_to_github.is_(False),
+            ChangeLog.change_type == ChangeType.ADD,
+        ).all()
+
+        if updates or additions:
+            file_path = f"{registers_path}/{dataset.dataset}.csv"
+            file, contents = _get_file_contents(repo, file_path)
+            lines = contents.split("\n")
+            headers = lines[0].split(",")
+
+            for update in updates:
+                row_parts = []
+                data = update.data["to"]
+                for header in headers:
+                    value = data.get(header, "")
+                    if value is None:
+                        value = ""
+                    if not isinstance(value, str):
+                        value = str(value)
+                    row_parts.append(value)
+                row_string = ",".join(row_parts)
+                lines[update.record.row_id] = row_string
+
+            for addition in additions:
+                row_parts = []
+                data = addition.data
+                for header in headers:
+                    value = data.get(header, "")
+                    if value is None:
+                        value = ""
+                    if not isinstance(value, str):
+                        value = str(value)
+                    row_parts.append(value)
+                row_string = ",".join(row_parts)
+                lines.append(row_string)
+
+            updated_contents = "\n".join(lines)
+            _commit(repo, file, updated_contents)
+
+        all_changes = updates + additions
+        for change in all_changes:
+            change.pushed_to_github = True
+            db.session.add(change)
+
+        if db.session.dirty:
+            db.session.commit()
+
+    print("Done")
+
+
+def _get_file_contents(repo, file_path):
+    file = repo.get_contents(file_path)
+    file_content = file.decoded_content.decode("utf-8")
+    return file, file_content
+
+
+def _commit(repo, file, contents):
+    repo.update_file(file.path, "Updating file", contents, file.sha)
+    print(f"{file.path} updated successfully!")

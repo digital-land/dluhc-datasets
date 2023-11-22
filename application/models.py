@@ -56,6 +56,20 @@ class ChangeLog(db.Model):
     record_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         UUID(as_uuid=True), ForeignKey("record.id")
     )
+    record: Mapped["Record"] = relationship("Record")
+
+    pushed_to_github: Mapped[bool] = mapped_column(
+        db.Boolean, default=False, nullable=True
+    )
+
+    def __repr__(self):
+        parts = [
+            f"<ChangeLog(dataset={self.dataset.name}",
+            f"change_type={self.change_type}",
+            f"created_date={self.created_date}",
+            f"pushed_to_github={self.pushed_to_github})>",
+        ]
+        return ", ".join(parts)
 
 
 class Dataset(DateModel):
@@ -135,10 +149,10 @@ class Record(DateModel):
             "notes": self.notes,
             "entry-date": self.entry_date.strftime("%Y-%m-%d")
             if self.entry_date
-            else None,
+            else "",
             "start-date": self.start_date.strftime("%Y-%m-%d")
             if self.start_date
-            else None,
+            else "",
             "end-date": self.end_date.strftime("%Y-%m-%d") if self.end_date else None,
             **self.data,
         }

@@ -19,6 +19,8 @@ class Config:
     GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
     SAFE_URLS = set(os.getenv("SAFE_URLS", "").split(","))
     AUTHENTICATION_ON = True
+    DATASETS_REPO_NAME = os.getenv("DATASETS_REPO_NAME")
+    DATASETS_REPO_REGISTERS_PATH = os.getenv("DATASETS_REPO_REGISTERS_PATH")
 
 
 class DevelopmentConfig(Config):

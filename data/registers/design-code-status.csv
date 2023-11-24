@@ -3,3 +3,4 @@ description,end-date,entity,entry-date,name,notes,prefix,reference,start-date
 ,,622001,,Draft,,design-code-status,draft,
 ,,622002,,Adopted,,design-code-status,adopted,
 ,,622003,,Withdrawn,,design-code-status,withdrawn,
+This is the description,,,2023-11-24,Yet another test design status,These are the notes,design-code-status,yet-another-test-design-status,

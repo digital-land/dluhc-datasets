@@ -6,3 +6,4 @@ description,end-date,entity,entry-date,name,notes,prefix,reference,start-date
 
 Another status test for backup to github,,,2023-11-22,Another test status,Update the notes,design-code-status,another-test-status,
 ,,,2023-11-24,Test design code,No notes,design-code-status,test-design-code,
+,,,2023-11-24,Design code status test,Notes for the design code,design-code-status,design-code-status-test,

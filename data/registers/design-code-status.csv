@@ -5,3 +5,4 @@ description,end-date,entity,entry-date,name,notes,prefix,reference,start-date
 ,,622003,,Withdrawn,,design-code-status,withdrawn,
 
 ,,,2023-11-24,Design code status test,Notes for the design code,design-code-status,design-code-status-test,
+,,,2023-11-24,Design code status update test,A test of adding new test update status,design-code-status,design-code-status-update-test,

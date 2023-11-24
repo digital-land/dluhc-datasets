@@ -175,6 +175,7 @@ def push_registers():
             messages = []
             file_path = f"{registers_path}/{dataset.dataset}.csv"
             file, contents = _get_file_contents(repo, file_path)
+            contents = contents.strip()
             lines = contents.split("\n")
             headers = lines[0].split(",")
 
@@ -193,7 +194,7 @@ def push_registers():
                 lines[update.record.row_id] = row_string
 
             for addition in additions:
-                messages.append(update.notes)
+                messages.append(addition.notes)
                 row_parts = []
                 data = addition.data
                 for header in headers:

@@ -2,7 +2,4 @@ description,end-date,entity,entry-date,name,notes,prefix,reference,start-date
 ,,622000,,Proposed,,design-code-status,proposed,
 ,,622001,,Draft,,design-code-status,draft,
 ,,622002,,Adopted,,design-code-status,adopted,
-Another status test for backup to github,,,2023-11-22,Another test status,Update the notes,design-code-status,another-test-status,
-
-Another status test for backup to github,,,2023-11-22,Another test status,A fake test of status,design-code-status,another-test-status,
-Another status test for backup to github,,,2023-11-22,Another test status,A fake test of status,design-code-status,another-test-status,
+,,622003,,Withdrawn,,design-code-status,withdrawn,

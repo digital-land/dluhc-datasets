@@ -172,12 +172,14 @@ def push_registers():
         ).all()
 
         if updates or additions:
+            messages = []
             file_path = f"{registers_path}/{dataset.dataset}.csv"
             file, contents = _get_file_contents(repo, file_path)
             lines = contents.split("\n")
             headers = lines[0].split(",")
 
             for update in updates:
+                messages.append(update.notes)
                 row_parts = []
                 data = update.data["to"]
                 for header in headers:
@@ -191,6 +193,7 @@ def push_registers():
                 lines[update.record.row_id] = row_string
 
             for addition in additions:
+                messages.append(update.notes)
                 row_parts = []
                 data = addition.data
                 for header in headers:
@@ -204,7 +207,8 @@ def push_registers():
                 lines.append(row_string)
 
             updated_contents = "\n".join(lines)
-            _commit(repo, file, updated_contents)
+            commit_message = "\n".join(messages)
+            _commit(repo, file, updated_contents, message=commit_message)
 
         all_changes = updates + additions
         for change in all_changes:
@@ -234,6 +238,6 @@ def _get_file_contents(repo, file_path):
     return file, file_content
 
 
-def _commit(repo, file, contents):
-    repo.update_file(file.path, "Updating file", contents, file.sha)
+def _commit(repo, file, contents, message="Updating file"):
+    repo.update_file(file.path, message, contents, file.sha)
     print(f"{file.path} updated successfully!")

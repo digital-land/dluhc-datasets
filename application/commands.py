@@ -37,9 +37,9 @@ def dataset_fields():
         if markdown.status_code == 200:
             front = frontmatter.loads(markdown.text)
             fields = [field["field"] for field in front["fields"]]
-            udpated_fields = [field for field in fields if field != dataset.name]
+            updated_fields = [field for field in fields if field != dataset.name]
 
-            for field in udpated_fields:
+            for field in updated_fields:
                 f = Field.query.get(field)
                 if f is None:
                     human_readable = field.replace("-", " ").capitalize()
@@ -52,10 +52,15 @@ def dataset_fields():
                         f.description = data[field]["description"]
                     db.session.add(f)
                     db.session.commit()
-                    print(f"field {f.field} with name {f.name} added")
-                dataset.fields.append(f)
-            db.session.add(dataset)
-            db.session.commit()
+                    print(f"new field {f.field} added to {dataset.dataset}")
+
+                if f not in dataset.fields:
+                    dataset.fields.append(f)
+                    db.session.add(dataset)
+                    db.session.commit()
+                    print(f"field {f.field} added to {dataset.dataset}")
+                else:
+                    print(f"field {f.field} already in schema for {dataset.dataset}")
         else:
             print(f"no markdown file found at {schema_url}")
 

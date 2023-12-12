@@ -118,8 +118,13 @@ def check_for_new_datasets():
         for field in fields:
             f = Field.query.get(field["field"])
             if f is None:
-                print("Something went wrong, field not found in database")
-                continue
+                human_readable = field["field"].replace("-", " ").capitalize()
+                f = Field(field=field["field"], name=human_readable)
+                f.datatype = field["datatype"]
+                if field.get("description"):
+                    f.description = field["description"]
+                db.session.add(f)
+                db.session.commit()
             print(f"field {f.field} added to dataset {dataset.dataset}")
             dataset.fields.append(f)
             db.session.add(dataset)

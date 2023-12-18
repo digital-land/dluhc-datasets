@@ -6,6 +6,7 @@ from csv import DictWriter
 from flask import (
     Blueprint,
     abort,
+    flash,
     make_response,
     redirect,
     render_template,
@@ -185,11 +186,21 @@ def add_record(id):
             .first()
         )
         next_id = last_record.row_id + 1 if last_record else 0
+        entity = (
+            last_record.entity + 1
+            if (last_record is not None and last_record.entity is not None)
+            else dataset.entity_minimum
+        )
+        if not (dataset.entity_minimum <= entity <= dataset.entity_maximum):
+            flash(
+                f"entity id {entity} is outside of range {dataset.entity_minimum} to {dataset.entity_maximum}"
+            )
+            return redirect(url_for("main.dataset", id=dataset.dataset))
 
         if "csrf_token" in data:
             del data["csrf_token"]
 
-        record = Record(row_id=next_id)
+        record = Record(row_id=next_id, entity=entity)
         extra_data = {}
         for key, val in data.items():
             if hasattr(record, key):

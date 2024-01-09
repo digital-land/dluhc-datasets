@@ -100,7 +100,15 @@ def check_for_new_datasets():
         dataset for dataset in data if dataset["dataset"] not in database_datasets
     ]
     for dataset in new_datasets:
+        schema_url = specfication_markdown_url.format(
+            base_url=base_url, dataset=dataset
+        )
         dataset = Dataset(dataset=dataset["dataset"], name=dataset["name"])
+        markdown = requests.get(schema_url)
+        if markdown.status_code == 200:
+            front = frontmatter.loads(markdown.text)
+            dataset.entity_min = front.get("entity-minimum")
+            dataset.entity_max = front.get("entity-maximum")
         db.session.add(dataset)
         db.session.commit()
         print(f"dataset {dataset.dataset} with name {dataset.name} added")
@@ -230,6 +238,29 @@ def push_registers():
             db.session.commit()
 
     print("Done")
+
+
+@data_cli.command("assign-entity")
+def assign_entity_range():
+    print("assigning entity range")
+    datasets = Dataset.query.filter(
+        Dataset.entity_minimum.is_(None), Dataset.entity_maximum.is_(None)
+    ).all()
+
+    for dataset in datasets:
+        schema_url = specfication_markdown_url.format(
+            base_url=base_url, dataset=dataset
+        )
+        markdown = requests.get(schema_url)
+        if markdown.status_code == 200:
+            front = frontmatter.loads(markdown.text)
+            dataset.entity_min = front.get("entity-minimum")
+            dataset.entity_max = front.get("entity-maximum")
+            print(
+                f"dataset {dataset.dataset} updated with entity range {dataset.entity_min} - {dataset.entity_max}"
+            )  # noqa
+        db.session.add(dataset)
+        db.session.commit()
 
 
 def _get_repo(config):

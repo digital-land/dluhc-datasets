@@ -240,26 +240,26 @@ def push_registers():
     print("Done")
 
 
-@data_cli.command("assign-entity")
-def assign_entity_range():
-    print("assigning entity range")
-    datasets = Dataset.query.filter(
-        Dataset.entity_minimum.is_(None), Dataset.entity_maximum.is_(None)
-    ).all()
+@data_cli.command("assign-entity-numbers")
+def assign_entity_number():
+    print("assigning entity numbers")
+    for dataset in Dataset.query.all():
+        entity_min = dataset.entity_minimum
+        entity_max = dataset.entity_maximum
+        current = 0
 
-    for dataset in datasets:
-        schema_url = specfication_markdown_url.format(
-            base_url=base_url, dataset=dataset
-        )
-        markdown = requests.get(schema_url)
-        if markdown.status_code == 200:
-            front = frontmatter.loads(markdown.text)
-            dataset.entity_min = front.get("entity-minimum")
-            dataset.entity_max = front.get("entity-maximum")
-            print(
-                f"dataset {dataset.dataset} updated with entity range {dataset.entity_min} - {dataset.entity_max}"
-            )  # noqa
-        db.session.add(dataset)
+        for record in dataset.records:
+            if record.entity is None:
+                entity = entity_min + current
+                if entity > entity_max:
+                    print("ran out of entity numbers")
+                    break
+                print(
+                    f"assigning entity number {entity} to {record.prefix}:{record.reference}"
+                )  # noqa
+                record.entity = entity
+                current += 1
+                db.session.add(record)
         db.session.commit()
 
 

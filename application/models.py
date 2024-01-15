@@ -103,7 +103,9 @@ class Dataset(DateModel):
         return sorted(self.fields)
 
     def __repr__(self):
-        return f"<Dataset(id={self.name}, name={self.name}, fields={self.fields})>"
+        return (
+            f"<Dataset(dataset={self.dataset}, name={self.name}, fields={self.fields})>"
+        )
 
     def to_dict(self):
         return {

@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileRequired
 from govuk_frontend_wtf.wtforms_widgets import GovDateInput
 from wtforms import DateField, StringField, TextAreaField, URLField
 from wtforms.validators import URL, DataRequired, ValidationError
@@ -56,3 +57,7 @@ class FormBuilder:
         for field in fields:
             if field.field not in skip_fields:
                 self.fields.append(field)
+
+
+class CsvUploadForm(FlaskForm):
+    csv_file = FileField("Upload a file", validators=[FileRequired()])

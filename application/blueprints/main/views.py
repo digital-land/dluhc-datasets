@@ -1,5 +1,7 @@
 import datetime
 import io
+import os
+import tempfile
 from collections import OrderedDict
 from csv import DictWriter
 
@@ -14,9 +16,10 @@ from flask import (
     url_for,
 )
 from sqlalchemy import desc
+from werkzeug.utils import secure_filename
 
 from application.extensions import db
-from application.forms import FormBuilder
+from application.forms import CsvUploadForm, FormBuilder
 from application.models import ChangeLog, ChangeType, Dataset, Record
 from application.utils import login_required
 
@@ -456,3 +459,34 @@ def csv(id):
         return response
     else:
         abort(404)
+
+
+@main.route("/dataset/<string:dataset>/upload", methods=["GET", "POST"])
+def upload_csv(dataset):
+    form = CsvUploadForm()
+    ds = Dataset.query.get(dataset)
+    if form.validate_on_submit():
+        f = form.csv_file.data
+        if _allowed_file(f.filename):
+            filename = secure_filename(f.filename)
+            temp_dir = tempfile.mkdtemp()
+            file_path = os.path.join(temp_dir, filename)
+            try:
+                f.save(file_path)
+                with open(file_path, "r") as csv_file:
+                    reader = csv.DictReader(csv_file)
+                    for row in reader:
+                        print(row)
+                        # do something with the row
+                return redirect(url_for("main.dataset", id=ds.dataset))
+            except Exception as e:
+                flash(f"Error: {e}")
+            finally:
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+
+    return render_template("upload.html", form=form, dataset=ds)
+
+
+def _allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() == "csv"

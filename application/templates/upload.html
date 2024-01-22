@@ -1,0 +1,21 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <span class="govuk-caption-l">{{ dataset.name }}</span>
+      <h1 class="govuk-heading-l">Upload a CSV file</h1>
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <form method="POST" action="{{ url_for('main.upload_csv', dataset=dataset.dataset) }}" enctype="multipart/form-data">
+          <div class="govuk-form-group">
+            {{ form.csv_file.label(class_="govuk-label") }}
+            {{ form.csv_file(class_="govuk-file-upload") }}
+            {{ form.csrf_token }}
+          </div>
+        </form>
+    </div>
+  </div>
+{% endblock content %}

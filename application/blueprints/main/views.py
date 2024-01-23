@@ -3,7 +3,7 @@ import io
 import os
 import tempfile
 from collections import OrderedDict
-from csv import DictWriter
+from csv import DictReader, DictWriter
 
 from flask import (
     Blueprint,
@@ -474,10 +474,21 @@ def upload_csv(dataset):
             try:
                 f.save(file_path)
                 with open(file_path, "r") as csv_file:
-                    reader = csv.DictReader(csv_file)
-                    for row in reader:
-                        print(row)
-                        # do something with the row
+                    reader = DictReader(csv_file)
+                    # as this is for new records start entity at minimum
+                    entity = ds.entity_minimum
+                    for row_id, data in enumerate(reader):
+                        if entity > ds.entity_maximum:
+                            flash(
+                                f"entity id {entity} is outside of range {ds.entity_minimum} to {ds.entity_maximum}"
+                            )
+                            return redirect(url_for("main.dataset", id=ds.dataset))
+                        else:
+                            record = Record.factory(row_id, entity, ds.dataset, data)
+                            ds.records.append(record)
+                            db.session.add(ds)
+                            entity += 1
+                    db.session.commit()
                 return redirect(url_for("main.dataset", id=ds.dataset))
             except Exception as e:
                 flash(f"Error: {e}")

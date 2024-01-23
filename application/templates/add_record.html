@@ -16,7 +16,7 @@
 {% endif %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-three-quarters">
-  <form method="POST" action="{{ url_for('main.add_record', dataset=dataset.dataset) }}">
+  <form method="POST" action="{{ url_for('main.add_record', id=dataset.dataset) }}">
     <div class="govuk-form-group">
       {% for field in form_fields %}
         {% set _hint = '' %}

@@ -162,6 +162,20 @@ class Record(DateModel):
             **self.data,
         }
 
+    @classmethod
+    def factory(cls, row_id, entity, dataset, data_dict):
+        record = cls()
+        for attr_name in dir(record):
+            if not attr_name.startswith("__") and attr_name != "data":
+                if attr_name in data_dict:
+                    setattr(record, attr_name, data_dict.pop(attr_name))
+        record.row_id = row_id
+        record.entity = entity
+        record.prefix = dataset
+        record.reference = data_dict.get(dataset)
+        record.data = data_dict
+        return record
+
 
 @total_ordering
 class Field(DateModel):

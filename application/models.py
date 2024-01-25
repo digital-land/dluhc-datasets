@@ -162,18 +162,51 @@ class Record(DateModel):
             **self.data,
         }
 
+    @staticmethod
+    def __parse_date(date_string):
+        try:
+            date_object = datetime.datetime.strptime(date_string, "%Y-%m-%d").date()
+            return date_object
+        except ValueError:
+            print(
+                f"Could not parse date {date_string} - try with year only and default to 1st Jan"
+            )
+
+        try:
+            date_object = (
+                datetime.datetime.strptime(date_string, "%Y")
+                .date()
+                .replace(month=1, day=1)
+            )
+            return date_object
+
+        except ValueError:
+            print(f"Could not parse date {date_string} - skip processing")
+            return None
+
     @classmethod
     def factory(cls, row_id, entity, dataset, data_dict):
         record = cls()
-        for attr_name in dir(record):
-            if not attr_name.startswith("__") and attr_name != "data":
-                if attr_name in data_dict:
-                    setattr(record, attr_name, data_dict.pop(attr_name))
+        for column in record.__table__.columns:
+            if column.name != "data":
+                if column.name in data_dict:
+                    setattr(record, column.name, data_dict.pop(column.name))
+
+        for key, value in data_dict.items():
+            if key.endswith("-date") and value:
+                date_key = key.replace("-", "_")
+                date_value = cls.__parse_date(value)
+                setattr(record, date_key, date_value)
+
+        for key in ["start-date", "end_date", "entry_date"]:
+            if key in data_dict:
+                data_dict.pop(key)
+
         record.row_id = row_id
         record.entity = entity
         record.prefix = dataset
-        record.reference = data_dict.get(dataset)
         record.data = data_dict
+
         return record
 
 

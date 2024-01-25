@@ -487,8 +487,8 @@ def upload_csv(dataset):
                             record = Record.factory(row_id, entity, ds.dataset, data)
                             ds.records.append(record)
                             db.session.add(ds)
+                            db.session.commit()
                             entity += 1
-                    db.session.commit()
                 return redirect(url_for("main.dataset", id=ds.dataset))
             except Exception as e:
                 flash(f"Error: {e}")

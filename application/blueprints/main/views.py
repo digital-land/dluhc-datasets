@@ -476,9 +476,10 @@ def upload_csv(dataset):
                 f.save(file_path)
                 with open(file_path, "r") as csv_file:
                     reader = DictReader(csv_file)
-                    if set(reader.fieldnames) != set(fieldnames):
+                    addtional_fields = set(reader.fieldnames) - set(fieldnames)
+                    if addtional_fields:
                         flash(
-                            f"CSV file does not match dataset schema. Expected fields: {fieldnames}"
+                            f"CSV file contains fields not in specification: {addtional_fields}"
                         )
                         return redirect(url_for("main.upload_csv", dataset=ds.dataset))
                     # as this is for new records start entity at minimum

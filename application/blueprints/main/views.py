@@ -15,7 +15,7 @@ from flask import (
     request,
     url_for,
 )
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from werkzeug.utils import secure_filename
 
 from application.extensions import db
@@ -289,38 +289,8 @@ def edit_record(id, record_id):
 
     if form.validate_on_submit():
         # capture current record data as "previous" before updating
-        previous = record.to_dict()
-        reference = previous["reference"]
 
-        # update record data
-        for key, value in form.data.items():
-            if key not in ["csrf_token", "edit_notes"]:
-                if hasattr(record, key):
-                    setattr(record, key, value)
-                else:
-                    record.data[key] = value
-
-        start_date, format = _collect_start_date(request.form)
-        if start_date:
-            start_date = datetime.datetime.strptime(start_date, format)
-            if start_date != record.start_date:
-                record.start_date = start_date
-                record.data["start-date"] = start_date.strftime(format)
-
-        # set existing reference as it is not in form.data
-        record.data["reference"] = reference
-
-        # end current version and create log entry
-        previous["end-date"] = datetime.datetime.today().strftime("%Y-%m-%d")
-        edit_notes = (
-            f"Updated {record.prefix}:{record.reference}. {form.edit_notes.data}"
-        )
-        change_log = ChangeLog(
-            change_type=ChangeType.EDIT,
-            data={"from": previous, "to": record.to_dict()},
-            notes=edit_notes,
-            record_id=record.id,
-        )
+        change_log = _create_change_log(record, form.data, ChangeType.EDIT)
         dataset.change_log.append(change_log)
         db.session.add(dataset)
         db.session.commit()
@@ -491,11 +461,30 @@ def upload_csv(dataset):
                             )
                             return redirect(url_for("main.dataset", id=ds.dataset))
                         else:
-                            record = Record.factory(row_id, entity, ds.dataset, data)
-                            ds.records.append(record)
+                            existing_entity = data.get("entity")
+                            if existing_entity:
+                                entity = existing_entity
+                            record = Record.query.filter_by(
+                                dataset_id=ds.dataset, entity=entity
+                            ).one_or_none()
+                            if record is not None:
+                                change_log = _create_change_log(
+                                    record, form.data, ChangeType.EDIT
+                                )
+                                ds.change_log.append(change_log)
+                            else:
+                                record = Record.factory(
+                                    row_id, entity, ds.dataset, data
+                                )
+                                ds.records.append(record)
                             db.session.add(ds)
                             db.session.commit()
-                            entity += 1
+                            entity = (
+                                db.session.query(func.max(Record.entity))
+                                .filter(Record.dataset_id == dataset)
+                                .scalar()
+                            )
+
                 return redirect(url_for("main.dataset", id=ds.dataset))
             except Exception as e:
                 flash(f"Error: {e}")
@@ -508,3 +497,41 @@ def upload_csv(dataset):
 
 def _allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() == "csv"
+
+
+def _create_change_log(record, data, change_type):
+    previous = record.to_dict()
+    reference = previous["reference"]
+    for key, value in data.items():
+        if key not in ["csrf_token", "edit_notes", "csv_file"]:
+            if hasattr(record, key):
+                setattr(record, key, value)
+            else:
+                record.data[key] = value
+
+    start_date, format = _collect_start_date(request.form)
+    if start_date:
+        start_date = datetime.datetime.strptime(start_date, format)
+        if start_date != record.start_date:
+            record.start_date = start_date
+            record.data["start-date"] = start_date.strftime(format)
+
+    # set existing reference as it is not in data
+    record.data["reference"] = reference
+
+    # if incoming data has end-date, use it, otherwise use today's date
+    if data.get("end-date"):
+        previous["end-date"] = data["end-date"]
+    else:
+        previous["end-date"] = datetime.datetime.today().strftime("%Y-%m-%d")
+
+    edit_notes = data.get("edit_notes", None)
+    if edit_notes:
+        edit_notes = f"Updated {record.prefix}:{record.reference}. {edit_notes}"
+    change_log = ChangeLog(
+        change_type=change_type,
+        data={"from": previous, "to": record.to_dict()},
+        notes=edit_notes,
+        record_id=record.id,
+    )
+    return change_log

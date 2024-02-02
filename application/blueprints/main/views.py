@@ -465,6 +465,7 @@ def csv(id):
 def upload_csv(dataset):
     form = CsvUploadForm()
     ds = Dataset.query.get(dataset)
+    fieldnames = [field.field for field in ds.fields]
     if form.validate_on_submit():
         f = form.csv_file.data
         if _allowed_file(f.filename):
@@ -475,6 +476,11 @@ def upload_csv(dataset):
                 f.save(file_path)
                 with open(file_path, "r") as csv_file:
                     reader = DictReader(csv_file)
+                    if set(reader.fieldnames) != set(fieldnames):
+                        flash(
+                            f"CSV file does not match dataset schema. Expected fields: {fieldnames}"
+                        )
+                        return redirect(url_for("main.upload_csv", dataset=ds.dataset))
                     # as this is for new records start entity at minimum
                     entity = ds.entity_minimum
                     for row_id, data in enumerate(reader):

@@ -462,7 +462,7 @@ def upload_csv(dataset):
 
                     for data in reader:
                         entity = data.get("entity")
-                        if entity and int(entity) > starting_entity:
+                        if entity and int(entity) >= starting_entity:
                             starting_entity = int(entity) + 1
 
                         reference = data.get("reference")
@@ -559,6 +559,7 @@ def history(id):
         sub_navigation=sub_navigation,
         page=page,
         records=records,
+        history=True,
     )
 
 

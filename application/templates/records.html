@@ -76,7 +76,11 @@
       </table>
     </section>
     <p class="govuk-hint govuk-!-margin-top-3">This dataset was last updated on {{dataset.last_updated.strftime("%d %B %Y")}}</p>
-    <p class="govuk-body govuk-!-margin-top-3"><a href="{{url_for('main.csv', id=dataset.dataset)}}">Download a csv file of this data</a></p>
+    {% if history %}
+      <p class="govuk-body govuk-!-margin-top-3"><a href="{{url_for('main.csv', id=dataset.dataset, history=True)}}">Download a csv file of the current data</a></p>
+    {% else %}
+      <p class="govuk-body govuk-!-margin-top-3"><a href="{{url_for('main.csv', id=dataset.dataset)}}">Download a csv file of this data</a></p>
+    {% endif %}
     {% else %}
       {{
         govukInsetText({

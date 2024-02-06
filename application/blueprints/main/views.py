@@ -15,13 +15,13 @@ from flask import (
     request,
     url_for,
 )
-from sqlalchemy import desc, func
+from sqlalchemy import desc
 from werkzeug.utils import secure_filename
 
 from application.extensions import db
 from application.forms import CsvUploadForm, FormBuilder
 from application.models import ChangeLog, ChangeType, Dataset, Record
-from application.utils import login_required
+from application.utils import date_to_string, login_required, parse_date
 
 main = Blueprint("main", __name__)
 
@@ -95,15 +95,18 @@ def dataset(id):
             {"title": "Records", "url": url_for("main.dataset", id=dataset.dataset)},
             {"title": "Schema", "url": url_for("main.schema", id=dataset.dataset)},
             {"title": "History", "url": url_for("main.history", id=dataset.dataset)},
+            {"title": "Changes", "url": url_for("main.change_log", id=dataset.dataset)},
         ],
     }
     page = {"title": dataset.name, "caption": "Dataset"}
+    records = [record.to_dict() for record in dataset.records]
     return render_template(
         "records.html",
         dataset=dataset,
         breadcrumbs=breadcrumbs,
         sub_navigation=sub_navigation,
         page=page,
+        records=records,
     )
 
 
@@ -118,8 +121,8 @@ def dataset_json(id):
     }
 
 
-@main.route("/dataset/<string:id>/history")
-def history(id):
+@main.route("/dataset/<string:id>/change-log.html")
+def change_log(id):
     dataset = Dataset.query.get(id)
     breadcrumbs = {
         "items": [
@@ -128,15 +131,16 @@ def history(id):
                 "text": dataset.name,
                 "href": url_for("main.dataset", id=dataset.dataset),
             },
-            {"text": "History"},
+            {"text": "Changes"},
         ]
     }
     sub_navigation = {
-        "currentPath": url_for("main.history", id=dataset.dataset),
+        "currentPath": url_for("main.change_log", id=dataset.dataset),
         "itemsList": [
             {"title": "Records", "url": url_for("main.dataset", id=dataset.dataset)},
             {"title": "Schema", "url": url_for("main.schema", id=dataset.dataset)},
             {"title": "History", "url": url_for("main.history", id=dataset.dataset)},
+            {"title": "Changes", "url": url_for("main.change_log", id=dataset.dataset)},
         ],
     }
     page = {"title": dataset.name, "caption": "Dataset"}
@@ -155,7 +159,7 @@ def history(id):
         changes_by_date[change.created_date].append(change)
 
     return render_template(
-        "history.html",
+        "change-log.html",
         dataset=dataset,
         changes_by_date=changes_by_date,
         breadcrumbs=breadcrumbs,
@@ -444,6 +448,7 @@ def upload_csv(dataset):
             file_path = os.path.join(temp_dir, filename)
             try:
                 f.save(file_path)
+                starting_entity = ds.entity_minimum
                 with open(file_path, "r") as csv_file:
                     reader = DictReader(csv_file)
                     addtional_fields = set(reader.fieldnames) - set(fieldnames)
@@ -452,38 +457,61 @@ def upload_csv(dataset):
                             f"CSV file contains fields not in specification: {addtional_fields}"
                         )
                         return redirect(url_for("main.upload_csv", dataset=ds.dataset))
-                    # as this is for new records start entity at minimum
-                    entity = ds.entity_minimum
-                    for row_id, data in enumerate(reader):
-                        if entity > ds.entity_maximum:
-                            flash(
-                                f"entity id {entity} is outside of range {ds.entity_minimum} to {ds.entity_maximum}"
-                            )
-                            return redirect(url_for("main.dataset", id=ds.dataset))
+
+                    records = OrderedDict()
+
+                    for data in reader:
+                        entity = data.get("entity")
+                        if entity and int(entity) > starting_entity:
+                            starting_entity = int(entity) + 1
+
+                        reference = data.get("reference")
+                        if reference not in records.keys():
+                            records[reference] = [data]
                         else:
-                            existing_entity = data.get("entity")
-                            if existing_entity:
-                                entity = existing_entity
-                            record = Record.query.filter_by(
-                                dataset_id=ds.dataset, entity=entity
-                            ).one_or_none()
-                            if record is not None:
-                                change_log = _create_change_log(
-                                    record, form.data, ChangeType.EDIT
-                                )
-                                ds.change_log.append(change_log)
-                            else:
-                                record = Record.factory(
-                                    row_id, entity, ds.dataset, data
-                                )
-                                ds.records.append(record)
+                            records[reference].append(data)
+
+                for reference, data in records.items():
+                    for record in data:
+                        for key, value in record.items():
+                            if "-date" in key:
+                                if not value:
+                                    record[key] = None
+                                else:
+                                    record[key] = parse_date(value)
+
+                for row_id, reference in enumerate(records):
+                    data = records[reference]
+                    ordered = _order_records(data)
+                    original_record = ordered.pop(0)
+
+                    if original_record is not None:
+                        if not original_record.get("entity"):
+                            original_record["entity"] = starting_entity
+                            starting_entity += 1
+                        else:
+                            original_record["entity"] = int(original_record["entity"])
+                        try:
+                            record = Record.factory(
+                                row_id,
+                                original_record.get("entity"),
+                                ds.dataset,
+                                original_record,
+                            )
+                            ds.records.append(record)
                             db.session.add(ds)
                             db.session.commit()
-                            entity = (
-                                db.session.query(func.max(Record.entity))
-                                .filter(Record.dataset_id == dataset)
-                                .scalar()
+                        except Exception as e:
+                            print(f"Error: {e}")
+
+                        for rest in ordered:
+                            change_log = _create_change_log(
+                                record, rest, ChangeType.EDIT
                             )
+                            ds.change_log.append(change_log)
+                            db.session.add(record)
+                            db.session.add(ds)
+                            db.session.commit()
 
                 return redirect(url_for("main.dataset", id=ds.dataset))
             except Exception as e:
@@ -495,6 +523,45 @@ def upload_csv(dataset):
     return render_template("upload.html", form=form, dataset=ds)
 
 
+@main.route("/dataset/<string:id>/history")
+def history(id):
+    dataset = Dataset.query.get(id)
+    breadcrumbs = {
+        "items": [
+            {"text": "Datasets", "href": url_for("main.index")},
+            {
+                "text": dataset.name,
+                "href": url_for("main.dataset", id=dataset.dataset),
+            },
+            {"text": "History"},
+        ]
+    }
+    sub_navigation = {
+        "currentPath": url_for("main.history", id=dataset.dataset),
+        "itemsList": [
+            {"title": "Records", "url": url_for("main.dataset", id=dataset.dataset)},
+            {"title": "Schema", "url": url_for("main.schema", id=dataset.dataset)},
+            {"title": "History", "url": url_for("main.history", id=dataset.dataset)},
+            {"title": "Changes", "url": url_for("main.change_log", id=dataset.dataset)},
+        ],
+    }
+    page = {"title": dataset.name, "caption": "Dataset"}
+    records = []
+    for record in dataset.records:
+        for change in record.change_log:
+            records.append(change.data["from"])
+        records.append(record.to_dict())
+
+    return render_template(
+        "records.html",
+        dataset=dataset,
+        breadcrumbs=breadcrumbs,
+        sub_navigation=sub_navigation,
+        page=page,
+        records=records,
+    )
+
+
 def _allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() == "csv"
 
@@ -502,36 +569,69 @@ def _allowed_file(filename):
 def _create_change_log(record, data, change_type):
     previous = record.to_dict()
     reference = previous["reference"]
-    for key, value in data.items():
-        if key not in ["csrf_token", "edit_notes", "csv_file"]:
-            if hasattr(record, key):
-                setattr(record, key, value)
-            else:
-                record.data[key] = value
 
-    start_date, format = _collect_start_date(request.form)
-    if start_date:
-        start_date = datetime.datetime.strptime(start_date, format)
-        if start_date != record.start_date:
-            record.start_date = start_date
-            record.data["start-date"] = start_date.strftime(format)
+    for key, value in data.items():
+        if key not in ["csrf_token", "edit_notes", "csv_file", "entity"]:
+            k = key
+            if "-date" in k:
+                k = k.replace("-date", "_date")
+            if hasattr(record, k):
+                setattr(record, k, value)
+            else:
+                v = value
+                if isinstance(value, datetime.date):
+                    v = date_to_string(value)
+                record.data[key] = v
+
+    # if this comes from a form, start date is in the form
+    if data.get("year") or data.get("month") or data.get("day"):
+        start_date, format = _collect_start_date(data)
+        if start_date:
+            start_date = datetime.datetime.strptime(start_date, format)
+            if start_date != record.start_date:
+                record.start_date = start_date
+                record.data["start-date"] = start_date.strftime(format)
 
     # set existing reference as it is not in data
     record.data["reference"] = reference
 
-    # if incoming data has end-date, use it, otherwise use today's date
-    if data.get("end-date"):
-        previous["end-date"] = data["end-date"]
-    else:
-        previous["end-date"] = datetime.datetime.today().strftime("%Y-%m-%d")
+    # check for end date in the original record and data
+    if change_type == ChangeType.ARCHIVE:
+        end_date = data.get("end-date")
+        if end_date is None:
+            record.end_date = datetime.datetime.today()
+        else:
+            record.end_date = end_date
 
     edit_notes = data.get("edit_notes", None)
     if edit_notes:
         edit_notes = f"Updated {record.prefix}:{record.reference}. {edit_notes}"
+
+    current = record.to_dict()
+
+    for key, value in previous.items():
+        if value is None:
+            previous[key] = ""
+
+    for key, value in current.items():
+        if value is None:
+            current[key] = ""
+
     change_log = ChangeLog(
         change_type=change_type,
-        data={"from": previous, "to": record.to_dict()},
+        data={"from": previous, "to": current},
         notes=edit_notes,
         record_id=record.id,
     )
     return change_log
+
+
+def _order_records(records):
+    def sort_key(item):
+        if item.get("end-date") is None:
+            return datetime.date.max
+        else:
+            return item.get("end-date")
+
+    ordered = sorted(records, key=sort_key)
+    return ordered

@@ -2,7 +2,7 @@
 
 {% block content_primary %}
 
-<div class="app-grid-row app-grid-row--space-betweenn govuk-!-margin-bottom-3">
+<div class="app-grid-row app-grid-row--space-between govuk-!-margin-bottom-3">
   <div class="app-grid-column">
     {% if session["user"] %}
       {{
@@ -20,21 +20,21 @@
     {% endif %}
   </div>
   <div class="app-grid-column">
-    <h2 class="govuk-heading-m govuk-!-margin-bottom-1">{{ dataset.records | length }} records</h2>
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-1">{{ records | length }} records</h2>
   </div>
 </div>
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    {% if dataset.records | length > 0 %}
+    {% if records | length > 0 %}
     <section class="app-table-container">
       <table class="app-data-table">
         <thead class="app-data-table__head">
           <tr class="app-data-table__row">
             {% for field in dataset.sorted_fields() %}
-                            <th scope="col" class="app-data-table__header">
+              <th scope="col" class="app-data-table__header">
                 <span class="app-data-table__header__label">{{field.field | capitalize}}</span>
               </th>
-                          {% endfor %}
+            {% endfor %}
             {% if session["user"] %}
               <th scope="col" class="app-data-table__header app-data-table__header--ui">
                 <span class="govuk-visually-hidden">Action</span>
@@ -43,12 +43,12 @@
           </tr>
         </thead>
         <tbody class="app-data-table__body">
-          {% for record in dataset.records %}
+          {% for record in records %}
           <tr class="app-data-table__row">
             {% for field in dataset.sorted_fields() %}
-              <td class="app-data-table__cell">{{ record.get(field.field, default="") | replace('-','&#8209;') | safe }}</td>
+              <td class="app-data-table__cell">{{ record.get(field.field, "") | replace('-','&#8209;') | safe }}</td>
             {% endfor %}
-            {% if session["user"]  and not record.end_date %}
+            {% if session["user"] and not record.end_date %}
             <td class="app-data-table__cell app-data-table__cell--ui">
               {{
                 buttonMenu({

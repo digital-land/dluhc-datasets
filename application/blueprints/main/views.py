@@ -549,7 +549,8 @@ def history(id):
     records = []
     for record in dataset.records:
         for change in record.change_log:
-            records.append(change.data["from"])
+            if change.data.get("from") is not None:
+                records.append(change.data["from"])
         records.append(record.to_dict())
 
     return render_template(

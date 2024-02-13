@@ -1,5 +1,7 @@
 # DLUHC Datasets
 
+![ci workflow ](https://github.com/digital-land/dluhc-datasets/actions/workflows/ci.yml/badge.svg)
+
 A tool to manage DLUHC's datasets. For example, the listed-building-grade dataset.
 
 

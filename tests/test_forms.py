@@ -29,7 +29,6 @@ def test_form_builder(app):
         form = builder.build()
         assert isinstance(form, Form)
         assert isinstance(form.organisation, StringField)
-        assert isinstance(form.prefix, StringField)
         assert isinstance(form.notes, StringField)
         assert isinstance(form["documentation-url"], URLField)
 

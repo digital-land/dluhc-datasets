@@ -18,6 +18,8 @@ def login_required(f):
 
 
 def parse_date(date_string):
+    if date_string is None:
+        return None
     if isinstance(date_string, datetime.date):
         return date_string
     try:

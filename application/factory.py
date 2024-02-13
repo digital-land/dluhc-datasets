@@ -44,7 +44,9 @@ def register_context_processors(app):
 
 
 def register_filters(app):
-    pass
+    from application.filters import value_or_empty_string
+
+    app.add_template_filter(value_or_empty_string)
 
 
 def register_extensions(app):

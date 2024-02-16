@@ -4,38 +4,38 @@
 #
 #    pip-compile requirements/requirements.in
 #
-alembic==1.12.0
+alembic==1.13.1
     # via flask-migrate
-authlib==1.2.1
+authlib==1.3.0
     # via -r requirements/requirements.in
-blinker==1.6.2
+blinker==1.7.0
     # via
     #   flask
     #   flask-debugtoolbar
     #   sentry-sdk
-certifi==2023.7.22
+certifi==2024.2.2
     # via
     #   requests
     #   sentry-sdk
-cffi==1.15.1
+cffi==1.16.0
     # via
     #   cryptography
     #   pynacl
-charset-normalizer==3.2.0
+charset-normalizer==3.3.2
     # via requests
 click==8.1.7
     # via flask
-cryptography==41.0.4
+cryptography==42.0.2
     # via
     #   authlib
     #   pyjwt
-deepmerge==1.1.0
+deepmerge==1.1.1
     # via govuk-frontend-wtf
 deprecated==1.2.14
     # via pygithub
 digital-land-frontend @ git+https://github.com/digital-land/digital-land-frontend.git
     # via -r requirements/requirements.in
-flask==2.3.3
+flask==3.0.2
     # via
     #   -r requirements/requirements.in
     #   flask-debugtoolbar
@@ -45,7 +45,7 @@ flask==2.3.3
     #   flask-wtf
     #   govuk-frontend-wtf
     #   sentry-sdk
-flask-debugtoolbar==0.13.1
+flask-debugtoolbar==0.14.1
     # via -r requirements/requirements.in
 flask-migrate==4.0.5
     # via -r requirements/requirements.in
@@ -57,21 +57,21 @@ flask-sslify==0.1.5
     # via -r requirements/requirements.in
 flask-talisman==1.1.0
     # via -r requirements/requirements.in
-flask-wtf==1.1.1
+flask-wtf==1.2.1
     # via
     #   -r requirements/requirements.in
     #   govuk-frontend-wtf
-govuk-frontend-jinja==2.7.0
+govuk-frontend-jinja==3.0.0
     # via
     #   digital-land-frontend
     #   govuk-frontend-wtf
 govuk-frontend-wtf==2.5.0
     # via -r requirements/requirements.in
-greenlet==3.0.0
+greenlet==3.0.3
     # via sqlalchemy
 gunicorn==21.2.0
     # via -r requirements/requirements.in
-idna==3.4
+idna==3.6
     # via requests
 is-safe-url==1.0
     # via -r requirements/requirements.in
@@ -80,27 +80,30 @@ itsdangerous==2.1.2
     #   flask
     #   flask-debugtoolbar
     #   flask-wtf
-jinja2==3.1.2
+jinja2==3.1.3
     # via
     #   flask
     #   govuk-frontend-jinja
     #   govuk-frontend-wtf
-mako==1.2.4
+mako==1.3.2
     # via alembic
-markupsafe==2.1.3
+markupsafe==2.1.5
     # via
+    #   flask-debugtoolbar
     #   jinja2
     #   mako
     #   sentry-sdk
     #   werkzeug
     #   wtforms
-packaging==23.1
-    # via gunicorn
-psycopg2-binary==2.9.7
+packaging==23.2
+    # via
+    #   flask-debugtoolbar
+    #   gunicorn
+psycopg2-binary==2.9.9
     # via -r requirements/requirements.in
 pycparser==2.21
     # via cffi
-pygithub==2.1.1
+pygithub==2.2.0
     # via -r requirements/requirements.in
 pyjwt[crypto]==2.8.0
     # via
@@ -108,11 +111,9 @@ pyjwt[crypto]==2.8.0
     #   pyjwt
 pynacl==1.5.0
     # via pygithub
-python-dateutil==2.8.2
-    # via pygithub
-python-dotenv==1.0.0
+python-dotenv==1.0.1
     # via -r requirements/requirements.in
-python-frontmatter==1.0.0
+python-frontmatter==1.1.0
     # via -r requirements/requirements.in
 pyyaml==6.0.1
     # via python-frontmatter
@@ -120,33 +121,31 @@ requests==2.31.0
     # via
     #   -r requirements/requirements.in
     #   pygithub
-sentry-sdk[flask]==1.31.0
+sentry-sdk[flask]==1.40.4
     # via -r requirements/requirements.in
-six==1.16.0
-    # via python-dateutil
-sqlalchemy==2.0.21
+sqlalchemy==2.0.26
     # via
     #   alembic
     #   flask-sqlalchemy
-typing-extensions==4.8.0
+typing-extensions==4.9.0
     # via
     #   alembic
     #   pygithub
     #   sqlalchemy
-urllib3==2.0.5
+urllib3==2.2.0
     # via
     #   pygithub
     #   requests
     #   sentry-sdk
 validators==0.22.0
     # via digital-land-frontend
-werkzeug==2.3.7
+werkzeug==3.0.1
     # via
     #   flask
     #   flask-debugtoolbar
 wrapt==1.16.0
     # via deprecated
-wtforms==3.0.1
+wtforms==3.1.2
     # via
     #   flask-wtf
     #   govuk-frontend-wtf

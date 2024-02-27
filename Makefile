@@ -18,7 +18,7 @@ upgrade::
 	python -m piptools sync requirements/requirements.txt requirements/dev-requirements.txt
 
 black:
-	black .
+	black application tests
 
 black-check:
 	black --check .

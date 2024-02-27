@@ -48,6 +48,24 @@ def date_to_string(date):
         return ""
 
 
+def collect_start_date(data):
+    parts = []
+    format = ""
+    if data.get("year"):
+        parts.append(data.get("year"))
+        format = "%Y"
+    if data.get("month"):
+        parts.append(data.get("month"))
+        format = f"{format}-%m"
+    if data.get("day"):
+        parts.append(data.get("day"))
+        format = f"{format}-%d"
+    if parts:
+        return "-".join(parts), format
+    else:
+        return None, None
+
+
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime):

@@ -13,7 +13,7 @@ from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from application.extensions import db
-from application.utils import parse_date
+from application.utils import collect_start_date, date_to_string, parse_date
 
 dataset_field = db.Table(
     "dataset_field",
@@ -42,7 +42,9 @@ class ChangeType(Enum):
 class ChangeLog(db.Model):
     __tablename__ = "change_log"
 
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.uuid4] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
     dataset_id: Mapped[str] = mapped_column(Text, ForeignKey("dataset.dataset"))
     dataset: Mapped["Dataset"] = relationship("Dataset", back_populates="change_log")
 
@@ -125,7 +127,9 @@ class Dataset(DateModel):
 class Record(DateModel):
     __tablename__ = "record"
 
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.uuid4] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
     row_id: Mapped[int] = mapped_column(db.Integer, nullable=False)
 
     entity: Mapped[int] = mapped_column(db.BigInteger, nullable=True)
@@ -151,7 +155,8 @@ class Record(DateModel):
         if field_name != "dataset":
             if hasattr(self, field_name):
                 value = getattr(self, field_name)
-                return value if value else default
+                if value:
+                    return value
         return self.data.get(field, default)
 
     def __repr__(self):
@@ -164,12 +169,12 @@ class Record(DateModel):
             "reference": self.reference,
             "description": self.description,
             "notes": self.notes,
-            "entry-date": self.entry_date.strftime("%Y-%m-%d")
-            if self.entry_date
-            else "",
-            "start-date": self.start_date.strftime("%Y-%m-%d")
-            if self.start_date
-            else "",
+            "entry-date": (
+                self.entry_date.strftime("%Y-%m-%d") if self.entry_date else ""
+            ),
+            "start-date": (
+                self.start_date.strftime("%Y-%m-%d") if self.start_date else ""
+            ),
             "end-date": self.end_date.strftime("%Y-%m-%d") if self.end_date else None,
             **self.data,
         }
@@ -266,6 +271,91 @@ class Field(DateModel):
                 return True
 
         return False
+
+
+class Update(db.Model):
+    __tablename__ = "update"
+    id: Mapped[uuid.uuid4] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    dataset_id: Mapped[str] = mapped_column(Text, db.ForeignKey("dataset.dataset"))
+    dataset: Mapped[Dataset] = relationship("Dataset", backref="updates")
+
+    created_date: Mapped[datetime.date] = mapped_column(
+        db.Date, default=datetime.datetime.today
+    )
+
+
+class UpdateRecord(db.Model):
+    __tablename__ = "update_record"
+
+    id: Mapped[uuid.uuid4] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    update_id: Mapped[uuid.uuid4] = mapped_column(
+        UUID(as_uuid=True), db.ForeignKey("update.id")
+    )
+    data: Mapped[dict] = mapped_column(JSONB, nullable=False)
+
+
+def create_change_log(record, data, change_type):
+    previous = record.to_dict()
+    reference = previous["reference"]
+
+    for key, value in data.items():
+        if key not in ["csrf_token", "edit_notes", "csv_file", "entity"]:
+            k = key
+            if "-date" in k:
+                k = k.replace("-date", "_date")
+            if hasattr(record, k):
+                setattr(record, k, value)
+            else:
+                v = value
+                if isinstance(value, datetime.date):
+                    v = date_to_string(value)
+                record.data[key] = v
+
+    # if this comes from a form, start date is in the form
+    if data.get("year") or data.get("month") or data.get("day"):
+        start_date, format = collect_start_date(data)
+        if start_date:
+            start_date = datetime.datetime.strptime(start_date, format)
+            if start_date != record.start_date:
+                record.start_date = start_date
+                record.data["start-date"] = start_date.strftime(format)
+
+    # set existing reference as it is not in data
+    record.data["reference"] = reference
+
+    # check for end date in the original record and data
+    if change_type == ChangeType.ARCHIVE:
+        end_date = data.get("end-date")
+        if end_date is None:
+            record.end_date = datetime.datetime.today()
+        else:
+            record.end_date = end_date
+
+    edit_notes = data.get("edit_notes", None)
+    if edit_notes:
+        edit_notes = f"Updated {record.prefix}:{record.reference}. {edit_notes}"
+
+    current = record.to_dict()
+
+    for key, value in previous.items():
+        if value is None:
+            previous[key] = ""
+
+    for key, value in current.items():
+        if value is None:
+            current[key] = ""
+
+    change_log = ChangeLog(
+        change_type=change_type,
+        data={"from": previous, "to": current},
+        notes=edit_notes,
+        record_id=record.id,
+    )
+    return change_log
 
 
 @event.listens_for(Dataset.records, "append")

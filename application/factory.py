@@ -27,9 +27,11 @@ def create_app(config_filename):
 def register_blueprints(app):
     from application.blueprints.auth.views import auth
     from application.blueprints.main.views import main
+    from application.blueprints.uploads.views import upload
 
     app.register_blueprint(main)
     app.register_blueprint(auth)
+    app.register_blueprint(upload)
 
 
 def register_context_processors(app):

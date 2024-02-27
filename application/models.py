@@ -1,14 +1,12 @@
 import datetime
 import uuid
-from enum import Enum
+from enum import Enum, auto
 from functools import total_ordering
 from typing import List, Optional
 
 from flask import url_for
-from sqlalchemy import UUID
-from sqlalchemy import Enum as ENUM
-from sqlalchemy import ForeignKey, Text, event
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import UUID, ForeignKey, Text, event
+from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -273,6 +271,12 @@ class Field(DateModel):
         return False
 
 
+class UpdateStatus(Enum):
+    PENDING = auto()
+    COMPLETE = auto()
+    INCOMPLETE = auto()
+
+
 class Update(db.Model):
     __tablename__ = "update"
     id: Mapped[uuid.uuid4] = mapped_column(
@@ -280,9 +284,15 @@ class Update(db.Model):
     )
     dataset_id: Mapped[str] = mapped_column(Text, db.ForeignKey("dataset.dataset"))
     dataset: Mapped[Dataset] = relationship("Dataset", backref="updates")
-
+    records: Mapped[List["UpdateRecord"]] = relationship(
+        "UpdateRecord", backref="update", cascade="all, delete"
+    )
     created_date: Mapped[datetime.date] = mapped_column(
         db.Date, default=datetime.datetime.today
+    )
+
+    status: Mapped[ENUM] = mapped_column(
+        ENUM(UpdateStatus), nullable=False, default=UpdateStatus.PENDING
     )
 
 
@@ -296,6 +306,7 @@ class UpdateRecord(db.Model):
         UUID(as_uuid=True), db.ForeignKey("update.id")
     )
     data: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    processed: Mapped[bool] = mapped_column(db.Boolean, default=False, nullable=False)
 
 
 def create_change_log(record, data, change_type):

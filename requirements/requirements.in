@@ -18,3 +18,4 @@ Flask-WTF
 sentry-sdk[flask]
 govuk-frontend-wtf
 PyGithub
+alembic-postgresql-enum

@@ -4,7 +4,11 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       <span class="govuk-caption-l">{{ dataset.name }}</span>
-      <h1 class="govuk-heading-l">Upload a CSV file</h1>
+      {% if action == 'upload' %}
+        <h1 class="govuk-heading-l">Upload a CSV file</h1>
+      {% else %}
+        <h1 class="govuk-heading-l">Upload an updated CSV file</h1>
+      {% endif %}
       <div>
 
       </div>
@@ -12,7 +16,11 @@
   </div>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
-      <form method="POST" action="{{ url_for('upload.upload_csv', dataset=dataset.dataset) }}" enctype="multipart/form-data">
+      {% if action == 'upload' %}
+        <form method="POST" action="{{ url_for('upload.upload_csv', dataset=dataset.dataset) }}" enctype="multipart/form-data">
+      {% else %}
+          <form method="POST" action="{{ url_for('upload.update_csv', dataset=dataset.dataset) }}" enctype="multipart/form-data">
+      {% endif %}
           <div class="govuk-form-group">
             {% with messages = get_flashed_messages() %}
               {% if messages %}

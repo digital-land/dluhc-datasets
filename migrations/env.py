@@ -1,3 +1,4 @@
+import alembic_postgresql_enum
 import logging
 from logging.config import fileConfig
 

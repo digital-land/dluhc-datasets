@@ -9,7 +9,14 @@ from werkzeug.utils import secure_filename
 
 from application.extensions import db
 from application.forms import CsvUploadForm
-from application.models import ChangeType, Dataset, Record, create_change_log
+from application.models import (
+    ChangeType,
+    Dataset,
+    Record,
+    Update,
+    UpdateRecord,
+    create_change_log,
+)
 from application.utils import parse_date
 
 upload = Blueprint("upload", __name__)
@@ -113,15 +120,58 @@ def upload_csv(dataset):
                 if os.path.exists(file_path):
                     os.remove(file_path)
 
-    return render_template("upload.html", form=form, dataset=ds)
+    return render_template("upload.html", form=form, dataset=ds, action="upload")
 
 
 @upload.route("/dataset/<string:dataset>/update", methods=["GET", "POST"])
 def update_csv(dataset):
-    # form = CsvUploadForm()
+    form = CsvUploadForm()
     ds = Dataset.query.get(dataset)
-    flash("Datset updated")
-    return redirect(url_for("upload.upload_csv", dataset=ds.dataset))
+    fieldnames = [field.field for field in ds.fields]
+    if form.validate_on_submit():
+        f = form.csv_file.data
+        if _allowed_file(f.filename):
+            filename = secure_filename(f.filename)
+            temp_dir = tempfile.mkdtemp()
+            file_path = os.path.join(temp_dir, filename)
+            try:
+                f.save(file_path)
+                with open(file_path, "r") as csv_file:
+                    reader = DictReader(csv_file)
+                    addtional_fields = set(reader.fieldnames) - set(fieldnames)
+                    if addtional_fields:
+                        flash(
+                            f"CSV file contains fields not in specification: {addtional_fields}"
+                        )
+                        return redirect(
+                            url_for("upload.update_csv", dataset=ds.dataset)
+                        )
+                    records = []
+                    for row in reader:
+                        records.append(row)
+
+                update = Update(dataset_id=ds.dataset)
+                for record in records:
+                    update.records.append(UpdateRecord(data=record))
+
+                db.session.add(update)
+                db.session.commit()
+            except Exception as e:
+                flash(f"Error: {e}")
+                return redirect(url_for("upload.update_csv", dataset=ds.dataset))
+            finally:
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+            return redirect(url_for("main.dataset", id=ds.dataset))
+
+    else:
+        return render_template("upload.html", form=form, dataset=ds, action="update")
+
+
+@upload.route("/dataset/<string:dataset>/process-updates", methods=["GET", "POST"])
+def process_updates(dataset):
+    update = Update.query.filter_by(dataset=dataset).first()
+    return update
 
 
 def _allowed_file(filename):

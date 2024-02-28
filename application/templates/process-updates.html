@@ -1,0 +1,140 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half">
+      <h1 class="govuk-heading-l">Updates provided in CSV file</h1>
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-quarter">
+      <p><a href="#new">New records: {{ new|count }}</a></p>
+      <p><a href="#updated">Updated records: {{ updated|count }}</a></p>
+    </div>
+    <div class="govuk-grid-column-one-quarter">
+      <p><a href="#ended">Ended records: {{ ended|count }}</a></p>
+      <p><a href="#ended">Invalid records: {{ invalid|count }}</a></p>
+    </div>
+  </div>
+  <hr class="govuk-section-break govuk-section-break--l">
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <h2 id="new" class="govuk-heading-m">New records</h2>
+      {% for record in new %}
+        <dl class="govuk-summary-list">
+          {% for key, value in record.data.items() %}
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  {{ key }}
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  {{ value }}
+                </dd>
+              </div>
+          {% endfor %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Change notes
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {{record.notes}}
+            </dd>
+          </div>
+        </dl>
+        <a href="#" class="govuk-button" role="button" data-module="govuk-button">
+          Create this record
+        </a>
+      {% endfor %}
+      <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+    </div>
+  </div>
+
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <h2 id="updated" class="govuk-heading-m">Updated records</h2>
+      {% for record in updated %}
+        <dl class="govuk-summary-list">
+          {% for key, value in record.data.items() %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              {{ key }}
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {{ value }}
+            </dd>
+          </div>
+        {% endfor %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">
+            Change notes
+          </dt>
+          <dd class="govuk-summary-list__value">
+            {{record.notes}}
+          </dd>
+        </div>
+      </dl>
+      {% endfor %}
+        <a href="#" class="govuk-button" role="button" data-module="govuk-button">
+          Update this record
+        </a>
+      <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <h2 id="ended" class="govuk-heading-m">Ended records</h2>
+      {% for record in ended %}
+        <dl class="govuk-summary-list">
+          {% for key, value in record.data.items() %}
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                {{ key }}
+              </dt>
+              <dd class="govuk-summary-list__value">
+                {{ value }}
+              </dd>
+            </div>
+          {% endfor %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Change notes
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {{record.notes}}
+            </dd>
+          </div>
+        </dl>
+      {% endfor %}
+        <a href="#" class="govuk-button" role="button" data-module="govuk-button">
+          Set the end date for this record
+        </a>
+      <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <h2 id="invalid" class="govuk-heading-m">Invalid records</h2>
+      {% for record in invalid %}
+        <dl class="govuk-summary-list">
+          {% for key, value in record.data.items() %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              {{ key }}
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {{ value }}
+            </dd>
+          </div>
+        {% endfor %}
+      </dl>
+      {{record.notes}}
+      {% endfor %}
+      <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+    </div>
+  </div>
+
+{% endblock content %}

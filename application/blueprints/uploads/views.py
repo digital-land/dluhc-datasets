@@ -4,7 +4,7 @@ import tempfile
 from collections import OrderedDict
 from csv import DictReader
 
-from flask import Blueprint, flash, redirect, render_template, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, url_for
 from werkzeug.utils import secure_filename
 
 from application.extensions import db
@@ -156,22 +156,89 @@ def update_csv(dataset):
 
                 db.session.add(update)
                 db.session.commit()
+                return redirect(
+                    url_for(
+                        "upload.process_updates", dataset=ds.dataset, update=update.id
+                    )
+                )
             except Exception as e:
                 flash(f"Error: {e}")
                 return redirect(url_for("upload.update_csv", dataset=ds.dataset))
             finally:
                 if os.path.exists(file_path):
                     os.remove(file_path)
-            return redirect(url_for("main.dataset", id=ds.dataset))
-
     else:
         return render_template("upload.html", form=form, dataset=ds, action="update")
 
 
-@upload.route("/dataset/<string:dataset>/process-updates", methods=["GET", "POST"])
-def process_updates(dataset):
-    update = Update.query.filter_by(dataset=dataset).first()
-    return update
+@upload.route(
+    "/dataset/<string:dataset>/process-updates/<string:update>", methods=["GET", "POST"]
+)
+def process_updates(dataset, update):
+    update = Update.query.get(update)
+    if update is None:
+        return abort(404, f"No update found for this {dataset}")
+    new = []
+    ended = []
+    updated = []
+    invalid = []
+    not_updated = []
+
+    for record in update.records:
+        current_record = Record.query.filter(
+            Record.dataset_id == dataset,
+            Record.entity == int(record.data.get("entity", 0)),
+        ).one_or_none()
+        match current_record:
+            case None:
+                record.notes = "New record"
+                new.append(record)
+            case _ if current_record.end_date is not None:
+                record.notes = "Error: This record has already ended"
+                invalid.append(record)
+            case _ if set(record.data.keys()) != set(
+                [field.field for field in current_record.dataset.fields]
+            ):
+                record.notes = (
+                    "Error: This records fields do not match the dataset specification"
+                )
+                invalid.append(record)
+            case _ if record.data.get("end-date") and current_record.end_date is None:
+                record.notes = "Record end date will be set"
+                ended.append(record)
+            case _ if _updated(record.data, current_record.to_dict()):
+                record.notes = record.data.pop("changes")
+                updated.append(record)
+            case _:
+                record.notes = "Record does not need updating"
+                not_updated.append(record)
+
+        if db.session.dirty:
+            db.session.add(record)
+            db.session.commit()
+
+    return render_template(
+        "process-updates.html",
+        new=new,
+        ended=ended,
+        updated=updated,
+        invalid=invalid,
+    )
+
+
+def _updated(record, current_record):
+    excluded = set(["entity", "prefix", "reference", "end-date"])
+    for key, new_value in record.items():
+        if key not in excluded and key in current_record.keys():
+            current_value = current_record.get(key)
+            if current_value != new_value:
+                if record.get("changes") is None:
+                    record["changes"] = []
+                record["changes"].append(
+                    f"{key} changed from: '{current_value}' to: '{new_value}'"
+                )
+                return True
+    return False
 
 
 def _allowed_file(filename):

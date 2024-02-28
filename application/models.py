@@ -165,15 +165,15 @@ class Record(DateModel):
             "entity": self.entity,
             "prefix": self.prefix,
             "reference": self.reference,
-            "description": self.description,
-            "notes": self.notes,
+            "description": self.description if self.description else "",
+            "notes": self.notes if self.notes else "",
             "entry-date": (
                 self.entry_date.strftime("%Y-%m-%d") if self.entry_date else ""
             ),
             "start-date": (
                 self.start_date.strftime("%Y-%m-%d") if self.start_date else ""
             ),
-            "end-date": self.end_date.strftime("%Y-%m-%d") if self.end_date else None,
+            "end-date": self.end_date.strftime("%Y-%m-%d") if self.end_date else "",
             **self.data,
         }
 
@@ -307,6 +307,7 @@ class UpdateRecord(db.Model):
     )
     data: Mapped[dict] = mapped_column(JSONB, nullable=False)
     processed: Mapped[bool] = mapped_column(db.Boolean, default=False, nullable=False)
+    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
 
 def create_change_log(record, data, change_type):

@@ -38,12 +38,14 @@
                           {
                             "element": "a",
                             "text": "Update record",
-                            "classes": "govuk-button--secondary",
+                            "classes": "govuk-button--primary",
                             "href": "#",
                           }
                       ]
                     })
                   }}
+                  {% else %}
+                  No changes
                 {% endif %}
               </td>
             {% endfor %}

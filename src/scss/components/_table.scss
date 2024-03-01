@@ -130,6 +130,9 @@ html, body {
       @include govuk-responsive-padding(4, 'right');
     }
   }
+  p {
+    background-color: rgba(govuk-colour('green'), 0.3);
+  }
 }
 
 .app-table {

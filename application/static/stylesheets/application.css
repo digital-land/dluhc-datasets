@@ -7500,6 +7500,8 @@ html, body {
       @media (min-width: 40.0625em) {
         .app-data-table__cell--ui {
           padding-right: 20px; } }
+  .app-data-table p {
+    background-color: rgba(0, 112, 60, 0.3); }
 
 .app-table {
   background-color: transparent;
@@ -7680,3 +7682,8 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center; }
+
+.app-code-block {
+  display: inline-block;
+  padding: 3px 8px;
+  background: #f4f4f4; }

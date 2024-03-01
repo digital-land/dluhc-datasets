@@ -307,7 +307,7 @@ class UpdateRecord(db.Model):
     )
     data: Mapped[dict] = mapped_column(JSONB, nullable=False)
     processed: Mapped[bool] = mapped_column(db.Boolean, default=False, nullable=False)
-    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    changes: Mapped[dict] = mapped_column(JSONB, nullable=True)
 
 
 def create_change_log(record, data, change_type):

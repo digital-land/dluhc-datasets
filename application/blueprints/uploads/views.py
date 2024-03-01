@@ -178,40 +178,22 @@ def process_updates(dataset, update):
     update = Update.query.get(update)
     if update is None:
         return abort(404, f"No update found for this {dataset}")
-    new = []
-    ended = []
-    updated = []
-    invalid = []
-    not_updated = []
 
     for record in update.records:
+        entity = record.data.get("entity")
+        if entity is None or entity.strip() == "":
+            flash("Missing entity in record")
+            abort(404)
+        entity = int(entity)
         current_record = Record.query.filter(
             Record.dataset_id == dataset,
-            Record.entity == int(record.data.get("entity", 0)),
+            Record.entity == entity,
         ).one_or_none()
-        match current_record:
-            case None:
-                record.notes = "New record"
-                new.append(record)
-            case _ if current_record.end_date is not None:
-                record.notes = "Error: This record has already ended"
-                invalid.append(record)
-            case _ if set(record.data.keys()) != set(
-                [field.field for field in current_record.dataset.fields]
-            ):
-                record.notes = (
-                    "Error: This records fields do not match the dataset specification"
-                )
-                invalid.append(record)
-            case _ if record.data.get("end-date") and current_record.end_date is None:
-                record.notes = "Record end date will be set"
-                ended.append(record)
-            case _ if _updated(record.data, current_record.to_dict()):
-                record.notes = record.data.pop("changes")
-                updated.append(record)
-            case _:
-                record.notes = "Record does not need updating"
-                not_updated.append(record)
+        if current_record is not None:
+            expected_fields = [field.field for field in current_record.dataset.fields]
+            record.changes = _check_update(
+                record.data, current_record.to_dict(), expected_fields
+            )
 
         if db.session.dirty:
             db.session.add(record)
@@ -219,26 +201,30 @@ def process_updates(dataset, update):
 
     return render_template(
         "process-updates.html",
-        new=new,
-        ended=ended,
-        updated=updated,
-        invalid=invalid,
+        records=update.records,
+        dataset=update.dataset,
     )
 
 
-def _updated(record, current_record):
+def _check_update(record, current_record, fields):
+    if not current_record.get("end-date").strip() == "":
+        return {"error": "This current record has already ended"}
+    if record.get("end-date").strip() != "":
+        return {
+            "end-date": f"Updated from '{current_record['end-date']}' to '{record['end-date']}'"
+        }
+    if set(record.keys()) != set(fields):
+        return {"error": "This records fields do not match the dataset specification"}
+
+    changes = {}
     excluded = set(["entity", "prefix", "reference", "end-date"])
     for key, new_value in record.items():
-        if key not in excluded and key in current_record.keys():
+        if key not in excluded:
             current_value = current_record.get(key)
             if current_value != new_value:
-                if record.get("changes") is None:
-                    record["changes"] = []
-                record["changes"].append(
-                    f"{key} changed from: '{current_value}' to: '{new_value}'"
-                )
-                return True
-    return False
+                changes[key] = f"Updated from '{current_value}' to '{new_value}'"
+
+    return changes
 
 
 def _allowed_file(filename):

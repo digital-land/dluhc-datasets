@@ -186,7 +186,7 @@ class Record(DateModel):
                     setattr(record, column.name, data_dict.pop(column.name))
 
         for key, value in data_dict.items():
-            if key.endswith("-date") and value:
+            if key.endswith("-date") and value and key != "entry-date":
                 date_key = key.replace("-", "_")
                 date_value = parse_date(value)
                 setattr(record, date_key, date_value)

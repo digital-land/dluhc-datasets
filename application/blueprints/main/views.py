@@ -339,7 +339,7 @@ def archive_record(id, record_id):
         change_type=ChangeType.ARCHIVE,
         data=record.data,
         dataset_id=record.dataset_id,
-        notes=f"Archived {record.data['prefix']}:{record.data['reference']}",
+        notes=f"Archived {record.prefix}:{record.reference}",
         record_id=record.id,
     )
 

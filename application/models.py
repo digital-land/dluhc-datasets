@@ -308,6 +308,7 @@ class UpdateRecord(db.Model):
     data: Mapped[dict] = mapped_column(JSONB, nullable=False)
     processed: Mapped[bool] = mapped_column(db.Boolean, default=False, nullable=False)
     changes: Mapped[dict] = mapped_column(JSONB, nullable=True)
+    new_record: Mapped[bool] = mapped_column(db.Boolean, default=False, nullable=False)
 
 
 def create_change_log(record, data, change_type):
@@ -317,14 +318,16 @@ def create_change_log(record, data, change_type):
     for key, value in data.items():
         if key not in ["csrf_token", "edit_notes", "csv_file", "entity"]:
             k = key
+            v = value
             if "-date" in k:
                 k = k.replace("-date", "_date")
-            if hasattr(record, k):
-                setattr(record, k, value)
-            else:
-                v = value
-                if isinstance(value, datetime.date):
+                if isinstance(v, str):
+                    v = parse_date(value)
+                elif isinstance(v, datetime.date):
                     v = date_to_string(value)
+            if hasattr(record, k):
+                setattr(record, k, v)
+            else:
                 record.data[key] = v
 
     # if this comes from a form, start date is in the form

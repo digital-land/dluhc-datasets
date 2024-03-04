@@ -4,7 +4,7 @@ import tempfile
 from collections import OrderedDict
 from csv import DictReader
 
-from flask import Blueprint, abort, flash, redirect, render_template, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 
 from application.extensions import db
@@ -15,6 +15,7 @@ from application.models import (
     Record,
     Update,
     UpdateRecord,
+    UpdateStatus,
     create_change_log,
 )
 from application.utils import parse_date
@@ -172,10 +173,17 @@ def update_csv(dataset):
 
 
 @upload.route(
-    "/dataset/<string:dataset>/process-updates/<string:update>", methods=["GET", "POST"]
+    "/dataset/<string:dataset>/process-updates/<string:update>", methods=["GET"]
 )
 def process_updates(dataset, update):
-    update = Update.query.get(update)
+    update = Update.query.filter(
+        Update.id == update,
+        Update.dataset_id == dataset,
+        Update.status == UpdateStatus.PENDING,
+    ).one_or_none()
+    if update is None:
+        return abort(404, f"No update found for this {dataset}")
+
     if update is None:
         return abort(404, f"No update found for this {dataset}")
 
@@ -194,6 +202,8 @@ def process_updates(dataset, update):
             record.changes = _check_update(
                 record.data, current_record.to_dict(), expected_fields
             )
+        else:
+            record.new_record = True
 
         if db.session.dirty:
             db.session.add(record)
@@ -201,9 +211,63 @@ def process_updates(dataset, update):
 
     return render_template(
         "process-updates.html",
+        update=update.id,
         records=update.records,
         dataset=update.dataset,
     )
+
+
+@upload.route(
+    "/dataset/<string:dataset>/process-updates/<string:update>", methods=["POST"]
+)
+def apply_updates(dataset, update):
+    update = Update.query.filter(
+        Update.id == update,
+        Update.dataset_id == dataset,
+        Update.status == UpdateStatus.PENDING,
+    ).one_or_none()
+    if update is None:
+        return abort(404, f"No update found for this {dataset}")
+
+    dataset = update.dataset
+    update_record_ids = set(request.form.getlist("record_id"))
+    for update_record in update.records:
+        if str(update_record.id) in update_record_ids:
+            record = Record.query.filter(
+                Record.dataset_id == dataset.dataset,
+                Record.entity == update_record.data["entity"],
+            ).one_or_none()
+            if record is not None:
+                change_log = create_change_log(
+                    record, update_record.data, ChangeType.EDIT
+                )
+                dataset.change_log.append(change_log)
+                update_record.processed = True
+                db.session.add(record)
+                db.session.add(update_record)
+                db.session.add(dataset)
+            else:
+                row_id = (
+                    Record.query.filter(Record.dataset_id == dataset.dataset).count()
+                    + 1
+                )
+                record = Record.factory(
+                    row_id,
+                    update_record.data["entity"],
+                    dataset.dataset,
+                    update_record.data,
+                )
+                update_record.processed = True
+                dataset.records.append(record)
+                db.session.add(dataset)
+                db.session.add(record)
+                db.session.add(update_record)
+
+    update.status = UpdateStatus.COMPLETE
+    db.session.add(update)
+    db.session.commit()
+
+    return redirect(url_for("main.dataset", id=dataset.dataset))
 
 
 def _check_update(record, current_record, fields):

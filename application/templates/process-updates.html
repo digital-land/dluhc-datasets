@@ -5,6 +5,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     {% if records | length > 0 %}
+    <form action="{{ url_for('upload.apply_updates', update=update, dataset=dataset.dataset) }}" method="POST">
       <section class="app-table-container">
         <table class="app-data-table">
           <thead class="app-data-table__head">
@@ -15,42 +16,49 @@
                 </th>
               {% endfor %}
               <th scope="col" class="app-data-table__header app-data-table__header--ui">
-                <span class="app-data-table__header__label">Action</span>
+                <div id="updates-hint" class="govuk-hint">
+                  Deselect checkbox to ignore update
+                </div>
               </th>
             </tr>
           </thead>
           <tbody class="app-data-table__body">
-            {% for record in records %}
-              <tr class="app-data-table__row">
-              {% for field in dataset.sorted_fields() %}
+              {% for record in records %}
+                <tr class="app-data-table__row">
+                {% for field in dataset.sorted_fields() %}
+                  <td class="app-data-table__cell app-data-table__cell--ui">
+                    {{ record.data.get(field.field, None)| value_or_empty_string | replace('-','&#8209;') | safe }}
+                    {% if record.changes and record.changes.get(field.field) %}
+                      <p class="govuk-body-s">({{record.changes.get(field.field)}})</p>
+                    {% endif %}
+                  </td>
+                {% endfor %}
                 <td class="app-data-table__cell app-data-table__cell--ui">
-                  {{ record.data.get(field.field, None)| value_or_empty_string | replace('-','&#8209;') | safe }}
-                  {% if record.changes and record.changes.get(field.field) %}
-                    <p class="govuk-body-s">({{record.changes.get(field.field)}})</p>
+                  {% if record.changes %}
+                    <label class="govuk-label govuk-checkboxes__label" for="record_id">
+                      Update record
+                    </label>
+                    <input id="record_id" name="record_id" type="checkbox" value="{{record.id}}" checked />
+                    {% elif record.new_record %}
+                    <label class="govuk-label govuk-checkboxes__label" for="record_id">
+                      Add record
+                    </label>
+                    <input id="record_id" name="record_id" type="checkbox" value="{{record.id}}" checked />
+                    {% else %}
+                    No changes
                   {% endif %}
                 </td>
               {% endfor %}
-              <td class="app-data-table__cell app-data-table__cell--ui">
-                {% if record.changes %}
-                  {{
-                    buttonMenu({
-                    "items": [
-                          {
-                            "element": "a",
-                            "text": "Update record",
-                            "classes": "govuk-button--primary",
-                            "href": "#",
-                          }
-                      ]
-                    })
-                  }}
-                  {% else %}
-                  No changes
-                {% endif %}
-              </td>
-            {% endfor %}
           </tbody>
         </table>
       </section>
-    {% endif %}
+      <div class="app-button-menu">
+        <div class="app-button-menu__wrapper">
+          <button type="submit" class="govuk-button">Apply updates</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+  {% endif %}
 {% endblock content %}

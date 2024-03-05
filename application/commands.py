@@ -101,14 +101,14 @@ def check_for_new_datasets():
     ]
     for dataset in new_datasets:
         schema_url = specfication_markdown_url.format(
-            base_url=base_url, dataset=dataset
+            base_url=base_url, dataset=dataset["dataset"]
         )
         dataset = Dataset(dataset=dataset["dataset"], name=dataset["name"])
         markdown = requests.get(schema_url)
         if markdown.status_code == 200:
             front = frontmatter.loads(markdown.text)
-            dataset.entity_min = front.get("entity-minimum")
-            dataset.entity_max = front.get("entity-maximum")
+            dataset.entity_minimum = int(front.get("entity-minimum"))
+            dataset.entity_maximum = int(front.get("entity-maximum"))
         db.session.add(dataset)
         db.session.commit()
         print(f"dataset {dataset.dataset} with name {dataset.name} added")

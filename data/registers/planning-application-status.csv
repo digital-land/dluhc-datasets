@@ -8,3 +8,4 @@ end-date,entity,entry-date,name,notes,prefix,reference,start-date
 ,,2023-08-22,Decision appealed,,planning-application-status,decision-appealed,
 ,,2023-08-22,Appeal refused,,planning-application-status,appeal-refused,
 ,,2023-08-22,Appeal granted,,planning-application-status,appeal-granted,
+,,2024-01-18,Application expired,We weren't sure whether it should be called lapsed or expired,planning-application-status,expired,

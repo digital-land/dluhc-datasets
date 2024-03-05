@@ -32,7 +32,7 @@
           <tr class="app-data-table__row">
             {% for field in dataset.sorted_fields() %}
               <th scope="col" class="app-data-table__header">
-                <span class="app-data-table__header__label">{{field.field | capitalize}}</span>
+                <span class="app-data-table__header__label">{{ field.field }}</span>
               </th>
             {% endfor %}
             {% if session["user"] %}

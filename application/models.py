@@ -275,6 +275,7 @@ class UpdateStatus(Enum):
     PENDING = auto()
     COMPLETE = auto()
     INCOMPLETE = auto()
+    CANCELLED = auto()
 
 
 class Update(db.Model):

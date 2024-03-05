@@ -209,11 +209,14 @@ def process_updates(dataset, update):
             db.session.add(record)
             db.session.commit()
 
+    updates = any([_any_updates(record) for record in update.records])
+
     return render_template(
         "process-updates.html",
         update=update.id,
         records=update.records,
         dataset=update.dataset,
+        updates=updates,
     )
 
 
@@ -270,18 +273,40 @@ def apply_updates(dataset, update):
     return redirect(url_for("main.dataset", id=dataset.dataset))
 
 
+@upload.route(
+    "/dataset/<string:dataset>/process-updates/<string:update>/cancel", methods=["GET"]
+)
+def cancel_updates(dataset, update):
+    update = Update.query.filter(
+        Update.id == update,
+        Update.dataset_id == dataset,
+        Update.status == UpdateStatus.PENDING,
+    ).one_or_none()
+    if update is None:
+        return abort(404, f"No update found for this {dataset}")
+
+    update.status = UpdateStatus.CANCELLED
+    for record in update.records:
+        record.processed = True
+        db.session.add(record)
+    db.session.add(update)
+    db.session.commit()
+
+    return redirect(url_for("main.dataset", id=dataset))
+
+
 def _check_update(record, current_record, fields):
     if not current_record.get("end-date").strip() == "":
-        return {"error": "This current record has already ended"}
+        return {"error": "The record has already ended"}
     if record.get("end-date").strip() != "":
         return {
             "end-date": f"Updated from '{current_record['end-date']}' to '{record['end-date']}'"
         }
     if set(record.keys()) != set(fields):
-        return {"error": "This records fields do not match the dataset specification"}
+        return {"error": "The fields don't match the specification"}
 
     changes = {}
-    excluded = set(["entity", "prefix", "reference", "end-date"])
+    excluded = set(["entity", "prefix", "reference", "end-date", "entry-date"])
     for key, new_value in record.items():
         if key not in excluded:
             current_value = current_record.get(key)
@@ -292,4 +317,17 @@ def _check_update(record, current_record, fields):
 
 
 def _allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() == "csv"
+    allowed = False
+    try:
+        allowed = "." in filename and filename.rsplit(".", 1)[1].lower() == "csv"
+    except Exception as e:
+        print(f"Error: {e}")
+    return allowed
+
+
+def _any_updates(record):
+    if record.processed:
+        return False
+    if record.changes == {} or record.changes.get("error"):
+        return False
+    return True

@@ -5,6 +5,18 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     {% if records | length > 0 %}
+      {% if not updates %}
+        <div class="govuk-warning-text">
+          <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+          <strong class="govuk-warning-text__text">
+            <span class="govuk-visually-hidden">Warning</span>
+            No valid updates found. Click cancel to return to the dataset.
+          </strong>
+        </div>
+          <p>
+            <a href="{{ url_for('upload.cancel_updates', update=update, dataset=dataset.dataset) }}"
+                class="govuk-button govuk-button--warning">Cancel</a></p>
+      {% endif %}
     <form action="{{ url_for('upload.apply_updates', update=update, dataset=dataset.dataset) }}" method="POST">
       <section class="app-table-container">
         <table class="app-data-table">
@@ -34,17 +46,19 @@
                   </td>
                 {% endfor %}
                 <td class="app-data-table__cell app-data-table__cell--ui">
-                  {% if record.changes %}
+                  {% if record.changes and not record.changes.get('error') %}
                     <label class="govuk-label govuk-checkboxes__label" for="record_id">
                       Update record
                     </label>
                     <input id="record_id" name="record_id" type="checkbox" value="{{record.id}}" checked />
-                    {% elif record.new_record %}
+                  {% elif record.changes and record.changes.get('error') %}
+                    <p class="govuk-body-s govuk-error-message">{{record.changes.get('error')}}</p>
+                  {% elif record.new_record %}
                     <label class="govuk-label govuk-checkboxes__label" for="record_id">
                       Add record
                     </label>
                     <input id="record_id" name="record_id" type="checkbox" value="{{record.id}}" checked />
-                    {% else %}
+                  {% else %}
                     No changes
                   {% endif %}
                 </td>
@@ -52,11 +66,13 @@
           </tbody>
         </table>
       </section>
-      <div class="app-button-menu">
-        <div class="app-button-menu__wrapper">
-          <button type="submit" class="govuk-button">Apply updates</button>
+      {% if updates %}
+        <div class="app-button-menu">
+          <div class="app-button-menu__wrapper">
+            <button type="submit" class="govuk-button">Apply updates</button>
+          </div>
         </div>
-      </div>
+      {% endif %}
     </form>
   </div>
 </div>

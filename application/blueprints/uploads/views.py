@@ -328,6 +328,8 @@ def _allowed_file(filename):
 def _any_updates(record):
     if record.processed:
         return False
-    if record.changes == {} or record.changes.get("error"):
+    if record.changes is not None and (
+        record.changes == {} or record.changes.get("error")
+    ):
         return False
     return True

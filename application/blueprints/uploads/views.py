@@ -200,7 +200,10 @@ def process_updates(dataset, update):
         if current_record is not None:
             expected_fields = [field.field for field in current_record.dataset.fields]
             record.changes = _check_update(
-                record.data, current_record.to_dict(), expected_fields
+                record.data,
+                current_record.to_dict(),
+                expected_fields,
+                current_record.change_log,
             )
         else:
             record.new_record = True
@@ -295,9 +298,13 @@ def cancel_updates(dataset, update):
     return redirect(url_for("main.dataset", id=dataset))
 
 
-def _check_update(record, current_record, fields):
+def _check_update(record, current_record, fields, change_log):
     if not current_record.get("end-date").strip() == "":
         return {"error": "The record has already ended"}
+    if record.get("end-date").strip() != "" and _already_ended(record, change_log):
+        return {
+            "error": "This is an earlier version of the record that has already been ended"
+        }
     if record.get("end-date").strip() != "":
         return {
             "end-date": f"Updated from '{current_record['end-date']}' to '{record['end-date']}'"
@@ -314,6 +321,14 @@ def _check_update(record, current_record, fields):
                 changes[key] = f"Updated from '{current_value}' to '{new_value}'"
 
     return changes
+
+
+def _already_ended(record, change_log):
+    end_date = record.get("end-date")
+    for change in change_log:
+        logged_end_date = change.data.get("from", {}).get("end-date", None)
+        if logged_end_date is not None and logged_end_date == end_date:
+            return True
 
 
 def _allowed_file(filename):

@@ -1,4 +1,6 @@
+import base64
 import csv
+import os
 from pathlib import Path
 
 import frontmatter
@@ -167,13 +169,9 @@ def backup_registers():
 
 @data_cli.command("push-registers")
 def push_registers():
-    from dotenv import dotenv_values
-
-    print("Pushing registers")
-    config = dotenv_values(".env")
-    registers_path = config.get("DATASETS_REPO_REGISTERS_PATH")
-    repo = _get_repo(config)
-
+    registers_path = os.getenv("DATASETS_REPO_REGISTERS_PATH")
+    repo = _get_repo(os.environ)
+    print("Pushing registers to repo", repo, "and path", registers_path)
     datasets = Dataset.query.all()
     for dataset in datasets:
         updates = ChangeLog.query.filter(
@@ -264,10 +262,12 @@ def assign_entity_number():
 
 
 def _get_repo(config):
-    app_id = int(config.get("GITHUB_APP_ID"))
-    private_key = config.get("GITHUB_APP_PRIVATE_KEY")
+    app_id = config.get("GITHUB_APP_ID")
     repo_name = config.get("DATASETS_REPO")
-    auth = github.Auth.AppAuth(app_id, private_key)
+    base64_key = config.get("GITHUB_APP_PRIVATE_KEY")
+    private_key = base64.b64decode(base64_key)
+    private_key_decoded = private_key.decode("utf-8")
+    auth = github.Auth.AppAuth(app_id, private_key_decoded)
     gi = github.GithubIntegration(auth=auth)
     installation_id = gi.get_installations()[0].id
     gh = gi.get_github_for_installation(installation_id)

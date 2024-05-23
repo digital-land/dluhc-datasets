@@ -60,7 +60,8 @@ def how_we_add_datasets():
 
 @main.route("/dataset/<string:id>")
 def dataset(id):
-    dataset = Dataset.query.get(id)
+    dataset = Dataset.query.get_or_404(id)
+
     breadcrumbs = {
         "items": [
             {"text": "Datasets", "href": url_for("main.index")},

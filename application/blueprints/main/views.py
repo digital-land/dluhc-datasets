@@ -101,7 +101,7 @@ def dataset_json(id):
     }
 
 
-@main.route("/dataset/<string:id>/change-log.html")
+@main.route("/dataset/<string:id>/change-log")
 def change_log(id):
     dataset = Dataset.query.get_or_404(id)
     breadcrumbs = {

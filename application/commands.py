@@ -111,6 +111,7 @@ def check_for_new_datasets():
             front = frontmatter.loads(markdown.text)
             dataset.entity_minimum = int(front.get("entity-minimum"))
             dataset.entity_maximum = int(front.get("entity-maximum"))
+            dataset.consideration = front.get("consideration")
         db.session.add(dataset)
         db.session.commit()
         print(f"dataset {dataset.dataset} with name {dataset.name} added")

@@ -335,6 +335,27 @@ def load_data():
     print("Data loaded successfully")
 
 
+@data_cli.command("set-considerations")
+def set_dataset_considerations():
+    print("Setting considerations for datasets")
+    for dataset in Dataset.query.all():
+        schema_url = specfication_markdown_url.format(
+            base_url=base_url, dataset=dataset.dataset
+        )
+        markdown = requests.get(schema_url)
+        if markdown.status_code == 200:
+            front = frontmatter.loads(markdown.text)
+            consideration = front.get("consideration")
+            dataset.consideration = consideration
+        db.session.add(dataset)
+        db.session.commit()
+        if consideration is not None:
+            print(f"Set consideration {consideration} for {dataset.dataset}")
+        else:
+            print(f"No consideration found for {dataset.dataset}")
+    print("Done")
+
+
 def _get_repo(config):
     app_id = config.get("GITHUB_APP_ID")
     repo_name = config.get("DATASETS_REPO")

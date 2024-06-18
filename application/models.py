@@ -104,6 +104,8 @@ class Dataset(DateModel):
     entity_minimum: Mapped[int] = mapped_column(db.BigInteger, nullable=True)
     entity_maximum: Mapped[int] = mapped_column(db.BigInteger, nullable=True)
 
+    consideration: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
     def sorted_fields(self):
         return sorted(self.fields)
 

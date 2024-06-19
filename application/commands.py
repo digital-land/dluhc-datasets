@@ -346,13 +346,13 @@ def set_dataset_considerations():
         if markdown.status_code == 200:
             front = frontmatter.loads(markdown.text)
             consideration = front.get("consideration")
-            dataset.consideration = consideration
-        db.session.add(dataset)
-        db.session.commit()
-        if consideration is not None:
-            print(f"Set consideration {consideration} for {dataset.dataset}")
-        else:
-            print(f"No consideration found for {dataset.dataset}")
+            if consideration:
+                dataset.consideration = consideration
+                db.session.add(dataset)
+                db.session.commit()
+                print(f"Set consideration {consideration} for {dataset.dataset}")
+            else:
+                print(f"No consideration found for {dataset.dataset}")
     print("Done")
 
 

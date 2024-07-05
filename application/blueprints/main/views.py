@@ -27,6 +27,7 @@ def getTabList(dataset):
     return [
         {"title": "Records", "url": url_for("main.dataset", id=dataset.dataset)},
         {"title": "Schema", "url": url_for("main.schema", id=dataset.dataset)},
+        {"title": "Links", "url": url_for("main.links", id=dataset.dataset)},
         {"title": "History", "url": url_for("main.history", id=dataset.dataset)},
         {"title": "Changes", "url": url_for("main.change_log", id=dataset.dataset)},
     ]
@@ -372,6 +373,33 @@ def schema(id):
     page = {"title": dataset.name, "caption": "Dataset"}
     return render_template(
         "schema.html",
+        dataset=dataset,
+        breadcrumbs=breadcrumbs,
+        sub_navigation=sub_navigation,
+        page=page,
+    )
+
+
+@main.route("/dataset/<string:id>/links")
+def links(id):
+    dataset = Dataset.query.get_or_404(id)
+    breadcrumbs = {
+        "items": [
+            {"text": "Datasets", "href": url_for("main.index")},
+            {
+                "text": dataset.name,
+                "href": url_for("main.dataset", id=dataset.dataset),
+            },
+            {"text": "Links"},
+        ]
+    }
+    sub_navigation = {
+        "currentPath": url_for("main.links", id=dataset.dataset),
+        "itemsList": getTabList(dataset),
+    }
+    page = {"title": dataset.name, "caption": "Dataset"}
+    return render_template(
+        "links.html",
         dataset=dataset,
         breadcrumbs=breadcrumbs,
         sub_navigation=sub_navigation,

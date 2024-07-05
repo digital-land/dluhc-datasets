@@ -23,6 +23,15 @@ from application.utils import collect_start_date, login_required
 main = Blueprint("main", __name__)
 
 
+def getTabList(dataset):
+    return [
+        {"title": "Records", "url": url_for("main.dataset", id=dataset.dataset)},
+        {"title": "Schema", "url": url_for("main.schema", id=dataset.dataset)},
+        {"title": "History", "url": url_for("main.history", id=dataset.dataset)},
+        {"title": "Changes", "url": url_for("main.change_log", id=dataset.dataset)},
+    ]
+
+
 @main.route("/")
 @main.route("/index")
 def index():
@@ -71,12 +80,7 @@ def dataset(id):
     }
     sub_navigation = {
         "currentPath": url_for("main.dataset", id=dataset.dataset),
-        "itemsList": [
-            {"title": "Records", "url": url_for("main.dataset", id=dataset.dataset)},
-            {"title": "Schema", "url": url_for("main.schema", id=dataset.dataset)},
-            {"title": "History", "url": url_for("main.history", id=dataset.dataset)},
-            {"title": "Changes", "url": url_for("main.change_log", id=dataset.dataset)},
-        ],
+        "itemsList": getTabList(dataset),
     }
     page = {"title": dataset.name, "caption": "Dataset"}
     records = [record for record in dataset.records]
@@ -116,12 +120,7 @@ def change_log(id):
     }
     sub_navigation = {
         "currentPath": url_for("main.change_log", id=dataset.dataset),
-        "itemsList": [
-            {"title": "Records", "url": url_for("main.dataset", id=dataset.dataset)},
-            {"title": "Schema", "url": url_for("main.schema", id=dataset.dataset)},
-            {"title": "History", "url": url_for("main.history", id=dataset.dataset)},
-            {"title": "Changes", "url": url_for("main.change_log", id=dataset.dataset)},
-        ],
+        "itemsList": getTabList(dataset),
     }
     page = {"title": dataset.name, "caption": "Dataset"}
 
@@ -368,12 +367,7 @@ def schema(id):
     }
     sub_navigation = {
         "currentPath": url_for("main.schema", id=dataset.dataset),
-        "itemsList": [
-            {"title": "Records", "url": url_for("main.dataset", id=dataset.dataset)},
-            {"title": "Schema", "url": url_for("main.schema", id=dataset.dataset)},
-            {"title": "History", "url": url_for("main.history", id=dataset.dataset)},
-            {"title": "Changes", "url": url_for("main.change_log", id=dataset.dataset)},
-        ],
+        "itemsList": getTabList(dataset),
     }
     page = {"title": dataset.name, "caption": "Dataset"}
     return render_template(
@@ -431,12 +425,7 @@ def history(id):
     }
     sub_navigation = {
         "currentPath": url_for("main.history", id=dataset.dataset),
-        "itemsList": [
-            {"title": "Records", "url": url_for("main.dataset", id=dataset.dataset)},
-            {"title": "Schema", "url": url_for("main.schema", id=dataset.dataset)},
-            {"title": "History", "url": url_for("main.history", id=dataset.dataset)},
-            {"title": "Changes", "url": url_for("main.change_log", id=dataset.dataset)},
-        ],
+        "itemsList": getTabList(dataset),
     }
     page = {"title": dataset.name, "caption": "Dataset"}
     records = []

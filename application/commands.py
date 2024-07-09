@@ -112,6 +112,7 @@ def check_for_new_datasets():
             dataset.entity_minimum = int(front.get("entity-minimum"))
             dataset.entity_maximum = int(front.get("entity-maximum"))
             dataset.consideration = front.get("consideration")
+            dataset.custodian = front.get("Data design team")
         db.session.add(dataset)
         db.session.commit()
         print(f"dataset {dataset.dataset} with name {dataset.name} added")
@@ -141,7 +142,8 @@ def check_for_new_datasets():
             db.session.add(dataset)
             db.session.commit()
 
-    print("new datasets added to database")
+        print("New datasets added to database")
+    print("No new datasets found")
 
 
 @data_cli.command("backup-registers")

@@ -340,7 +340,8 @@ def load_data():
 @data_cli.command("set-considerations")
 def set_dataset_considerations():
     print("Setting considerations for datasets")
-    for dataset in Dataset.query.all():
+    for dataset in Dataset.query.filter(Dataset.consideration.is_(None)).all():
+        print(f"Consideration for {dataset.dataset} is not set")
         schema_url = specfication_markdown_url.format(
             base_url=base_url, dataset=dataset.dataset
         )
@@ -348,7 +349,7 @@ def set_dataset_considerations():
         if markdown.status_code == 200:
             front = frontmatter.loads(markdown.text)
             consideration = front.get("consideration")
-            if consideration:
+            if consideration and consideration.strip() != "":
                 dataset.consideration = consideration
                 db.session.add(dataset)
                 db.session.commit()

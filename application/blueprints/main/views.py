@@ -3,6 +3,7 @@ import io
 from collections import OrderedDict
 from csv import DictWriter
 
+import requests
 from flask import (
     Blueprint,
     abort,
@@ -27,6 +28,7 @@ def getTabList(dataset):
     return [
         {"title": "Records", "url": url_for("main.dataset", id=dataset.dataset)},
         {"title": "Schema", "url": url_for("main.schema", id=dataset.dataset)},
+        {"title": "Links", "url": url_for("main.links", id=dataset.dataset)},
         {"title": "History", "url": url_for("main.history", id=dataset.dataset)},
         {"title": "Changes", "url": url_for("main.change_log", id=dataset.dataset)},
     ]
@@ -376,6 +378,55 @@ def schema(id):
         breadcrumbs=breadcrumbs,
         sub_navigation=sub_navigation,
         page=page,
+    )
+
+
+@main.route("/dataset/<string:id>/links")
+def links(id):
+    from flask import current_app
+
+    dataset = Dataset.query.get_or_404(id)
+    breadcrumbs = {
+        "items": [
+            {"text": "Datasets", "href": url_for("main.index")},
+            {
+                "text": dataset.name,
+                "href": url_for("main.dataset", id=dataset.dataset),
+            },
+            {"text": "Links"},
+        ]
+    }
+    sub_navigation = {
+        "currentPath": url_for("main.links", id=dataset.dataset),
+        "itemsList": getTabList(dataset),
+    }
+    page = {"title": dataset.name, "caption": "Dataset"}
+
+    specification_url = f"{current_app.config['SPECIFICATION_REPO_URL']}/blob/main/content/dataset/{dataset.dataset}.md"
+    consideration_url = (
+        f"{current_app.config['PLANNING_DATA_DESIGN_URL']}/planning-consideration/{dataset.consideration}"
+        if dataset.consideration
+        else None
+    )
+
+    platform_url = f"{current_app.config['PLATFORM_URL']}/dataset/{dataset.dataset}"
+    try:
+        resp = requests.get(platform_url)
+        resp.raise_for_status()
+    except requests.exceptions.HTTPError:
+        platform_url = None
+    except Exception:
+        platform_url = None
+
+    return render_template(
+        "links.html",
+        dataset=dataset,
+        breadcrumbs=breadcrumbs,
+        sub_navigation=sub_navigation,
+        page=page,
+        specification_url=specification_url,
+        consideration_url=consideration_url,
+        platform_url=platform_url,
     )
 
 

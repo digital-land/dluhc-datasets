@@ -1,0 +1,28 @@
+{% extends 'layouts/dataset.html' %}
+
+{% block content_primary %}
+
+<div class='govuk-grid-row'>
+  <div class='govuk-grid-column-three-quarters'>
+    <h2 class="govuk-heading-m">Schema</h2>
+
+    <p class="govuk-body">The schema defines the dataset, it sets up what fields are included in each record and the typology of the dataset.</p>
+    <p class="govuk-body">You can see the schema for <a href="{{ specification_url }}" class="govuk-link">{{dataset.name}}</a> in the specification repository on github.</p>
+
+    {% if consideration_url %}
+      <h2 class="govuk-heading-m">Consideration</h2>
+      <p class="govuk-body">This dataset came out of the data design work looking at the <a href="{{ consideration_url }}" class="govuk-link">{{ dataset.consideration | capitalize | replace("-", " ") }}</a> consideration.</p>
+      <p class="govuk-body">See the planning consideration on design.planning.data.gov.uk</p>
+    {% endif %}
+
+    {% if platform_url %}
+      <h2 class="govuk-heading-m">Dataset on the platform</h2>
+      <p class="govuk-body">This dataset is republished on planning.data.gov.uk so that it is available through the API.</p>
+      <p class="govuk-body">See the <a href="{{ platform_url }}" class="govuk-link">dataset</a> on planning.data.gov.uk</p>
+    {% endif %}
+
+  </div>
+</div>
+
+
+{% endblock content_primary %}

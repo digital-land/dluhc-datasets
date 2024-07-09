@@ -349,7 +349,7 @@ def set_dataset_considerations():
         if markdown.status_code == 200:
             front = frontmatter.loads(markdown.text)
             consideration = front.get("consideration")
-            if consideration:
+            if consideration and consideration.strip() != "":
                 dataset.consideration = consideration
                 db.session.add(dataset)
                 db.session.commit()

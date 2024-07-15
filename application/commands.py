@@ -110,6 +110,9 @@ def check_for_new_datasets():
         dataset for dataset in data if dataset["dataset"] not in database_datasets
     ]
 
+    # process new datasets first as they may be replacements for existing
+    # datasets and therefore need to be available in the database for the
+    # processing of replacements
     if new_datasets:
         print("New datasets found")
         _process_new_datasets(new_datasets)

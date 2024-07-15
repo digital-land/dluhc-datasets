@@ -120,7 +120,6 @@ def get_new_datasets():
         print("No new datasets found")
 
     if replacement_datasets:
-        print("Replacement datasets found")
         _process_replacement_datasets(replacement_datasets)
     else:
         print("No replacement datasets found")
@@ -128,8 +127,21 @@ def get_new_datasets():
 
 def _process_replacement_datasets(replacement_datasets):
     for dataset, fields in replacement_datasets.items():
-        print(f"Replacing dataset {dataset} with {fields['replacement_dataset']}")
-        old_dataset = Dataset.query.filter(Dataset.dataset == dataset).one_or_none()
+        replacement_dataset = fields["replacement_dataset"]
+
+        d = Dataset.query.filter(Dataset.dataset == replacement_dataset).one_or_none()
+        if d is not None:
+            if d.records is not None or d.change_log is not None:
+                print(
+                    f"Replacement dataset {replacement_dataset} has already been processed and contains data. Skipping."
+                )
+                continue
+
+        print(f"Replacing dataset {dataset} with {replacement_dataset}")
+
+        old_dataset = Dataset.query.filter(
+            Dataset.dataset == dataset, Dataset.end_date.is_not(None)
+        ).one_or_none()
         new_dataset = Dataset.query.filter(
             Dataset.dataset == fields["replacement_dataset"]
         ).one_or_none()
@@ -144,6 +156,10 @@ def _process_replacement_datasets(replacement_datasets):
                 record.prefix = new_dataset.dataset
                 db.session.add(record)
 
+            for change in old_dataset.change_log:
+                change.dataset_id = new_dataset.dataset
+                db.session.add(change)
+
             old_dataset.end_date = datetime.datetime.today()
 
             db.session.add(old_dataset)
@@ -155,7 +171,7 @@ def _process_replacement_datasets(replacement_datasets):
         else:
             if old_dataset is None:
                 print(
-                    f"Could not replace dataset {dataset} as it does not exist in the database"
+                    f"Could not replace dataset {dataset} as it does not exist or may have been replaced already"
                 )
 
             if new_dataset is None:

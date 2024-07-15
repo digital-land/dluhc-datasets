@@ -120,6 +120,8 @@ def dataset_json(id):
 @main.route("/dataset/<string:id>/change-log")
 def change_log(id):
     dataset = Dataset.query.get_or_404(id)
+    if dataset.end_date is not None:
+        abort(404)
     breadcrumbs = {
         "items": [
             {"text": "Datasets", "href": url_for("main.index")},
@@ -163,6 +165,8 @@ def change_log(id):
 @login_required
 def add_record(id):
     dataset = Dataset.query.get_or_404(id)
+    if dataset.end_date is not None:
+        abort(404)
     builder = FormBuilder(dataset.fields)
     form = builder.build()
     form_fields = builder.form_fields()
@@ -275,6 +279,8 @@ def get_record(id, record_id):
 @login_required
 def edit_record(id, record_id):
     dataset = Dataset.query.get_or_404(id)
+    if dataset.end_date is not None:
+        abort(404)
     record = Record.query.filter(
         Record.dataset_id == dataset.dataset, Record.id == record_id
     ).one()
@@ -367,6 +373,8 @@ def archive_record(id, record_id):
 @main.route("/dataset/<string:id>/schema")
 def schema(id):
     dataset = Dataset.query.get_or_404(id)
+    if dataset.end_date is not None:
+        abort(404)
     breadcrumbs = {
         "items": [
             {"text": "Datasets", "href": url_for("main.index")},
@@ -396,6 +404,8 @@ def links(id):
     from flask import current_app
 
     dataset = Dataset.query.get_or_404(id)
+    if dataset.end_date is not None:
+        abort(404)
     breadcrumbs = {
         "items": [
             {"text": "Datasets", "href": url_for("main.index")},
@@ -452,7 +462,9 @@ def schema_json(id):
 @main.route("/dataset/<string:id>.csv")
 def csv(id):
     dataset = Dataset.query.get_or_404(id)
-    if dataset is not None and dataset.records:
+    if dataset.end_date is not None:
+        abort(404)
+    if dataset.records:
         output = io.StringIO()
         fieldnames = [field.field for field in dataset.sorted_fields()]
         writer = DictWriter(output, fieldnames)
@@ -474,6 +486,8 @@ def csv(id):
 @main.route("/dataset/<string:id>/history")
 def history(id):
     dataset = Dataset.query.get_or_404(id)
+    if dataset.end_date is not None:
+        abort(404)
     breadcrumbs = {
         "items": [
             {"text": "Datasets", "href": url_for("main.index")},

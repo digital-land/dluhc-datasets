@@ -1,5 +1,6 @@
 import base64
 import csv
+import datetime
 import os
 from pathlib import Path
 
@@ -23,6 +24,9 @@ dataset_query_part = "dataset__not=category&realm__exact=dataset&typology__exact
 dataset_query = f"{datasette_url}/dataset.json?{dataset_query_part}"
 dataset_field_query = (
     "{datasette_url}/dataset_field.json?dataset__exact={dataset}&_shape=array"
+)
+dataset_replacement_query = (
+    f"{datasette_url}/dataset.json?_shape=object&replacement_dataset__notblank=1"
 )
 
 dataset_editor_base_url = "https://dluhc-datasets.planning-data.dev"
@@ -69,7 +73,7 @@ def dataset_fields():
     print("db loaded")
 
 
-@data_cli.command("check")
+@data_cli.command("check-dataset-fields")
 def check_dataset_fields():
     for dataset in Dataset.query.all():
         schema_url = specfication_markdown_url.format(
@@ -93,14 +97,70 @@ def check_dataset_fields():
                 print("\n")
 
 
-@data_cli.command("new-datasets")
+@data_cli.command("check-datasets")
 def check_for_new_datasets():
+    database_datasets = set([dataset.dataset for dataset in Dataset.query.all()])
+
+    resp = requests.get(dataset_replacement_query)
+    replacement_datasets = resp.json()
+
     resp = requests.get(dataset_query)
     data = resp.json()
-    database_datasets = set([dataset.dataset for dataset in Dataset.query.all()])
     new_datasets = [
         dataset for dataset in data if dataset["dataset"] not in database_datasets
     ]
+
+    if new_datasets:
+        print("New datasets found")
+        _process_new_datasets(new_datasets)
+    else:
+        print("No new datasets found")
+
+    if replacement_datasets:
+        print("Replacement datasets found")
+        _process_replacement_datasets(replacement_datasets)
+    else:
+        print("No replacement datasets found")
+
+
+def _process_replacement_datasets(replacement_datasets):
+    for dataset, fields in replacement_datasets.items():
+        print(f"Replacing dataset {dataset} with {fields['replacement_dataset']}")
+        old_dataset = Dataset.query.filter(Dataset.dataset == dataset).one_or_none()
+        new_dataset = Dataset.query.filter(
+            Dataset.dataset == fields["replacement_dataset"]
+        ).one_or_none()
+
+        if old_dataset is not None and new_dataset is not None:
+            for field in old_dataset.fields:
+                if field not in new_dataset.fields:
+                    new_dataset.fields.append(field)
+
+            for record in old_dataset.records:
+                record.dataset_id = new_dataset.dataset
+                db.session.add(record)
+
+            old_dataset.end_date = datetime.datetime.today()
+
+            db.session.add(old_dataset)
+            db.session.add(new_dataset)
+            db.session.commit()
+
+            print(f"dataset {dataset} replaced by {fields['replacement_dataset']}")
+
+        else:
+            if old_dataset is None:
+                print(
+                    f"Could not replace dataset {dataset} as it does not exist in the database"
+                )
+
+            if new_dataset is None:
+                print(
+                    f"Could migrate data to the replacement dataset {fields['replacement_dataset']} as it was not found"
+                )
+
+
+def _process_new_datasets(new_datasets):
     for dataset in new_datasets:
         schema_url = specfication_markdown_url.format(
             base_url=base_url, dataset=dataset["dataset"]
@@ -143,7 +203,6 @@ def check_for_new_datasets():
             db.session.commit()
 
         print("New datasets added to database")
-    print("No new datasets found")
 
 
 @data_cli.command("backup-registers")

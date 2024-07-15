@@ -141,6 +141,7 @@ def _process_replacement_datasets(replacement_datasets):
 
             for record in old_dataset.records:
                 record.dataset_id = new_dataset.dataset
+                record.prefix = new_dataset.dataset
                 db.session.add(record)
 
             old_dataset.end_date = datetime.datetime.today()

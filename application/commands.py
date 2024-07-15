@@ -97,8 +97,8 @@ def check_dataset_fields():
                 print("\n")
 
 
-@data_cli.command("check-datasets")
-def check_for_new_datasets():
+@data_cli.command("new-datasets")
+def get_new_datasets():
     database_datasets = set([dataset.dataset for dataset in Dataset.query.all()])
 
     resp = requests.get(dataset_replacement_query)

@@ -256,7 +256,7 @@ def add_record(id):
     }
 
     return render_template(
-        "add_record.html",
+        "add-record.html",
         dataset=dataset,
         form=form,
         form_fields=form_fields,
@@ -269,7 +269,7 @@ def add_record(id):
 @login_required
 def get_record(id, record_id):
     record = Record.query.filter(Record.dataset_id == id, Record.id == record_id).one()
-    return render_template("view_record.html", record=record)
+    return render_template("view-record.html", record=record)
 
 
 @main.route(
@@ -330,7 +330,7 @@ def edit_record(id, record_id):
             error_list = None
 
         return render_template(
-            "edit_record.html",
+            "edit-record.html",
             dataset=record.dataset,
             record=record,
             form=form,
@@ -347,7 +347,7 @@ def archive_record(id, record_id):
     record = Record.query.filter(Record.dataset_id == id, Record.id == record_id).one()
 
     if request.method == "GET":
-        return render_template("archive_record.html", record=record)
+        return render_template("archive-record.html", record=record)
 
     record.data["end-date"] = datetime.datetime.today().strftime("%Y-%m-%d")
     record.end_date = datetime.datetime.today()
@@ -517,4 +517,22 @@ def history(id):
         page=page,
         records=records,
         history=True,
+    )
+
+
+@main.route("/dataset/<string:id>/category-finder")
+def category_finder(id):
+    dataset = Dataset.query.get_or_404(id)
+    breadcrumbs = {
+        "items": [
+            {"text": "Datasets", "href": url_for("main.index")},
+            {
+                "text": dataset.name,
+                "href": url_for("main.dataset", id=dataset.dataset),
+            },
+            {"text": "Category Finder"},
+        ]
+    }
+    return render_template(
+        "category-finder.html", dataset=dataset, breadcrumbs=breadcrumbs
     )

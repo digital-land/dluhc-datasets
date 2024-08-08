@@ -28,8 +28,9 @@ dataset_field_query = (
 dataset_replacement_query = (
     f"{datasette_url}/dataset.json?_shape=object&replacement_dataset__notblank=1"
 )
-
 dataset_editor_base_url = "https://dluhc-datasets.planning-data.dev"
+dataset_field_query = "{datasette_url}/dataset_field.json?field_dataset__exact={dataset}&_shape=array"  # noqa
+specification_dataset_query = "{datasette_url}/specification_dataset.json?dataset__exact={dataset}&_shape=array"  # noqa
 
 
 @data_cli.command("dataset-fields")
@@ -435,6 +436,43 @@ def set_dataset_considerations():
                 print(f"Set consideration {consideration} for {dataset.dataset}")
             else:
                 print(f"No consideration found for {dataset.dataset}")
+    print("Done")
+
+
+@data_cli.command("set-specification")
+def set_dataset_specification():
+    print("Setting specification for datasets")
+    for dataset in Dataset.query.filter(Dataset.specification.is_(None)).all():
+        try:
+            resp = requests.get(
+                dataset_field_query.format(
+                    datasette_url=datasette_url, dataset=dataset.dataset
+                )
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            if not data:
+                print(f"No data found for {dataset.dataset}")
+                continue
+            dataset_referencing_field = data[0].get("dataset")
+            specification_dataset_query_url = specification_dataset_query.format(
+                datasette_url=datasette_url, dataset=dataset_referencing_field
+            )
+            resp = requests.get(specification_dataset_query_url)
+            resp.raise_for_status()
+            specification_data = resp.json()
+            if not specification_data:
+                print(f"No specification found for {dataset_referencing_field}")
+                continue
+            specification = specification_data[0].get("specification")
+            dataset.specification = specification
+            db.session.add(dataset)
+            db.session.commit()
+            print(f"Set specification {specification} for {dataset.dataset}")
+        except requests.exceptions.HTTPError as e:
+            print(f"Error data for {dataset.dataset}: {e}")
+            continue
+
     print("Done")
 
 

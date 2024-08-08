@@ -106,6 +106,7 @@ class Dataset(DateModel):
     consideration: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     custodian: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     specification: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    referenced_by: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     def sorted_fields(self):
         return sorted(self.fields)

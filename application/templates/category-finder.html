@@ -4,7 +4,7 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    <p class="govuk-body-s">{{dataset.name}}</p>
+    {% if dataset.specification %}<p class="govuk-body-m">{{dataset.specification | replace("-", " ") | capitalize }} specification</p>{% endif %}
     <h1 class="govuk-heading-l">{{dataset.name}}</h1>
     <p></p>
   </div>

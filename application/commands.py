@@ -454,18 +454,19 @@ def set_dataset_specification():
             if not data:
                 print(f"No data found for {dataset.dataset}")
                 continue
-            dataset_referencing_field = data[0].get("dataset")
+            referenced_by = data[0].get("dataset")
             specification_dataset_query_url = specification_dataset_query.format(
-                datasette_url=datasette_url, dataset=dataset_referencing_field
+                datasette_url=datasette_url, dataset=referenced_by
             )
             resp = requests.get(specification_dataset_query_url)
             resp.raise_for_status()
             specification_data = resp.json()
             if not specification_data:
-                print(f"No specification found for {dataset_referencing_field}")
+                print(f"No specification found for {referenced_by}")
                 continue
             specification = specification_data[0].get("specification")
             dataset.specification = specification
+            dataset.referenced_by = referenced_by
             db.session.add(dataset)
             db.session.commit()
             print(f"Set specification {specification} for {dataset.dataset}")

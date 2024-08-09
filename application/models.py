@@ -141,14 +141,21 @@ class Reference(db.Model):
     specification: Mapped[str] = mapped_column(Text, nullable=True)
 
     def __repr__(self):
-        return f"<Reference(dataset={self.dataset.name}, referencing_dataset={self.referencing_dataset}, specification={self.specification})>"  # noqa
+        return f"<Reference(dataset={self.dataset_id}, referencing_dataset={self.referencing_dataset}, specification={self.specification})>"  # noqa
 
     def __eq__(self, other: "Reference") -> bool:
-        if self.dataset_id == other.dataset_id:
-            if self.specification is None or other.specification is None:
+        if not isinstance(other, Reference):
+            return NotImplemented
+        if self.referencing_dataset == other.referencing_dataset:
+            if self.specification is None and other.specification is None:
                 return True
             return self.specification == other.specification
         return False
+
+    def __hash__(self) -> int:
+        if self.specification is None:
+            return hash(self.referencing_dataset)
+        return hash((self.referencing_dataset, self.specification))
 
 
 class Record(DateModel):

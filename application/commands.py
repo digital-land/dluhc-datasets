@@ -496,10 +496,13 @@ def set_dataset_references():
             else:
                 if reference not in dataset.references:
                     dataset.references.append(reference)
+                    print(f"Set {reference} for {dataset.dataset}")
+                else:
+                    print(f"Reference {reference} already exists for {dataset.dataset}")
 
             db.session.add(dataset)
             db.session.commit()
-            print(f"Set references {dataset.references} for {dataset.dataset}")
+
         except requests.exceptions.HTTPError as e:
             print(f"Error data for {dataset.dataset}: {e}")
             continue

@@ -10,7 +10,7 @@ import requests
 from flask.cli import AppGroup
 
 from application.extensions import db
-from application.models import ChangeLog, ChangeType, Dataset, Field
+from application.models import ChangeLog, ChangeType, Dataset, Field, Reference
 
 data_cli = AppGroup("data")
 
@@ -29,7 +29,13 @@ dataset_replacement_query = (
     f"{datasette_url}/dataset.json?_shape=object&replacement_dataset__notblank=1"
 )
 dataset_editor_base_url = "https://dluhc-datasets.planning-data.dev"
-dataset_field_query = "{datasette_url}/dataset_field.json?field_dataset__exact={dataset}&_shape=array"  # noqa
+
+
+dataset_field_field_query = (
+    "{datasette_url}/dataset_field.json?field__exact={dataset}&_shape=array"  # noqa
+)
+dataset_field_field_dataset_query = "{datasette_url}/dataset_field.json?field_dataset__exact={dataset}&_shape=array"  # noqa
+
 specification_dataset_query = "{datasette_url}/specification_dataset.json?dataset__exact={dataset}&_shape=array"  # noqa
 
 
@@ -439,37 +445,61 @@ def set_dataset_considerations():
     print("Done")
 
 
-@data_cli.command("set-specification")
-def set_dataset_specification():
-    print("Setting specification for datasets")
-    for dataset in Dataset.query.filter(Dataset.specification.is_(None)).all():
+@data_cli.command("set-references")
+def set_dataset_references():
+    print("Setting references for datasets")
+    for dataset in Dataset.query.filter().all():
         try:
+            referenced_by = None
+
             resp = requests.get(
-                dataset_field_query.format(
+                dataset_field_field_dataset_query.format(
                     datasette_url=datasette_url, dataset=dataset.dataset
                 )
             )
             resp.raise_for_status()
             data = resp.json()
-            if not data:
-                print(f"No data found for {dataset.dataset}")
+
+            if data:
+                referenced_by = data[0].get("dataset")
+            else:
+                resp = requests.get(
+                    dataset_field_field_query.format(
+                        datasette_url=datasette_url, dataset=dataset.dataset
+                    )
+                )
+                resp.raise_for_status()
+                data = resp.json()
+                if data:
+                    referenced_by = data[0].get("dataset")
+
+            if referenced_by is None:
+                print(f"No references found for {dataset.dataset}")
                 continue
-            referenced_by = data[0].get("dataset")
+
+            reference = Reference(referencing_dataset=referenced_by)
             specification_dataset_query_url = specification_dataset_query.format(
                 datasette_url=datasette_url, dataset=referenced_by
             )
             resp = requests.get(specification_dataset_query_url)
             resp.raise_for_status()
             specification_data = resp.json()
+
             if not specification_data:
                 print(f"No specification found for {referenced_by}")
-                continue
-            specification = specification_data[0].get("specification")
-            dataset.specification = specification
-            dataset.referenced_by = referenced_by
+            else:
+                specification = specification_data[0].get("specification")
+                reference.specification = specification
+
+            if dataset.references is None:
+                dataset.references = [reference]
+            else:
+                if reference not in dataset.references:
+                    dataset.references.append(reference)
+
             db.session.add(dataset)
             db.session.commit()
-            print(f"Set specification {specification} for {dataset.dataset}")
+            print(f"Set references {dataset.references} for {dataset.dataset}")
         except requests.exceptions.HTTPError as e:
             print(f"Error data for {dataset.dataset}: {e}")
             continue

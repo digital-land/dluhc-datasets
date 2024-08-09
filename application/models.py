@@ -107,6 +107,9 @@ class Dataset(DateModel):
     custodian: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     specification: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     referenced_by: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    references: Mapped[List["Reference"]] = relationship(
+        "Reference", back_populates="dataset", cascade="all, delete"
+    )
 
     def sorted_fields(self):
         return sorted(self.fields)
@@ -124,6 +127,28 @@ class Dataset(DateModel):
             "last_updated": self.last_updated,
             "data": f"{url_for('main.dataset_json', id=self.dataset, _external=True)}",
         }
+
+
+class Reference(db.Model):
+    __tablename__ = "reference"
+
+    id: Mapped[uuid.uuid4] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    dataset_id: Mapped[str] = mapped_column(Text, ForeignKey("dataset.dataset"))
+    dataset: Mapped["Dataset"] = relationship("Dataset", back_populates="references")
+    referencing_dataset: Mapped[str] = mapped_column(Text, nullable=False)
+    specification: Mapped[str] = mapped_column(Text, nullable=True)
+
+    def __repr__(self):
+        return f"<Reference(dataset={self.dataset.name}, referencing_dataset={self.referencing_dataset}, specification={self.specification})>"  # noqa
+
+    def __eq__(self, other: "Reference") -> bool:
+        if self.dataset_id == other.dataset_id:
+            if self.specification is None or other.specification is None:
+                return True
+            return self.specification == other.specification
+        return False
 
 
 class Record(DateModel):

@@ -448,10 +448,8 @@ def set_dataset_considerations():
 @data_cli.command("set-references")
 def set_dataset_references():
     print("Setting references for datasets")
-    for dataset in Dataset.query.filter().all():
+    for dataset in Dataset.query.order_by(Dataset.dataset).all():
         try:
-            referenced_by = None
-
             resp = requests.get(
                 dataset_field_field_dataset_query.format(
                     datasette_url=datasette_url, dataset=dataset.dataset
@@ -460,51 +458,74 @@ def set_dataset_references():
             resp.raise_for_status()
             data = resp.json()
 
-            if data:
-                referenced_by = data[0].get("dataset")
-            else:
-                resp = requests.get(
-                    dataset_field_field_query.format(
-                        datasette_url=datasette_url, dataset=dataset.dataset
-                    )
-                )
-                resp.raise_for_status()
-                data = resp.json()
-                if data:
-                    referenced_by = data[0].get("dataset")
-
-            if referenced_by is None:
-                print(f"No references found for {dataset.dataset}")
-                continue
-
-            reference = Reference(referencing_dataset=referenced_by)
-            specification_dataset_query_url = specification_dataset_query.format(
-                datasette_url=datasette_url, dataset=referenced_by
-            )
-            resp = requests.get(specification_dataset_query_url)
-            resp.raise_for_status()
-            specification_data = resp.json()
-
-            if not specification_data:
-                print(f"No specification found for {referenced_by}")
-            else:
-                specification = specification_data[0].get("specification")
-                reference.specification = specification
-
-            if dataset.references is None:
-                dataset.references = [reference]
-            else:
-                if reference not in dataset.references:
-                    dataset.references.append(reference)
-                    print(f"Set {reference} for {dataset.dataset}")
+            for d in data:
+                referenced_by = d.get("dataset")
+                if not referenced_by:
+                    print(f"No references found for {dataset.dataset}")
+                    continue
+                reference = Reference(referenced_by=referenced_by)
+                if dataset.references is None:
+                    dataset.references = [reference]
                 else:
-                    print(f"Reference {reference} already exists for {dataset.dataset}")
+                    if reference not in dataset.references:
+                        dataset.references.append(reference)
+                        print(f"Set {reference} for {dataset.dataset}")
+                    else:
+                        print(
+                            f"Reference {reference} already exists for {dataset.dataset}"
+                        )
+
+            resp = requests.get(
+                dataset_field_field_query.format(
+                    datasette_url=datasette_url, dataset=dataset.dataset
+                )
+            )
+            resp.raise_for_status()
+            data = resp.json()
+
+            for d in data:
+                referenced_by = d.get("dataset")
+                if not referenced_by:
+                    print(f"No references found for {dataset.dataset}")
+                    continue
+                reference = Reference(referenced_by=referenced_by)
+                if dataset.references is None:
+                    dataset.references = [reference]
+                else:
+                    if reference not in dataset.references:
+                        dataset.references.append(reference)
+                        print(f"Set {reference} for {dataset.dataset}")
+                    else:
+                        print(
+                            f"Reference {reference} already exists for {dataset.dataset}"
+                        )
 
             db.session.add(dataset)
             db.session.commit()
 
+            for reference in [
+                r for r in dataset.references if dataset.references is not None
+            ]:
+                specification_dataset_query_url = specification_dataset_query.format(
+                    datasette_url=datasette_url, dataset=reference.referenced_by
+                )
+                resp = requests.get(specification_dataset_query_url)
+                resp.raise_for_status()
+                specification_data = resp.json()
+                if not specification_data:
+                    print(f"No specification found for {reference.referenced_by}")
+                else:
+                    specification = specification_data[0].get("specification")
+                    reference.specification = specification
+                    print(
+                        f"Set specification {specification} for {reference.referenced_by}"
+                    )
+
+                db.session.add(dataset)
+                db.session.commit()
+
         except requests.exceptions.HTTPError as e:
-            print(f"Error data for {dataset.dataset}: {e}")
+            print(f"Error setting references for {dataset.dataset}: {e}")
             continue
 
     print("Done")

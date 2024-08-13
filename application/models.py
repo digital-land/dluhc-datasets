@@ -137,16 +137,16 @@ class Reference(db.Model):
     )
     dataset_id: Mapped[str] = mapped_column(Text, ForeignKey("dataset.dataset"))
     dataset: Mapped["Dataset"] = relationship("Dataset", back_populates="references")
-    referencing_dataset: Mapped[str] = mapped_column(Text, nullable=False)
+    referenced_by: Mapped[str] = mapped_column(Text, nullable=False)
     specification: Mapped[str] = mapped_column(Text, nullable=True)
 
     def __repr__(self):
-        return f"<Reference(dataset={self.dataset_id}, referencing_dataset={self.referencing_dataset}, specification={self.specification})>"  # noqa
+        return f"<Reference(dataset={self.dataset_id}, referencing_dataset={self.referenced_by}, specification={self.specification})>"  # noqa
 
     def __eq__(self, other: "Reference") -> bool:
         if not isinstance(other, Reference):
             return NotImplemented
-        if self.referencing_dataset == other.referencing_dataset:
+        if self.referenced_by == other.referenced_by:
             if self.specification is None and other.specification is None:
                 return True
             return self.specification == other.specification
@@ -154,8 +154,8 @@ class Reference(db.Model):
 
     def __hash__(self) -> int:
         if self.specification is None:
-            return hash(self.referencing_dataset)
-        return hash((self.referencing_dataset, self.specification))
+            return hash(self.referenced_by)
+        return hash((self.referenced_by, self.specification))
 
 
 class Record(DateModel):

@@ -141,7 +141,7 @@ class Reference(db.Model):
     specification: Mapped[str] = mapped_column(Text, nullable=True)
 
     def __repr__(self):
-        return f"<Reference(dataset={self.dataset_id}, referencing_dataset={self.referenced_by}, specification={self.specification})>"  # noqa
+        return f"<Reference(dataset={self.dataset_id}, referenced_by={self.referenced_by}, specification={self.specification})>"  # noqa
 
     def __eq__(self, other: "Reference") -> bool:
         if not isinstance(other, Reference):

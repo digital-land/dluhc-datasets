@@ -476,20 +476,6 @@ def set_dataset_references():
                         {"referenced_by": referenced_by, "specification": None}
                     ]
 
-                # reference = Reference(referenced_by=referenced_by)
-                # if dataset.references is None:
-                #     dataset.references = [reference]
-                # else:
-                #     if reference not in dataset.references:
-                #         dataset.references.append(reference)
-                #         print(f"Set {reference} for {dataset.dataset}")
-                #     else:
-                #         print(
-                #             f"Reference {reference} already exists for {dataset.dataset}"
-                #         )
-                # db.session.add(dataset)
-                # db.session.commit()
-
             resp = requests.get(
                 dataset_field_field_query.format(
                     datasette_url=datasette_url, dataset=dataset.dataset
@@ -513,24 +499,6 @@ def set_dataset_references():
                         {"referenced_by": referenced_by, "specification": None}
                     ]
 
-                # referenced_by = d.get("dataset")
-                # if not referenced_by:
-                #     print(f"No references found for {dataset.dataset}")
-                #     continue
-                # reference = Reference(referenced_by=referenced_by)
-                # if dataset.references is None:
-                #     dataset.references = [reference]
-                # else:
-                #     if reference not in dataset.references:
-                #         dataset.references.append(reference)
-                #         print(f"Set {reference} for {dataset.dataset}")
-                #     else:
-                #         print(
-                #             f"Reference {reference} already exists for {dataset.dataset}"
-                #         )
-                # db.session.add(dataset)
-                # db.session.commit()
-
         except requests.exceptions.HTTPError as e:
             print(f"Error setting references for {dataset.dataset}: {e}")
             continue
@@ -550,10 +518,9 @@ def set_dataset_references():
             else:
                 specification = specification_data[0].get("specification")
                 ref["specification"] = specification
-                print(f"Set specification {specification} for {ref['referenced_by']}")
+                print(f"Specification {specification} found for {ref['referenced_by']}")
 
     for d, r in refs.items():
-        print(f"References for {d}")
         for ref in r:
             referenced_by = ref["referenced_by"]
             specification = ref["specification"]
@@ -576,55 +543,9 @@ def set_dataset_references():
                 )
                 db.session.add(reference)
                 db.session.commit()
-
-    # references = Reference.query.filter(Reference.specification.is_(None)).all()
-    # for reference in references:
-    #     try:
-    #         resp = requests.get(
-    #             specification_dataset_query.format(
-    #                 datasette_url=datasette_url, dataset=reference.referenced_by
-    #             )
-    #         )
-    #         resp.raise_for_status()
-    #         specification_data = resp.json()
-    #         if not specification_data:
-    #             print(f"No specification found for {reference.referenced_by}")
-    #         else:
-    #             specification = specification_data[0].get("specification")
-    #             reference.specification = specification
-    #             print(f"Set specification {specification} for {reference}")
-    #             db.session.add(reference)
-    #             db.session.commit()
-
-    #     except requests.exceptions.HTTPError as e:
-    #         print(f"Error setting references for {dataset.dataset}: {e}")
-    #         continue
-
-    #         specification_dataset_query_url = specification_dataset_query.format(
-    #             datasette_url=datasette_url, dataset=reference.referenced_by
-    #         )
-    #         resp = requests.get(specification_dataset_query_url)
-    #         resp.raise_for_status()
-    #         specification_data = resp.json()
-    #         if not specification_data:
-    #             print(f"No specification found for {reference.referenced_by}")
-    #         else:
-    #             specification = specification_data[0].get("specification")
-    #             if reference.specification is None or reference.specification != specification:
-    #                 reference.specification = specification
-    #                 print(
-    #                     f"Set specification {specification} for {reference}"
-    #                 )
-    #                 db.session.add(dataset)
-    #                 db.session.commit()
-    #             else:
-    #                 print(
-    #                     f"Specification {specification} already set for {reference}"
-    #                 )
-
-    # except requests.exceptions.HTTPError as e:
-    #     print(f"Error setting references for {dataset.dataset}: {e}")
-    #     continue
+                print(
+                    f"Reference {referenced_by} with specification {specification} added to {d}"
+                )
 
     print("Done")
 

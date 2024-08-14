@@ -6,7 +6,11 @@
   <div class="govuk-grid-column-full">
     {% if dataset.specification %}<p class="govuk-body-m">{{dataset.specification | replace("-", " ") | capitalize }} specification</p>{% endif %}
     <h1 class="govuk-heading-l">{{dataset.name}}</h1>
-    <p></p>
+    <ul>
+      {% for reference in dataset.references %}
+        <li>{{ reference }}</li>
+      {% endfor %}
+    </ul>
   </div>
 </div>
 

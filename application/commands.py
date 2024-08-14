@@ -474,6 +474,8 @@ def set_dataset_references():
                         print(
                             f"Reference {reference} already exists for {dataset.dataset}"
                         )
+                db.session.add(dataset)
+                db.session.commit()
 
             resp = requests.get(
                 dataset_field_field_query.format(
@@ -500,8 +502,8 @@ def set_dataset_references():
                             f"Reference {reference} already exists for {dataset.dataset}"
                         )
 
-            db.session.add(dataset)
-            db.session.commit()
+                db.session.add(dataset)
+                db.session.commit()
 
             for reference in [
                 r for r in dataset.references if dataset.references is not None

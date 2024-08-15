@@ -5,12 +5,52 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     {% if dataset.specification %}<p class="govuk-body-m">{{dataset.specification | replace("-", " ") | capitalize }} specification</p>{% endif %}
-    <h1 class="govuk-heading-l">{{dataset.name}}</h1>
-    <ul>
+    <h1 class="govuk-heading-xl">Find a {{dataset.name}}</h1>
+  </div>
+</div>
+
+<div class='govuk-grid-row'>
+  <div class='govuk-grid-column-two-thirds'>
+    <p class="govuk-body-l">Use this page to find the reference for the {{ dataset.name }} you need to include in your data.</p>
+    <p class="govuk-body">There are datasets that have {{ dataset.name }} as field. The value you put in this field must be one of the references on this page.</p>
+    <p class="govuk-body">If the field accepts multiple values separated by a <code>;</code> then each instance should be a reference from the list below.</p>
+
+    <h3 class="govuk-heading-m">Where is this field used</h3>
+    <ul class="govuk-list govuk-list--bullet">
       {% for reference in dataset.references %}
-        <li>{{ reference }}</li>
+      <li>{{ reference.specification }}/{{ reference.referenced_by }}/{{ dataset.dataset }}/@reference</li>
       {% endfor %}
     </ul>
+  </div>
+</div>
+
+<div class='govuk-grid-row'>
+  <div class='govuk-grid-column-two-thirds'>
+    <h3 class="govuk-heading-l govuk-!-margin-top-6">Find reference</h3>
+    <p class="govuk-body">Below is a list of all the {{ dataset.name }} records. Find the one you need and use the reference in your data.</p>
+  </div>
+</div>
+
+<div class='govuk-grid-row'>
+  <div class='govuk-grid-column-full'>
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Name</th>
+          <th scope="col" class="govuk-table__header">Description</th>
+          <th scope="col" class="govuk-table__header">Reference</th>
+        </tr>
+      </thead>
+      <tbody>
+        {%- for record in active_records %}
+        <tr>
+          <td class="govuk-table__cell">{{ record.data['name'] }}</td>
+          <td class="govuk-table__cell">{{ record.description if record.description is not none }}</td>
+          <td class="govuk-table__cell"><code class="app-code-block">{{ record.reference }}</code></td>
+        </tr>
+        {% endfor -%}
+      </tbody>
+    </table>
   </div>
 </div>
 

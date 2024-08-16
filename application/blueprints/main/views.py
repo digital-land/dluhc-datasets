@@ -520,8 +520,8 @@ def history(id):
     )
 
 
-@main.route("/dataset/<string:id>/category-finder")
-def category_finder(id):
+@main.route("/dataset/<string:id>/finder")
+def finder(id):
     dataset = Dataset.query.get_or_404(id)
     breadcrumbs = {
         "items": [
@@ -535,7 +535,7 @@ def category_finder(id):
     }
     active_records = [record for record in dataset.records if record.end_date is None]
     return render_template(
-        "category-finder.html",
+        "finder.html",
         dataset=dataset,
         breadcrumbs=breadcrumbs,
         active_records=active_records,

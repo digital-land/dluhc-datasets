@@ -46,7 +46,7 @@
         <tr>
           <td class="govuk-table__cell">{{ record.data['name'] }}</td>
           <td class="govuk-table__cell">{{ record.description if record.description is not none }}</td>
-          <td class="govuk-table__cell"><code class="app-code-block">{{ record.reference }}</code></td>
+          <td class="govuk-table__cell"><code class="dl-code-block dl-code-block--inline dl-code-block--small">{{ record.reference }}</code></td>
         </tr>
         {% endfor -%}
       </tbody>

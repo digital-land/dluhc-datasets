@@ -35,3 +35,12 @@ $govuk-new-link-styles: true;
   padding: 3px 8px;
   background: #f4f4f4;
 }
+
+
+.dl-code-block--small {
+  font-size: 14px;
+
+  @include govuk-media-query($from: tablet) {
+    font-size: 16px;
+  }
+}

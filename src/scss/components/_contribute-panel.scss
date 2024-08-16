@@ -1,0 +1,9 @@
+.app-contribute-panel {
+  @include govuk-responsive-margin(6, 'top');
+  padding-top: $govuk-gutter-half;
+  border-top: 2px solid govuk-colour('blue');
+}
+
+.app-contribute-panel__content {
+  max-width: 640px;
+}

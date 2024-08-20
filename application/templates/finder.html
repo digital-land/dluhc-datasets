@@ -33,24 +33,42 @@
 
 <div class='govuk-grid-row'>
   <div class='govuk-grid-column-full'>
-    <table class="govuk-table">
-      <thead class="govuk-table__head">
-        <tr class="govuk-table__row">
-          <th scope="col" class="govuk-table__header">Name</th>
-          <th scope="col" class="govuk-table__header">Description</th>
-          <th scope="col" class="govuk-table__header">Reference</th>
-        </tr>
-      </thead>
-      <tbody>
-        {%- for record in active_records %}
-        <tr>
-          <td class="govuk-table__cell">{{ record.data['name'] }}</td>
-          <td class="govuk-table__cell">{{ record.description if record.description is not none }}</td>
-          <td class="govuk-table__cell"><code class="dl-code-block dl-code-block--inline dl-code-block--small">{{ record.reference }}</code></td>
-        </tr>
-        {% endfor -%}
-      </tbody>
-    </table>
+
+    <form class="govuk-!-margin-top-6 govuk-!-margin-bottom-6" data-filter="form">
+      <label class="dl-list-filter__label govuk-label govuk-!-font-weight-bold" for="filter-reference-list">I'm looking for</label>
+      <input class="dl-list-filter__input govuk-input" type="text" id="filter-reference-list" placeholder="Start typing an expected value">
+    </form>
+
+    <div class="reference-list__wrapper">
+
+      <div class="reference-list__count__wrapper">
+        <p class="govuk-body">Showing <span class="js-accessible-list-filter__count">{{ active_records|length }}</span> options</p>
+        <span class="govuk-body govuk-!-font-weight-bold govuk-visually-hidden js-list-filter__count" aria-hidden="true">{{ active_records|length }}</span>
+      </div>
+
+      <table class="govuk-table" data-filter="list">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Name</th>
+            <th scope="col" class="govuk-table__header">Description</th>
+            <th scope="col" class="govuk-table__header">Reference</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for record in active_records %}
+          <tr data-filter="item">
+            <td class="govuk-table__cell" data-filter="match-content">{{ record.data['name'] }}</td>
+            <td class="govuk-table__cell">{{ record.description if record.description is not none }}</td>
+            <td class="govuk-table__cell"><code class="dl-code-block dl-code-block--inline dl-code-block--small">{{ record.reference }}</code></td>
+          </tr>
+          {% endfor -%}
+        </tbody>
+      </table>
+
+      <p class="dl-list-filter__no-filter-match js-no-filter-list-matches">No matches found.</p>
+
+    </div>
+
   </div>
 </div>
 
@@ -65,3 +83,15 @@
   </div>
 </div>
 {% endblock content %}
+
+
+{% block pageScripts %}
+<script>
+  // initialise list filter
+  const $form = document.querySelector('[data-filter="form"]');
+  new window.DLFrontend.ListFilter($form).init({
+    list_section_selector: '.reference-list__wrapper',
+    count_wrapper_selector: '.reference-list__count__wrapper'
+  })
+</script>
+{% endblock %}

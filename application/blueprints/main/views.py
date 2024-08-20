@@ -533,7 +533,10 @@ def finder(id):
             {"text": "Category Finder"},
         ]
     }
-    active_records = [record for record in dataset.records if record.end_date is None]
+    active_records = sorted(
+        [record for record in dataset.records if record.end_date is None],
+        key=lambda record: record.data["name"],
+    )
     return render_template(
         "finder.html",
         dataset=dataset,

@@ -31,7 +31,7 @@ class FormBuilder:
             if form_field is not None:
                 if field.datatype == "curie":
                     setattr(TheForm, field.field, form_field(validators=[curie_check]))
-                elif field.field == "name":
+                elif field.field == "name" or field.field == "reference":
                     setattr(
                         TheForm, field.field, form_field(validators=[DataRequired()])
                     )

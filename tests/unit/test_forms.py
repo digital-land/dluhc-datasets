@@ -17,7 +17,7 @@ def app():
 fields = [
     Field(field="organisation", datatype="curie", name="Orgasnisation"),
     Field(field="prefix", datatype="string", name="Prefix"),
-    Field(field="reference", datatype="string", name="Prefix"),
+    Field(field="reference", datatype="string", name="Reference"),
     Field(field="documentation-url", datatype="url", name="Documentation url"),
     Field(field="notes", datatype="text", name="Notes"),
 ]
@@ -55,3 +55,23 @@ def test_form_with_curie_field_fails_validation_of_invalid_input(app):
             form.errors.get("organisation")[0]
             == "organisation is a curie and should be in the format 'namespace:identifier'"
         )
+
+
+def test_form_required_fields(app):
+    with app.test_request_context():
+        fields = [
+            Field(field="name", datatype="string", name="Name"),
+            Field(field="reference", datatype="string", name="Reference"),
+        ]
+        builder = FormBuilder(fields)
+        form = builder.build()
+
+        form.name.data = None
+        form.reference.data = None
+        form.validate()
+
+        assert form.errors.get("name")
+        assert form.errors.get("name")[0] == "This field is required."
+
+        assert form.errors.get("reference")
+        assert form.errors.get("reference")[0] == "This field is required."

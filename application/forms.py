@@ -31,7 +31,9 @@ class FormBuilder:
             if form_field is not None:
                 if field.datatype == "curie":
                     setattr(TheForm, field.field, form_field(validators=[curie_check]))
-                elif field.field == "name" or field.field == "reference":
+                elif field.field == "name" or (
+                    field.field == "reference" and self.require_reference
+                ):
                     setattr(
                         TheForm, field.field, form_field(validators=[DataRequired()])
                     )
@@ -50,10 +52,11 @@ class FormBuilder:
     def form_fields(self):
         return sorted(self.fields)
 
-    def __init__(self, fields, include_edit_notes=False):
+    def __init__(self, fields, include_edit_notes=False, require_reference=True):
         skip_fields = {"entity", "end-date", "entry-date", "prefix"}
         self.fields = []
         self.include_edit_notes = include_edit_notes
+        self.require_reference = require_reference
         for field in fields:
             if field.field not in skip_fields:
                 self.fields.append(field)

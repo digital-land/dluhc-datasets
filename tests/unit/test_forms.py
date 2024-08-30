@@ -75,3 +75,17 @@ def test_form_required_fields(app):
 
         assert form.errors.get("reference")
         assert form.errors.get("reference")[0] == "This field is required."
+
+
+def test_form_can_set_reference_not_required(app):
+    with app.test_request_context():
+        fields = [
+            Field(field="reference", datatype="string", name="Reference"),
+        ]
+        builder = FormBuilder(fields, require_reference=False)
+        form = builder.build()
+
+        form.reference.data = None
+        form.validate()
+
+        assert form.errors.get("reference") is None

@@ -283,7 +283,9 @@ def edit_record(id, record_id):
     record = Record.query.filter(
         Record.dataset_id == dataset.dataset, Record.id == record_id
     ).one()
-    builder = FormBuilder(record.dataset.fields, include_edit_notes=True)
+    builder = FormBuilder(
+        record.dataset.fields, include_edit_notes=True, require_reference=False
+    )
     form = builder.build()
     form_fields = builder.form_fields()
 

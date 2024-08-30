@@ -49,7 +49,7 @@
               {% for field in dataset.sorted_fields() %}
                 <td class="app-data-table__cell">{{ record.get(field.field, None)| value_or_empty_string | replace('-','&#8209;') | safe }}</td>
               {% endfor %}
-              {% if session["user"] and not record.end_date %}
+              {% if session["user"] and not record.end_date and not history %}
               <td class="app-data-table__cell app-data-table__cell--ui">
                 {{
                   buttonMenu({

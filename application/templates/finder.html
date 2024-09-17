@@ -5,20 +5,20 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     {% if dataset.specification %}<p class="govuk-body-m">{{dataset.specification | replace("-", " ") | capitalize }} specification</p>{% endif %}
-    <h1 class="govuk-heading-xl">Find a {{dataset.name}}</h1>
+    <h1 class="govuk-heading-xl">Find a {{dataset.name}} code</h1>
   </div>
 </div>
 
 <div class='govuk-grid-row'>
   <div class='govuk-grid-column-two-thirds'>
-    <p class="govuk-body-l">Use this page to find the value for the {{ dataset.name }} you need to include in your data.</p>
-    <p class="govuk-body">There are datasets that have {{ dataset.name }} as a field. The value you put in this field must be one of the values on this page.</p>
-    <p class="govuk-body">If the field accepts multiple values separated by a <code>;</code> then each instance should be a value from the list below.</p>
+    <p class="govuk-body-l">Use this page to find the code for the {{ dataset.name }} you need to include in your data.</p>
+    <p class="govuk-body">There are datasets that have {{ dataset.name }} as a field. The code you put in this field must be one of the codes on this page.</p>
+    <p class="govuk-body">If the field accepts multiple codes separated by a <code>;</code> then each instance should be a code from the list below.</p>
 
     <h3 class="govuk-heading-m">Where is this field used</h3>
     <ul class="govuk-list govuk-list--bullet">
       {% for reference in dataset.references %}
-      <li>{{ reference.specification }}/{{ reference.referenced_by }}/{{ dataset.dataset }}/@reference</li>
+      <li>{{ reference.specification }}/{{ reference.referenced_by }}/{{ dataset.dataset }}/@code</li>
       {% endfor %}
     </ul>
   </div>
@@ -26,8 +26,9 @@
 
 <div class='govuk-grid-row'>
   <div class='govuk-grid-column-two-thirds'>
-    <h3 class="govuk-heading-l govuk-!-margin-top-6">Find value to use in your data</h3>
-    <p class="govuk-body">Below is a list of all the {{ dataset.name }} records. Find the one you need and use the value in your data.</p>
+    <h3 class="govuk-heading-l govuk-!-margin-top-6">Find a code to use in your data</h3>
+    <p class="govuk-body">Below is a list of all the {{ dataset.name }} records. Find the one you need and use the code in your data.</p>
+    <p class="govuk-body">You must use the correct code otherwise your data will be unusable.</p>
   </div>
 </div>
 
@@ -36,7 +37,7 @@
 
     <form class="govuk-!-margin-top-6 govuk-!-margin-bottom-6" data-filter="form">
       <label class="dl-list-filter__label govuk-label govuk-!-font-weight-bold" for="filter-reference-list">I'm looking for</label>
-      <input class="dl-list-filter__input govuk-input" type="text" id="filter-reference-list" placeholder="Start typing an expected value">
+      <input class="dl-list-filter__input govuk-input" type="text" id="filter-reference-list" placeholder="Start typing...">
     </form>
 
     <div class="reference-list__wrapper">
@@ -51,7 +52,7 @@
           <tr class="govuk-table__row">
             <th scope="col" class="govuk-table__header">Name</th>
             <th scope="col" class="govuk-table__header">Description</th>
-            <th scope="col" class="govuk-table__header">Value</th>
+            <th scope="col" class="govuk-table__header">Code</th>
           </tr>
         </thead>
         <tbody>
@@ -77,7 +78,7 @@
     <div class="app-contribute-panel">
       <div class="app-contribute-panel__content">
         <h2 class="govuk-heading-m">Noticed something wrong?</h2>
-        <p class="govuk-body">If you have noticed an issue with this list of values in this dataset, contact the team on the <a href="https://github.com/digital-land/data-standards-backlog/discussions" class="govuk-link">discussion threads</a>.</p>
+        <p class="govuk-body">If you have noticed an issue with this list of codes in this dataset, contact the team on the <a href="https://github.com/digital-land/data-standards-backlog/discussions" class="govuk-link">discussion threads</a>.</p>
       </div>
     </div>
   </div>

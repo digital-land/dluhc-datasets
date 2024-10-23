@@ -1,0 +1,6 @@
+entity,name,prefix,reference,description,notes,entry-date,start-date,end-date
+4210000,Area appraisal,conservation-area-document-type,area-appraisal,,,2024-05-20,2022-01-01,
+4210001,Notice,conservation-area-document-type,notice,Notice documents can include items published in the local paper such as the London Gazette,"For example, a notice published in the local paper such as the London Gazette",2024-05-20,2022-01-01,
+4210002,Designation-report,conservation-area-document-type,designation-report,,,2024-05-20,2022-01-01,
+4210003,Area map,conservation-area-document-type,area-map,,,2024-05-20,2022-01-01,
+4210004,Management plan,conservation-area-document-type,management-plan,,,2024-10-14,2024-10-14,

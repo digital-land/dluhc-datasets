@@ -1,6 +1,6 @@
-end-date,entity,entry-date,name,notes,prefix,reference,start-date
-,,2023-07-20,Fluvial model,,flood-risk-type,fluvial-model,2023-07-20
-,,2023-07-20,Tidal model,,flood-risk-type,tidal-model,2023-07-20
-,,2023-07-20,Fluvial event,,flood-risk-type,fluvial-event,2023-07-20
-,,2023-07-20,Tidal event,,flood-risk-type,tidal-event,2023-07-20
-,,2023-07-20,Coastal event,,flood-risk-type,coastal-event,2023-07-20
+entity,name,prefix,reference,description,notes,entry-date,start-date,end-date
+6400000,Fluvial model,flood-risk-type,fluvial-model,,,2023-07-20,2023-07-20,
+6400001,Tidal model,flood-risk-type,tidal-model,,,2023-07-20,2023-07-20,
+6400002,Fluvial event,flood-risk-type,fluvial-event,,,2023-07-20,2023-07-20,
+6400003,Tidal event,flood-risk-type,tidal-event,,,2023-07-20,2023-07-20,
+6400004,Coastal event,flood-risk-type,coastal-event,,,2023-07-20,2023-07-20,

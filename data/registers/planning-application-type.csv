@@ -1,42 +1,42 @@
-end-date,entity,entry-date,name,notes,prefix,reference,start-date,planning-application-category
-,,2023-08-22,Householder planning permission,,,householder-planning-permission,,householder
-,,2023-08-22,Householder planning and demolition in a conservation area,,,householder-planning-and-demolition-in-a-conservation-area,,householder
-,,2023-08-22,Householder planning and listed building consent,,,householder-planning-and-listed-building-consent,,householder
-,,2023-08-22,Full planning permission,,,full-planning-permission,,full
-,,2023-08-22,Outline planning permission – some matters reserved,,,outline-planning-permission-–-some-matters-reserved,,outline
-,,2023-08-22,Outline planning permission – all matters reserved,,,outline-planning-permission-–-all-matters-reserved,,outline
-,,2023-08-22,Full planning and demolition in a conservation area,,,full-planning-and-demolition-in-a-conservation-area,,full
-,,2023-08-22,Full planning and listed building consent,,,full-planning-and-listed-building-consent,,full
-,,2023-08-22,Full planning and display of advertisments,,,full-planning-and-display-of-advertisments,,full
-,,2023-08-22,Demolition in a conservation area,,,demolition-in-a-conservation-area,,conservation-area
-,,2023-08-22,Listed building consent,,,listed-building-consent,,listed-building
-,,2023-08-22,Consent to display an advertisment,,,consent-to-display-an-advertisment,,advertisment
-,,2023-08-22,Lawful development – existing use,,,lawful-development-–-existing-use,,certificate-of-lawfulness
-,,2023-08-22,Lawful development – proposed use,,,lawful-development-–-proposed-use,,certificate-of-lawfulness
-,,2023-08-22,Building for agricultural or forestry use,,,building-for-agricultural-or-forestry-use,,prior-approval
-,,2023-08-22,Private road for agricultural or forestry use,,,private-road-for-agricultural-or-forestry-use,,prior-approval
-,,2023-08-22,Excavation or deposit waste for agriculture,,,excavation-or-deposit-waste-for-agriculture,,prior-approval
-,,2023-08-22,Tank or cage structure for use in fishing farm,,,tank-or-cage-structure-for-use-in-fishing-farm,,prior-approval
-,,2023-08-22,Development for electronic communications network,,,development-for-electronic-communications-network,,prior-approval
-,,2023-08-22,Hedgerow removal notice,,,hedgerow-removal-notice,,hedgerows
-,,2023-08-22,Demolition of building,,,demolition-of-building,,prior-approval
-,,2023-08-22,Removal or variation of a condition,,,removal-or-variation-of-a-condition,,reserved-matters
-,,2023-08-22,Approval of details reserved by a condition,,,approval-of-details-reserved-by-a-condition,,reserved-matters
-,,2023-08-22,Tree in conservation areas or subject to a tree preservation order,,,tree-in-conservation-areas-or-subject–to-a-tree-preservation-order,,tree-works
-,,2023-08-22,Non-material amendment,,,non-material-amendment,,non-material-amendment
-,,2023-08-22,Larger home extension,,,larger-home-extension,,prior-approval
-,,2023-08-22,Retail to restaurant or cafe,,,retail-to-restaurant-or-cafe,,change-of-use
-,,2023-08-22,Takeaway or sui generis or mixed use to dwelling houses,,,takeaway-or-sui-generis-or-mixed-use-to-dwelling-houses,,change-of-use
-,,2023-08-22,Retail to assembly or leisure,,,retail-to-assembly-or-leisure,,change-of-use
-,,2023-08-22,Agriculture to dwelling houses,,,agriculture-to-dwelling-houses,,change-of-use
-,,2023-08-22,Agriculture to flexible commercial use,,,agriculture-to-flexible-commercial-use,,change-of-use
-,,2023-08-22,Agriculture to state funded school,,,agriculture-to-state-funded-school,,change-of-use
-,,2023-08-22,Commercial or business or service or hotel to state funded school,,,commercial-or-business-or-service-or-hotel-to-state-funded-school,,change-of-use
-,,2023-08-22,Offices to dwelling houses,,,offices-to-dwelling-houses,,change-of-use
-,,2023-08-22,Light industrial to dwelling houses,,,light-industrial-to-dwelling-houses,,change-of-use
-,,2023-08-22,Amusements or casinos to dwelling houses,,,amusements-or-casinos-to-dwelling-houses,,change-of-use
-,,2023-08-22,Collection facility for a shop,,,collection-facility-for-a-shop,,prior-approval
-,,2023-08-22,Roof mounted solar PV on non-domestic building,,,roof-mounted-solar-pv-on-non-domestic-building,,prior-approval
-,,2023-08-22,Temporary school on previously vacant commercial land,,,temporary-school-on-previously-vacant-commercial-land,,prior-approval
-,,2023-08-22,Temporary use for commercial film making,,,temporary-use-for-commercial-film-making,,prior-approval
-,,2023-08-22,Retail or takeaway to offices,,,retail-or-takeaway-to-offices,,change-of-use
+entity,name,prefix,reference,description,notes,planning-application-category,entry-date,start-date,end-date
+621000,Householder planning permission,,householder-planning-permission,,,householder,2023-09-28,,
+621001,Householder planning and demolition in a conservation area,,householder-planning-and-demolition-in-a-conservation-area,,,householder,2023-09-28,,
+621002,Householder planning and listed building consent,,householder-planning-and-listed-building-consent,,,householder,2023-09-28,,
+621003,Full planning permission,,full-planning-permission,,,full,2023-09-28,,
+621004,Outline planning permission – some matters reserved,,outline-planning-permission-–-some-matters-reserved,,,outline,2023-09-28,,
+621005,Outline planning permission – all matters reserved,,outline-planning-permission-–-all-matters-reserved,,,outline,2023-09-28,,
+621006,Full planning and demolition in a conservation area,,full-planning-and-demolition-in-a-conservation-area,,,full,2023-09-28,,
+621007,Full planning and listed building consent,,full-planning-and-listed-building-consent,,,full,2023-09-28,,
+621008,Full planning and display of advertisments,,full-planning-and-display-of-advertisments,,,full,2023-09-28,,
+621009,Demolition in a conservation area,,demolition-in-a-conservation-area,,,conservation-area,2023-09-28,,
+621010,Listed building consent,,listed-building-consent,,,listed-building,2023-09-28,,
+621011,Consent to display an advertisment,,consent-to-display-an-advertisment,,,advertisment,2023-09-28,,
+621012,Lawful development – existing use,,lawful-development-–-existing-use,,,certificate-of-lawfulness,2023-09-28,,
+621013,Lawful development – proposed use,,lawful-development-–-proposed-use,,,certificate-of-lawfulness,2023-09-28,,
+621014,Building for agricultural or forestry use,,building-for-agricultural-or-forestry-use,,,prior-approval,2023-09-28,,
+621015,Private road for agricultural or forestry use,,private-road-for-agricultural-or-forestry-use,,,prior-approval,2023-09-28,,
+621016,Excavation or deposit waste for agriculture,,excavation-or-deposit-waste-for-agriculture,,,prior-approval,2023-09-28,,
+621017,Tank or cage structure for use in fishing farm,,tank-or-cage-structure-for-use-in-fishing-farm,,,prior-approval,2023-09-28,,
+621018,Development for electronic communications network,,development-for-electronic-communications-network,,,prior-approval,2023-09-28,,
+621019,Hedgerow removal notice,,hedgerow-removal-notice,,,hedgerows,2023-09-28,,
+621020,Demolition of building,,demolition-of-building,,,prior-approval,2023-09-28,,
+621021,Removal or variation of a condition,,removal-or-variation-of-a-condition,,,reserved-matters,2023-09-28,,
+621022,Approval of details reserved by a condition,,approval-of-details-reserved-by-a-condition,,,reserved-matters,2023-09-28,,
+621023,Tree in conservation areas or subject to a tree preservation order,,tree-in-conservation-areas-or-subject–to-a-tree-preservation-order,,,tree-works,2023-09-28,,
+621024,Non-material amendment,,non-material-amendment,,,non-material-amendment,2023-09-28,,
+621025,Larger home extension,,larger-home-extension,,,prior-approval,2023-09-28,,
+621026,Retail to restaurant or cafe,,retail-to-restaurant-or-cafe,,,change-of-use,2023-09-28,,
+621027,Takeaway or sui generis or mixed use to dwelling houses,,takeaway-or-sui-generis-or-mixed-use-to-dwelling-houses,,,change-of-use,2023-09-28,,
+621028,Retail to assembly or leisure,,retail-to-assembly-or-leisure,,,change-of-use,2023-09-28,,
+621029,Agriculture to dwelling houses,,agriculture-to-dwelling-houses,,,change-of-use,2023-09-28,,
+621030,Agriculture to flexible commercial use,,agriculture-to-flexible-commercial-use,,,change-of-use,2023-09-28,,
+621031,Agriculture to state funded school,,agriculture-to-state-funded-school,,,change-of-use,2023-09-28,,
+621032,Commercial or business or service or hotel to state funded school,,commercial-or-business-or-service-or-hotel-to-state-funded-school,,,change-of-use,2023-09-28,,
+621033,Offices to dwelling houses,,offices-to-dwelling-houses,,,change-of-use,2023-09-28,,
+621034,Light industrial to dwelling houses,,light-industrial-to-dwelling-houses,,,change-of-use,2023-09-28,,
+621035,Amusements or casinos to dwelling houses,,amusements-or-casinos-to-dwelling-houses,,,change-of-use,2023-09-28,,
+621036,Collection facility for a shop,,collection-facility-for-a-shop,,,prior-approval,2023-09-28,,
+621037,Roof mounted solar PV on non-domestic building,,roof-mounted-solar-pv-on-non-domestic-building,,,prior-approval,2023-09-28,,
+621038,Temporary school on previously vacant commercial land,,temporary-school-on-previously-vacant-commercial-land,,,prior-approval,2023-09-28,,
+621039,Temporary use for commercial film making,,temporary-use-for-commercial-film-making,,,prior-approval,2023-09-28,,
+621040,Retail or takeaway to offices,,retail-or-takeaway-to-offices,,,change-of-use,2023-09-28,,

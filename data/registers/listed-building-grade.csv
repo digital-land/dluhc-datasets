@@ -1,4 +1,4 @@
-description,end-date,entity,entry-date,name,notes,prefix,reference,start-date
-,,700000,,I,,listed-building-grade,I,
-,,700001,,II,,listed-building-grade,II,
-,,700002,,II*,,listed-building-grade,II*,
+entity,name,prefix,reference,description,notes,entry-date,start-date,end-date
+700000,I,listed-building-grade,I,,,2023-09-28,,
+700001,II,listed-building-grade,II,,,2023-09-28,,
+700002,II*,listed-building-grade,II*,,,2023-09-28,,

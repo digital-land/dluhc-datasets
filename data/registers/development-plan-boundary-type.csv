@@ -1,0 +1,4 @@
+entity,name,prefix,reference,description,notes,entry-date,start-date,end-date
+3000000,Planning authority district,development-plan-boundary-type,planning-authority-district,,,2023-10-10,,
+3000001,Combined planning authority district,development-plan-boundary-type,combined-planning-authority-district,,,2023-10-10,,
+3000002,Designated plan area,development-plan-boundary-type,designated-plan-area,,The geography of an area defined for the purposes of a specific plan,2023-10-10,,

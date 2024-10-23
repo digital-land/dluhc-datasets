@@ -350,8 +350,8 @@ def assign_entity_number():
         db.session.commit()
 
 
-@data_cli.command("load-data")
-def load_data():
+@data_cli.command("load-db-backup")
+def load_db_backup():
     import subprocess
     import sys
     import tempfile

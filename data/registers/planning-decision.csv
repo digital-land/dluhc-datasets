@@ -1,5 +1,5 @@
-end-date,entity,entry-date,name,notes,prefix,reference,start-date
-,,2023-08-22,Permission refused,,planning-decision,permission-refused,
-,,2023-08-22,Permission granted with conditions,,planning-decision,permission-granted-with-conditions,
-,,2023-08-22,Permission granted,,planning-decision,permission-granted,
-,,2023-08-22,Application withdrawn,,planning-decision,application-withdrawn,
+entity,name,prefix,reference,description,notes,entry-date,start-date,end-date
+6801000,Permission refused,planning-decision,permission-refused,,,2023-09-28,,
+6801001,Permission granted with conditions,planning-decision,permission-granted-with-conditions,,,2023-09-28,,
+6801002,Permission granted,planning-decision,permission-granted,,,2023-09-28,,
+6801003,Application withdrawn,planning-decision,application-withdrawn,,,2023-09-28,,

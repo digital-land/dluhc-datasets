@@ -1,5 +1,5 @@
-description,end-date,entity,entry-date,name,notes,prefix,reference,start-date,organisation
-,,,,Consent granted,,infrastructure-project-decision,consent-granted,,government-organisation:EA39
-,,,,Consent rejected,,infrastructure-project-decision,consent-rejected,,government-organisation:EA39
-,,,,Withdrawn,,infrastructure-project-decision,withdrawn,,government-organisation:EA39
-,,,,Appealed,,infrastructure-project-decision,appealed,,government-organisation:EA39
+entity,name,prefix,reference,description,notes,organisation,entry-date,start-date,end-date
+11010000000,Consent granted,infrastructure-project-decision,consent-granted,,,government-organisation:EA39,2023-10-23,,
+11010000254,Consent rejected,infrastructure-project-decision,consent-rejected,,,government-organisation:EA39,2023-10-23,,
+11010000255,Withdrawn,infrastructure-project-decision,withdrawn,,,government-organisation:EA39,2023-10-23,,
+11010000256,Appealed,infrastructure-project-decision,appealed,,,government-organisation:EA39,2023-10-23,,

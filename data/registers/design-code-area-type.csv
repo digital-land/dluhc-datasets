@@ -1,0 +1,11 @@
+entity,name,prefix,reference,description,notes,entry-date,start-date,end-date
+622500,High Rise City,design-code-area-type,high-rise-city,Large City Centres where there are limited restrictions to height.,,2024-03-05,,
+622501,Town / City Centre,design-code-area-type,town-city-centre,A typical dense city typology with over 120dph and a strong mix of uses.,,2024-03-05,,
+622502,Industrial Areas,design-code-area-type,industrial-areas,Industrial areas often comprising manufacturing and storage.,,2024-03-05,,
+622503,"Business, Science or Retail Parks",design-code-area-type,business-science-retail-parks,"Areas of retail, office, science and technology parks.",,2024-03-05,,
+622504,Local Centres,design-code-area-type,local-centres,District and neighbourhood centres comprising high streets. Often a modest scale.,,2024-03-05,,
+622505,Urban Neighbourhood,design-code-area-type,urban-neighbourhood,Neighbourhoods with densities between 60-120dph and a mix of uses.,,2024-03-05,,
+622506,Suburbs,design-code-area-type,suburbs,Residential area with densities between 40-60dph. A mix of short terraces and semi detached homes.,,2024-03-05,,
+622507,Outer Suburbs,design-code-area-type,outer-suburbs,Low density suburbs with densities between 20-40dph. Minimal mix of uses.,,2024-03-05,,
+622508,Villages,design-code-area-type,villages,Distinctive characterm often with an informal layout.,,2024-03-05,,
+622509,Rural Settlements,design-code-area-type,rural-settlements,Small isolated clusters of buildings.,,2024-03-05,,

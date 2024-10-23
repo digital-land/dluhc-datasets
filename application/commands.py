@@ -1,6 +1,7 @@
 import base64
 import csv
 import datetime
+import hashlib
 import os
 from pathlib import Path
 
@@ -11,7 +12,7 @@ import requests
 from flask.cli import AppGroup
 
 from application.extensions import db
-from application.models import ChangeLog, ChangeType, Dataset, Field, Record, Reference
+from application.models import Dataset, Field, Record, Reference
 
 data_cli = AppGroup("data")
 
@@ -268,71 +269,38 @@ def backup_registers():
 def push_registers():
     registers_path = os.getenv("DATASETS_REPO_REGISTERS_PATH")
     repo = _get_repo(os.environ)
+    local_registers_directory = (
+        Path(__file__).resolve().parent.parent / "data/registers"
+    )
     print("Pushing registers to repo", repo, "and path", registers_path)
     datasets = Dataset.query.all()
     for dataset in datasets:
-        updates = ChangeLog.query.filter(
-            ChangeLog.dataset_id == dataset.dataset,
-            ChangeLog.pushed_to_github.isnot(None),
-            ChangeLog.pushed_to_github.is_(False),
-            ChangeLog.change_type == ChangeType.EDIT,
-        ).all()
-        additions = ChangeLog.query.filter(
-            ChangeLog.dataset_id == dataset.dataset,
-            ChangeLog.pushed_to_github.isnot(None),
-            ChangeLog.pushed_to_github.is_(False),
-            ChangeLog.change_type == ChangeType.ADD,
-        ).all()
+        csv_file = f"{dataset.dataset}.csv"
+        local_file_path = os.path.join(local_registers_directory, csv_file)
+        try:
+            with open(local_file_path, "r") as f:
+                local_content = f.read()
+        except FileNotFoundError:
+            print(f"Local file {local_file_path} not found. Skipping.")
+            continue
 
-        if updates or additions:
-            messages = []
-            file_path = f"{registers_path}/{dataset.dataset}.csv"
-            file, contents = _get_file_contents(repo, file_path)
-            contents = contents.strip()
-            lines = contents.split("\n")
-            headers = lines[0].split(",")
+        remote_path_file_path = f"{registers_path}/{csv_file}"
+        remote_file, remote_content = _get_file_contents(repo, remote_path_file_path)
 
-            for update in updates:
-                messages.append(update.notes)
-                row_parts = []
-                data = update.data["to"]
-                for header in headers:
-                    value = data.get(header, "")
-                    if value is None:
-                        value = ""
-                    if not isinstance(value, str):
-                        value = str(value)
-                    row_parts.append(value)
-                row_string = ",".join(row_parts)
-                lines[update.record.row_id] = row_string
+        if remote_file is None and remote_content is None:
+            print(f"push new file {csv_file}")
+            _commit_new(repo, remote_path_file_path, local_content)
 
-            for addition in additions:
-                messages.append(addition.notes)
-                row_parts = []
-                data = addition.data
-                for header in headers:
-                    value = data.get(header, "")
-                    if value is None:
-                        value = ""
-                    if not isinstance(value, str):
-                        value = str(value)
-                    row_parts.append(value)
-                row_string = ",".join(row_parts)
-                lines.append(row_string)
-
-            updated_contents = "\n".join(lines)
-            commit_message = "\n".join(messages)
-            _commit(repo, file, updated_contents, message=commit_message)
-
-        all_changes = updates + additions
-        for change in all_changes:
-            change.pushed_to_github = True
-            db.session.add(change)
-
-        if db.session.dirty:
-            db.session.commit()
-
-    print("Done")
+        elif remote_file is not None and remote_content is not None:
+            local_content_hash = _get_sha256(local_content)
+            remote_content_hash = _get_sha256(remote_content)
+            if local_content_hash != remote_content_hash:
+                print(f"update file {remote_path_file_path}")
+                _commit_update(repo, remote_file, local_content)
+            else:
+                print(f"No changes to {csv_file}")
+        else:
+            print(f"Error getting remote file {csv_file}. Skipping.")
 
 
 @data_cli.command("backup-push-registers")
@@ -578,20 +546,26 @@ def _get_repo(config):
     return gh.get_repo(repo_name)
 
 
+def _get_sha256(content):
+    return hashlib.sha256(content.encode("utf-8")).hexdigest()
+
+
 def _get_file_contents(repo, file_path):
-    file = repo.get_contents(file_path)
-    file_content = file.decoded_content.decode("utf-8")
-    return file, file_content
+    try:
+        file = repo.get_contents(file_path)
+        file_content = file.decoded_content.decode("utf-8")
+        return file, file_content
+    except github.UnknownObjectException as e:
+        print(f"File {file_path} is not on remote repo")
+        print(e)
+        return None, None
 
 
-def _commit(repo, file, contents, message="Updated local-plan data"):
-    if file is None:
-        print(
-            f"File not found or error in fetching file. Skipping commit for {file.path}."
-        )
-        return
-    if contents != file.decoded_content.decode("utf-8"):
-        repo.update_file(file.path, message, contents, file.sha)
-        print(f"{file.path} updated successfully!")
-    else:
-        print(f"No changes detected in {file.path}. Skipping commit.")
+def _commit_update(repo, file, contents, message="Updated dataset registers"):
+    repo.update_file(file.path, message, contents, file.sha)
+    print(f"Committed {file.path} to remote repo")
+
+
+def _commit_new(repo, file_path, contents, message="New dataset registers"):
+    repo.create_file(file_path, message, contents)
+    print(f"Created new {file_path} on remote repo")

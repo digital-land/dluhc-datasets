@@ -1,5 +1,6 @@
-description,end-date,entity,entry-date,name,notes,prefix,reference,start-date
-,,622000,,Proposed,,design-code-status,proposed,
-,,622001,,Draft,,design-code-status,draft,
-,,622002,,Adopted,,design-code-status,adopted,
-,,622003,,Withdrawn,,design-code-status,withdrawn,
+entity,name,prefix,reference,description,notes,entry-date,start-date,end-date
+622000,Proposed,design-code-status,proposed,,,2023-09-28,,
+622001,Draft,design-code-status,draft,,,2023-09-28,,
+622002,Adopted,design-code-status,adopted,,,2023-09-28,,
+622003,Withdrawn,design-code-status,withdrawn,,,2023-09-28,,
+622004,Informal,design-code-status,informal,,,2023-11-23,2023-11-23,

@@ -197,12 +197,10 @@ class Record(DateModel):
         return f"<Record(dataset={self.dataset.name}, row_id={self.row_id}, data={self.data}))>"
 
     def to_dict(self):
-        return {
+        data = {
             "entity": self.entity,
             "prefix": self.prefix,
             "reference": self.reference,
-            "description": self.description if self.description else "",
-            "notes": self.notes if self.notes else "",
             "entry-date": (
                 self.entry_date.strftime("%Y-%m-%d") if self.entry_date else ""
             ),
@@ -212,6 +210,11 @@ class Record(DateModel):
             "end-date": self.end_date.strftime("%Y-%m-%d") if self.end_date else "",
             **self.data,
         }
+        if self.description:
+            data["description"] = self.description
+        if self.notes:
+            data["notes"] = self.notes
+        return data
 
     @classmethod
     def factory(cls, row_id, entity, dataset, data_dict):

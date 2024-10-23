@@ -10,7 +10,7 @@ import requests
 from flask.cli import AppGroup
 
 from application.extensions import db
-from application.models import ChangeLog, ChangeType, Dataset, Field, Reference
+from application.models import ChangeLog, ChangeType, Dataset, Field, Record, Reference
 
 data_cli = AppGroup("data")
 
@@ -235,24 +235,31 @@ def _process_new_datasets(new_datasets):
 @data_cli.command("backup-registers")
 def backup_registers():
     print("backing up registers")
-    resp = requests.get(f"{dataset_editor_base_url}/index.json")
-    dataset_json = resp.json()
-    for dataset in dataset_json["datasets"]:
-        if dataset["total_records"] > 0:
-            resp = requests.get(dataset["data"])
-            data = resp.json()
-            fields = [field for field in data["fields"]]
-            dataset = data["dataset"]
-            data_dir = Path(__file__).resolve().parent.parent / "data/registers"
-            file_path = data_dir / f"{dataset}.csv"
-            try:
-                with open(file_path, "w") as csvfile:
-                    writer = csv.DictWriter(csvfile, fieldnames=fields)
-                    writer.writeheader()
-                    writer.writerows(data["records"])
-                # print(f"backed up {dataset} to {file_path}")
-            except Exception as e:
-                print(f"failed to backup {dataset} to {file_path} with error {e}")
+    subquery = (
+        db.session.query(Record.dataset_id)
+        .filter(Record.dataset_id == Dataset.dataset)
+        .exists()
+    )
+    datasets = (
+        db.session.query(Dataset)
+        .filter(Dataset.end_date.is_(None))
+        .filter(subquery)
+        .order_by(Dataset.dataset)
+        .all()
+    )
+    for dataset in datasets:
+        fields = [field.field for field in dataset.sorted_fields()]
+        data_dir = Path(__file__).resolve().parent.parent / "data/registers"
+        file_path = data_dir / f"{dataset.dataset}.csv"
+        records = [record.to_dict() for record in dataset.records]
+        try:
+            with open(file_path, "w") as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=fields)
+                writer.writeheader()
+                writer.writerows(records)
+            print(f"backed up {dataset.dataset} to {file_path}")
+        except Exception as e:
+            print(f"failed to backup {dataset} to {file_path} with error {e}")
     print("registers backed up")
 
 

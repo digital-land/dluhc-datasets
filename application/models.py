@@ -63,16 +63,11 @@ class ChangeLog(db.Model):
     )
     record: Mapped["Record"] = relationship("Record", back_populates="change_log")
 
-    pushed_to_github: Mapped[bool] = mapped_column(
-        db.Boolean, default=False, nullable=True
-    )
-
     def __repr__(self):
         parts = [
             f"<ChangeLog(dataset={self.dataset.name}",
             f"change_type={self.change_type}",
             f"created_date={self.created_date}",
-            f"pushed_to_github={self.pushed_to_github})>",
         ]
         return ", ".join(parts)
 

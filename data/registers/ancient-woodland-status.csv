@@ -1,3 +1,3 @@
-description,end-date,entity,entry-date,name,notes,prefix,reference,start-date,documentation-url
-,,29100001,2023-09-28,Ancient Replanted Woodland,,ancient-woodland-status,PAWS,,
-,,29100001,,Ancient Replanted Woodland,,ancient-woodland-status,PAWS,,
+entity,name,prefix,reference,description,documentation-url,notes,entry-date,start-date,end-date
+29100000,Ancient & Semi-Natural Woodland,ancient-woodland-status,ASNW,,,,2023-09-28,,
+29100001,Ancient Replanted Woodland,ancient-woodland-status,PAWS,,,,2023-09-28,,

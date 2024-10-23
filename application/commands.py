@@ -4,6 +4,7 @@ import datetime
 import os
 from pathlib import Path
 
+import click
 import frontmatter
 import github
 import requests
@@ -334,6 +335,13 @@ def push_registers():
     print("Done")
 
 
+@data_cli.command("backup-push-registers")
+@click.pass_context
+def export(ctx):
+    ctx.invoke(backup_registers)
+    ctx.invoke(push_registers)
+
+
 @data_cli.command("assign-entity-numbers")
 def assign_entity_number():
     print("assigning entity numbers")
@@ -576,6 +584,14 @@ def _get_file_contents(repo, file_path):
     return file, file_content
 
 
-def _commit(repo, file, contents, message="Updating file"):
-    repo.update_file(file.path, message, contents, file.sha)
-    print(f"{file.path} updated successfully!")
+def _commit(repo, file, contents, message="Updated local-plan data"):
+    if file is None:
+        print(
+            f"File not found or error in fetching file. Skipping commit for {file.path}."
+        )
+        return
+    if contents != file.decoded_content.decode("utf-8"):
+        repo.update_file(file.path, message, contents, file.sha)
+        print(f"{file.path} updated successfully!")
+    else:
+        print(f"No changes detected in {file.path}. Skipping commit.")

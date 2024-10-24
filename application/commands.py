@@ -41,6 +41,11 @@ dataset_field_field_dataset_query = "{datasette_url}/dataset_field.json?field_da
 specification_dataset_query = "{datasette_url}/specification_dataset.json?dataset__exact={dataset}&_shape=array"  # noqa
 
 
+platform_dataset_query = (
+    "https://www.planning.data.gov.uk/entity{format}?dataset={dataset}"
+)
+
+
 @data_cli.command("dataset-fields")
 def dataset_fields():
     print("loading dataset fields")
@@ -187,6 +192,43 @@ def _process_replacement_datasets(replacement_datasets):
                 print(
                     f"Could migrate data to the replacement dataset {fields['replacement_dataset']} as it was not found"
                 )
+
+
+@data_cli.command("add-dataset")
+@click.argument("dataset")
+def add_dataset(dataset):
+    schema_url = specfication_markdown_url.format(base_url=base_url, dataset=dataset)
+    try:
+        resp = requests.get(schema_url)
+        resp.raise_for_status()
+        front = frontmatter.loads(resp.text)
+        dataset = Dataset(dataset=dataset)
+        dataset.name = front.get("name")
+        dataset.entity_minimum = int(front.get("entity-minimum"))
+        dataset.entity_maximum = int(front.get("entity-maximum"))
+        dataset.consideration = front.get("consideration")
+        dataset.custodian = front.get("Data design team")
+
+        print(f"dataset {dataset} with name {front.get('name')} added")
+        print(f"get fields for {dataset}")
+
+        fields = front["fields"]
+        for field in fields:
+            f = Field.query.get(field["field"])
+            if f is None:
+                human_readable = field["field"].replace("-", " ").capitalize()
+                f = Field(field=field["field"], name=human_readable)
+                f.datatype = field["datatype"]
+                if field.get("description"):
+                    f.description = field["description"]
+                db.session.add(f)
+                db.session.commit()
+            print(f"field {f.field} added to dataset {dataset.dataset}")
+            dataset.fields.append(f)
+            db.session.add(dataset)
+            db.session.commit()
+    except requests.exceptions.HTTPError as e:
+        print(f"Error adding dataset {dataset}: {e}")
 
 
 def _process_new_datasets(new_datasets):
@@ -531,6 +573,53 @@ def set_dataset_references():
                 )
 
     print("Done")
+
+
+@data_cli.command("check-dataset-on-platform")
+def check_dataset_on_platform():
+    print("Checking datasets on platform")
+    on_platform = []
+    for dataset in Dataset.query.order_by(Dataset.dataset).all():
+        try:
+            resp = requests.get(
+                platform_dataset_query.format(format=".html", dataset=dataset.dataset)
+            )
+            resp.raise_for_status()
+            print(f"Dataset {dataset.dataset} found on platform")
+            on_platform.append(dataset.dataset)
+        except requests.exceptions.RequestException as e:
+            print(f"Error checking dataset {dataset.dataset} on platform: {e}")
+            continue
+
+    mismatches = []
+    for dataset in on_platform:
+        print("checking records for", dataset)
+        resp = requests.get(
+            platform_dataset_query.format(format=".json", dataset=dataset)
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        dataset_editor_count = Record.query.filter(Record.dataset_id == dataset).count()
+        platform_count = data["count"]
+        if dataset_editor_count != platform_count:
+            print(
+                f"Record count mismatch for {dataset}. Local: {dataset_editor_count}, Remote: {platform_count}"
+            )
+            mismatches.append(
+                {
+                    "dataset": dataset,
+                    "dataset-editor-count": dataset_editor_count,
+                    "platform-count": platform_count,
+                }
+            )
+
+    if mismatches:
+        with open("dataset-editor-platform.csv", "w", newline="") as csvfile:
+            fieldnames = ["dataset", "dataset-editor-count", "platform-count"]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(mismatches)
+        print("Mismatches written to dataset-editor-platform.csv")
 
 
 def _get_repo(config):

@@ -212,8 +212,7 @@ def add_dataset(dataset):
         print(f"dataset {dataset} with name {front.get('name')} added")
         print(f"get fields for {dataset}")
 
-        fields = front["fields"]
-        for field in fields:
+        for field in front.get("fields", []):
             f = Field.query.get(field["field"])
             if f is None:
                 human_readable = field["field"].replace("-", " ").capitalize()
@@ -248,17 +247,7 @@ def _process_new_datasets(new_datasets):
         db.session.commit()
         print(f"dataset {dataset.dataset} with name {dataset.name} added")
         print(f"get fields for {dataset.dataset}")
-        fields = requests.get(
-            dataset_field_query.format(
-                datasette_url=datasette_url, dataset=dataset.dataset
-            )
-        ).json()
-        print(
-            dataset_field_query.format(
-                datasette_url=datasette_url, dataset=dataset.dataset
-            )
-        )
-        for field in fields:
+        for field in front.get("fields"):
             f = Field.query.get(field["field"])
             if f is None:
                 human_readable = field["field"].replace("-", " ").capitalize()

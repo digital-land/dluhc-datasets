@@ -147,7 +147,9 @@ def get_new_datasets():
 
 def _process_ended_datasets(ended_datasets):
     for dataset in ended_datasets:
-        d = Dataset.query.filter(Dataset.dataset == dataset["dataset"]).one_or_none()
+        d = Dataset.query.filter(
+            Dataset.dataset == dataset["dataset"], Dataset.end_date.is_(None)
+        ).one_or_none()
         if d is not None:
             end_date_str = dataset["end_date"]
             end_date = datetime.datetime.strptime(end_date_str, "%Y-%m-%d").date()

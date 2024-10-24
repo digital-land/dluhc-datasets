@@ -121,8 +121,11 @@ def get_new_datasets():
     resp = requests.get(dataset_query)
     data = resp.json()
     new_datasets = [
-        dataset for dataset in data if dataset["dataset"] not in database_datasets
+        dataset
+        for dataset in data
+        if dataset["dataset"] not in database_datasets and dataset["end_date"] != ""
     ]
+    ended_datasets = [dataset for dataset in data if dataset["end_date"] != ""]
 
     # process new datasets first as they may be replacements for existing
     # datasets and therefore need to be available in the database for the
@@ -137,6 +140,21 @@ def get_new_datasets():
         _process_replacement_datasets(replacement_datasets)
     else:
         print("No replacement datasets found")
+
+    if ended_datasets:
+        _process_ended_datasets(ended_datasets)
+
+
+def _process_ended_datasets(ended_datasets):
+    for dataset in ended_datasets:
+        d = Dataset.query.filter(Dataset.dataset == dataset["dataset"]).one_or_none()
+        if d is not None:
+            end_date_str = dataset["end_date"]
+            end_date = datetime.datetime.strptime(end_date_str, "%Y-%m-%d").date()
+            d.end_date = end_date
+            db.session.add(d)
+            db.session.commit()
+            print(f"dataset {dataset['dataset']} ended")
 
 
 def _process_replacement_datasets(replacement_datasets):

@@ -588,7 +588,9 @@ def set_dataset_references():
 def check_dataset_on_platform():
     print("Checking datasets on platform")
     on_platform = []
-    for dataset in Dataset.query.order_by(Dataset.dataset).all():
+    for dataset in (
+        Dataset.query.filter(Dataset.end_date.is_(None)).order_by(Dataset.dataset).all()
+    ):
         try:
             resp = requests.get(
                 platform_dataset_query.format(format=".html", dataset=dataset.dataset)

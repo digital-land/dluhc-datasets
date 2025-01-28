@@ -4,3 +4,4 @@ entity,name,prefix,reference,description,notes,entry-date,start-date,end-date
 4210002,Designation-report,conservation-area-document-type,designation-report,,,2024-05-20,2022-01-01,
 4210003,Area map,conservation-area-document-type,area-map,,,2024-05-20,2022-01-01,
 4210004,Management plan,conservation-area-document-type,management-plan,,,2024-10-14,2024-10-14,
+4210005,Design guidance,conservation-area-document-type,design-guidance,"Documents to help guide the design of new development, as mentioned by Historic England in their ""Conservation Area Appraisal, Designation and Management"" publication",,2025-01-27,,

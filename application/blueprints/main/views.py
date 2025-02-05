@@ -120,8 +120,6 @@ def dataset_json(id):
 @main.route("/dataset/<string:id>/change-log")
 def change_log(id):
     dataset = Dataset.query.get_or_404(id)
-    if dataset.end_date is not None:
-        abort(404)
     breadcrumbs = {
         "items": [
             {"text": "Datasets", "href": url_for("main.index")},

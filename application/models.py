@@ -391,7 +391,7 @@ def create_change_log(record, data, change_type):
 
     edit_notes = data.get("edit_notes", None)
     if edit_notes:
-        edit_notes = f"Updated {record.prefix}:{record.reference}. {edit_notes}"
+        edit_notes = f"Updated {record.prefix}:{reference}. {edit_notes}"
 
     current = record.to_dict()
 

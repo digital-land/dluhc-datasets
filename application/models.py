@@ -85,7 +85,10 @@ class Dataset(DateModel):
     )
 
     records: Mapped[List["Record"]] = relationship(
-        "Record", back_populates="dataset", order_by="Record.row_id"
+        "Record",
+        back_populates="dataset",
+        order_by="Record.row_id",
+        cascade="all, delete",
     )
 
     change_log: Mapped[List["ChangeLog"]] = relationship(
@@ -230,9 +233,10 @@ class Record(DateModel):
                 data_dict.pop(key)
 
         record.row_id = row_id
-        record.entity = entity
+        record.entity = int(entity)
         record.prefix = dataset
         record.data = data_dict
+        record.dataset_id = dataset
 
         return record
 

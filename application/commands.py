@@ -16,8 +16,10 @@ from application.models import Dataset, Field, Record, Reference
 
 data_cli = AppGroup("data")
 
-base_url = "https://raw.githubusercontent.com/digital-land"
-specfication_markdown_url = "{base_url}/specification/main/content/dataset/{dataset}.md"
+base_git_content_url = "https://raw.githubusercontent.com/digital-land"
+specfication_markdown_url = (
+    "{base_git_content_url}/specification/main/content/dataset/{dataset}.md"
+)
 
 datasette_url = "https://datasette.planning.data.gov.uk/digital-land"
 field_query = "{datasette_url}/field.json?field__exact={field}&_shape=object"
@@ -51,7 +53,7 @@ def dataset_fields():
     print("loading dataset fields")
     for dataset in Dataset.query.all():
         schema_url = specfication_markdown_url.format(
-            base_url=base_url, dataset=dataset.dataset
+            base_url=base_git_content_url, dataset=dataset.dataset
         )
         markdown = requests.get(schema_url)
         if markdown.status_code == 200:
@@ -91,7 +93,7 @@ def dataset_fields():
 def check_dataset_fields():
     for dataset in Dataset.query.all():
         schema_url = specfication_markdown_url.format(
-            base_url=base_url, dataset=dataset.dataset
+            base_url=base_git_content_url, dataset=dataset.dataset
         )
         markdown = requests.get(schema_url)
         if markdown.status_code == 200:
@@ -217,7 +219,9 @@ def _process_replacement_datasets(replacement_datasets):
 @data_cli.command("add-dataset")
 @click.argument("dataset")
 def add_dataset(dataset):
-    schema_url = specfication_markdown_url.format(base_url=base_url, dataset=dataset)
+    schema_url = specfication_markdown_url.format(
+        base_url=base_git_content_url, dataset=dataset
+    )
     try:
         resp = requests.get(schema_url)
         resp.raise_for_status()
@@ -253,7 +257,7 @@ def add_dataset(dataset):
 def _process_new_datasets(new_datasets):
     for dataset in new_datasets:
         schema_url = specfication_markdown_url.format(
-            base_url=base_url, dataset=dataset["dataset"]
+            base_url=base_git_content_url, dataset=dataset["dataset"]
         )
         dataset = Dataset(dataset=dataset["dataset"], name=dataset["name"])
         markdown = requests.get(schema_url)
@@ -463,7 +467,7 @@ def set_dataset_considerations():
     for dataset in Dataset.query.filter(Dataset.consideration.is_(None)).all():
         print(f"Consideration for {dataset.dataset} is not set")
         schema_url = specfication_markdown_url.format(
-            base_url=base_url, dataset=dataset.dataset
+            base_url=base_git_content_url, dataset=dataset.dataset
         )
         markdown = requests.get(schema_url)
         if markdown.status_code == 200:
@@ -631,6 +635,96 @@ def check_dataset_on_platform():
             writer.writeheader()
             writer.writerows(mismatches)
         print("Mismatches written to dataset-editor-platform.csv")
+
+
+@data_cli.command("setup-orgs")
+def setup_organisations():
+    print("Setting up organisations")
+    url = f"{datasette_url}/dataset.json?_sort=dataset&typology__exact=organisation&_shape=array"
+    resp = requests.get(url)
+    resp.raise_for_status()
+    data = resp.json()
+    for d in data:
+        if d["dataset"] in [
+            "company",
+            "organisation",
+            "internal-drainage-board",
+            "neighbourhood-forum",
+        ]:
+            continue
+        if (
+            Dataset.query.filter(Dataset.dataset == d["dataset"]).one_or_none()
+            is not None
+        ):
+            print(f"Dataset {d['dataset']} already exists")
+            continue
+        print(f"Setup dataset {d['dataset']}")
+        dataset = Dataset(dataset=d["dataset"], name=d["name"])
+        dataset.entity_minimum = d["entity_minimum"]
+        dataset.entity_maximum = d["entity_maximum"]
+        dataset.description = d["description"] if d["description"] else None
+        db.session.add(dataset)
+        db.session.commit()
+        ds_fields_query = dataset_field_query.format(
+            datasette_url=datasette_url, dataset=d["dataset"]
+        )
+        resp = requests.get(ds_fields_query)
+        resp.raise_for_status()
+        data = resp.json()
+        for field in data:
+            f = Field.query.filter(Field.field == field["field"]).one_or_none()
+            if f is None:
+                print(f"Adding field {field['field']}")
+                f_query = field_query.format(
+                    datasette_url=datasette_url,
+                    dataset=d["dataset"],
+                    field=field["field"],
+                )
+                r = requests.get(f_query)
+                r.raise_for_status()
+                field_data = r.json()
+                f, data = next(iter(field_data.items()))
+                f = Field(field=f, name=data["name"], datatype=data["datatype"])
+                db.session.add(f)
+                db.session.commit()
+            dataset.fields.append(f)
+
+        org_repo_data_path = "organisation-collection/refs/heads/main/data"
+        records_csv = (
+            f"{base_git_content_url}/{org_repo_data_path}/{dataset.dataset}.csv"
+        )
+        resp = requests.get(records_csv)
+        resp.raise_for_status()
+        reader = csv.DictReader(resp.text.splitlines())
+        for index, row in enumerate(reader):
+            record = Record.factory(index, row["entity"], dataset.dataset, row)
+            db.session.add(record)
+            dataset.records.append(record)
+        db.session.commit()
+
+
+@data_cli.command("remove-orgs")
+def remove_orgs():
+    print("Removing organisations")
+    url = f"{datasette_url}/dataset.json?_sort=dataset&typology__exact=organisation&_shape=array"
+    resp = requests.get(url)
+    resp.raise_for_status()
+    data = resp.json()
+    for d in data:
+        if d["dataset"] in [
+            "company",
+            "organisation",
+            "internal-drainage-board",
+            "neighbourhood-forum",
+        ]:
+            continue
+        dataset = Dataset.query.filter(Dataset.dataset == d["dataset"]).one_or_none()
+        if dataset is None:
+            print(f"Dataset {d['dataset']} does not exist")
+            continue
+        print(f"Removing dataset {d['dataset']}")
+        db.session.delete(dataset)
+        db.session.commit()
 
 
 def _get_repo(config):

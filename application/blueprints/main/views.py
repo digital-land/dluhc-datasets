@@ -30,6 +30,7 @@ def get_tab_list(dataset):
         {"title": "Links", "url": url_for("main.links", id=dataset.dataset)},
         {"title": "History", "url": url_for("main.history", id=dataset.dataset)},
         {"title": "Changes", "url": url_for("main.change_log", id=dataset.dataset)},
+        {"title": "Schema", "url": url_for("main.schema", id=dataset.dataset)},
     ]
 
 

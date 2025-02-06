@@ -1,0 +1,9 @@
+entity,name,prefix,reference,notes,parliament-thesaurus,wikidata,wikipedia,entry-date,start-date,end-date
+8800000,Combined Authority,local-authority-type,COMB,,,Q5150900,Combined_authority,2025-02-05,,
+8800001,Strategic Regional Authority,local-authority-type,SRA,,,Q80647952,,2025-02-05,,
+8800002,City Corporation,local-authority-type,CC,,,Q1094147,Municipal_corporation,2025-02-05,,
+8800003,Unitary Authority,local-authority-type,UA,,,Q21561328,Unitary_authorities_of_England,2025-02-05,,
+8800004,Metropolitan District,local-authority-type,MD,,,Q1002812,Metropolitan_borough,2025-02-05,,
+8800005,Non-metropolitan district,local-authority-type,NMD,,,Q1187580,Non-metropolitan_district,2025-02-05,,
+8800006,London Borough,local-authority-type,LBO,,,Q211690,London_boroughs,2025-02-05,,
+8800007,County,local-authority-type,CTY,,,Q110417190,,2025-02-05,,

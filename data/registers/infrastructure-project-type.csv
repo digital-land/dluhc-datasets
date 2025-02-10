@@ -1,0 +1,11 @@
+entity,name,prefix,reference,description,notes,organisation,entry-date,start-date,end-date
+11010000001,Electricity line,infrastructure-project-type,electricity-line,,,government-organisation:EA39,2025-02-10,2023-09-22,
+11010000002,Waste and water,infrastructure-project-type,waste-and-water,,,government-organisation:EA39,2025-02-10,2023-09-22,2023-09-22
+11010000003,Pipeline,infrastructure-project-type,pipeline,,,government-organisation:EA39,2025-02-10,2023-09-22,
+11010000004,Energy,infrastructure-project-type,energy,,,government-organisation:EA39,2025-02-10,2023-09-22,
+11010000005,Transport,infrastructure-project-type,transport,,,government-organisation:EA39,2025-02-10,2023-09-22,
+11010000006,Business & commercial,infrastructure-project-type,business-and-commercial,,,government-organisation:EA39,2025-02-10,2023-09-22,
+11010000007,Water,infrastructure-project-type,water,,,government-organisation:EA39,2025-02-10,2023-09-22,
+11010000008,Waste,infrastructure-project-type,waste,,,government-organisation:EA39,2025-02-10,2023-09-22,
+11010000009,Waste water,infrastructure-project-type,waste-water,,,government-organisation:EA39,2025-02-10,2023-09-22,
+11020000000,Generating station,infrastructure-project-type,generating-station,,,government-organisation:EA39,2025-02-10,2023-09-22,

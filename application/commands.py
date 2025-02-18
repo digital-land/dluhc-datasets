@@ -32,7 +32,7 @@ dataset_field_query = (
 dataset_replacement_query = (
     f"{datasette_url}/dataset.json?_shape=object&replacement_dataset__notblank=1"
 )
-dataset_editor_base_url = "https://dluhc-datasets.planning-data.dev"
+dataset_editor_base_url = "https://dataset-editor.development.planning.data.gov.uk"
 
 
 dataset_field_field_query = (

@@ -61,7 +61,7 @@ def index_json():
 def support():
     breadcrumbs = {
         "items": [
-            {"text": "DLUHC Datasets", "href": url_for("main.index")},
+            {"text": "MHCLG Datasets", "href": url_for("main.index")},
             {"text": "Support"},
         ]
     }
@@ -72,7 +72,7 @@ def support():
 def how_we_add_datasets():
     breadcrumbs = {
         "items": [
-            {"text": "DLUHC Datasets", "href": url_for("main.index")},
+            {"text": "Datasets", "href": url_for("main.index")},
             {"text": "How we add datasets"},
         ]
     }

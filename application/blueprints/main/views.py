@@ -61,7 +61,7 @@ def index_json():
 def support():
     breadcrumbs = {
         "items": [
-            {"text": "MHCLG Datasets", "href": url_for("main.index")},
+            {"text": "Datasets", "href": url_for("main.index")},
             {"text": "Support"},
         ]
     }

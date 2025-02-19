@@ -206,6 +206,7 @@ def process_updates(dataset, update):
         current_record = Record.query.filter(
             Record.dataset_id == dataset,
             Record.entity == entity,
+            Record.end_date.is_(None),
         ).one_or_none()
         if current_record is not None:
             expected_fields = [field.field for field in current_record.dataset.fields]
@@ -272,6 +273,7 @@ def apply_updates(dataset, update):
                     update_record.data["entity"],
                     dataset.dataset,
                     update_record.data,
+                    current_app.config,
                 )
                 update_record.processed = True
                 dataset.records.append(record)
@@ -309,16 +311,6 @@ def cancel_updates(dataset, update):
 
 
 def _check_update(record, current_record, fields, change_log):
-    if not current_record.get("end-date").strip() == "":
-        return {"error": "The record has already ended"}
-    if record.get("end-date").strip() != "" and _already_ended(record, change_log):
-        return {
-            "error": "This is an earlier version of the record that has already been ended"
-        }
-    if record.get("end-date").strip() != "":
-        return {
-            "end-date": f"Updated from '{current_record['end-date']}' to '{record['end-date']}'"
-        }
     if set(record.keys()) != set(fields):
         return {"error": "The fields don't match the specification"}
 
@@ -331,14 +323,6 @@ def _check_update(record, current_record, fields, change_log):
                 changes[key] = f"Updated from '{current_value}' to '{new_value}'"
 
     return changes
-
-
-def _already_ended(record, change_log):
-    end_date = record.get("end-date")
-    for change in change_log:
-        logged_end_date = change.data.get("from", {}).get("end-date", None)
-        if logged_end_date is not None and logged_end_date == end_date:
-            return True
 
 
 def _allowed_file(filename):

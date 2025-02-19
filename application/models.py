@@ -199,19 +199,25 @@ class Record(DateModel):
             "entity": self.entity,
             "prefix": self.prefix,
             "reference": self.reference,
-            "entry-date": (
-                self.entry_date.strftime("%Y-%m-%d") if self.entry_date else ""
-            ),
-            "start-date": (
-                self.start_date.strftime("%Y-%m-%d") if self.start_date else ""
-            ),
-            "end-date": self.end_date.strftime("%Y-%m-%d") if self.end_date else "",
             **self.data,
         }
         if self.description:
             data["description"] = self.description
         if self.notes:
             data["notes"] = self.notes
+
+        if self.start_date:
+            if isinstance(self.start_date, datetime.date):
+                data["start-date"] = self.start_date.strftime("%Y-%m-%d")
+            else:
+                data["start-date"] = self.start_date
+        if self.end_date:
+            data["end-date"] = self.end_date.strftime("%Y-%m-%d")
+        if self.entry_date:
+            if isinstance(self.entry_date, datetime.date):
+                data["entry-date"] = self.entry_date.strftime("%Y-%m-%d")
+            else:
+                data["entry-date"] = self.entry_date
         return data
 
     @classmethod
@@ -363,7 +369,7 @@ def create_change_log(record, data, change_type):
             if "-date" in k:
                 k = k.replace("-date", "_date")
                 if isinstance(v, str):
-                    v = parse_date(value)
+                    v = value
                 elif isinstance(v, datetime.date):
                     v = date_to_string(value)
             if hasattr(record, k):

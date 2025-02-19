@@ -42,6 +42,8 @@ def parse_date(date_string):
 
 
 def date_to_string(date):
+    if isinstance(date, str):
+        return date
     try:
         return date.strftime("%Y-%m-%d")
     except Exception:

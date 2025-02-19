@@ -7,6 +7,7 @@ import requests
 from flask import (
     Blueprint,
     abort,
+    current_app,
     flash,
     make_response,
     redirect,
@@ -176,7 +177,11 @@ def add_record(id):
             data["start-date"] = start_date
 
         # set prefix to as it is not in form
-        data["prefix"] = dataset.dataset
+        data["prefix"] = (
+            dataset.dataset
+            if dataset.dataset not in current_app.config.WIKIDATA_PREFIX_DATASETS
+            else "wikidata"
+        )
         data["entry-date"] = datetime.datetime.today().strftime("%Y-%m-%d")
 
         last_record = (

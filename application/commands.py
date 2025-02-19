@@ -727,6 +727,22 @@ def remove_orgs():
         db.session.commit()
 
 
+@data_cli.command("wikidata-prefix")
+def wikidata_prefix():
+    from flask import current_app
+
+    for dataset in current_app.config["WIKIDATA_PREFIX_DATASETS"]:
+        print(f"Setting wikidata prefix for {dataset}")
+        dataset = Dataset.query.filter(Dataset.dataset == dataset).one_or_none()
+        if dataset is None:
+            print(f"Dataset {dataset} does not exist")
+            continue
+        for record in dataset.records:
+            record.prefix = "wikidata"
+            db.session.add(record)
+        db.session.commit()
+
+
 def _get_repo(config):
     app_id = config.get("GITHUB_APP_ID")
     repo_name = config.get("DATASETS_REPO")

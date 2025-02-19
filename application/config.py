@@ -24,6 +24,17 @@ class Config:
     SPECIFICATION_REPO_URL = os.getenv("SPECIFICATION_REPO_URL")
     PLATFORM_URL = os.getenv("PLATFORM_URL")
     PLANNING_DATA_DESIGN_URL = os.getenv("PLANNING_DATA_DESIGN_URL")
+    WIKIDATA_PREFIX_DATASETS = set(
+        [
+            "development-corporation",
+            "national-park-authority",
+            "nonprofit",
+            "public-authority",
+            "passenger-transport-executive",
+            "regional-park-authority",
+            "waste-authority",
+        ]
+    )
 
 
 class DevelopmentConfig(Config):

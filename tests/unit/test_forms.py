@@ -10,12 +10,12 @@ from application.models import Field
 def app():
     from application.factory import create_app
 
-    app = create_app("config.TestConfig")
+    app = create_app("application.config.TestConfig")
     yield app
 
 
 fields = [
-    Field(field="organisation", datatype="curie", name="Orgasnisation"),
+    Field(field="organisation", datatype="curie", name="Organisation"),
     Field(field="prefix", datatype="string", name="Prefix"),
     Field(field="reference", datatype="string", name="Reference"),
     Field(field="documentation-url", datatype="url", name="Documentation url"),

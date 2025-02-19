@@ -178,9 +178,9 @@ def add_record(id):
 
         # set prefix to as it is not in form
         data["prefix"] = (
-            dataset.dataset
-            if dataset.dataset not in current_app.config.WIKIDATA_PREFIX_DATASETS
-            else "wikidata"
+            "wikidata"
+            if dataset.dataset in current_app.config["WIKIDATA_PREFIX_DATASETS"]
+            else dataset.dataset
         )
         data["entry-date"] = datetime.datetime.today().strftime("%Y-%m-%d")
 

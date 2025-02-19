@@ -4,7 +4,16 @@ import tempfile
 from collections import OrderedDict
 from csv import DictReader
 
-from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from werkzeug.utils import secure_filename
 
 from application.extensions import db
@@ -98,6 +107,7 @@ def upload_csv(dataset):
                                 original_record.get("entity"),
                                 ds.dataset,
                                 original_record,
+                                current_app.config,
                             )
                             ds.records.append(record)
                             db.session.add(ds)

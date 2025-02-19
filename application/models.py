@@ -215,7 +215,7 @@ class Record(DateModel):
         return data
 
     @classmethod
-    def factory(cls, row_id, entity, dataset, data_dict):
+    def factory(cls, row_id, entity, dataset, data_dict, config):
         record = cls()
         for column in record.__table__.columns:
             if column.name != "data":
@@ -234,7 +234,9 @@ class Record(DateModel):
 
         record.row_id = row_id
         record.entity = int(entity)
-        record.prefix = dataset
+        record.prefix = (
+            "wikidata" if dataset in config["WIKIDATA_PREFIX_DATASETS"] else dataset
+        )
         record.data = data_dict
         record.dataset_id = dataset
 

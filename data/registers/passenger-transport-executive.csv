@@ -1,10 +1,10 @@
 entity,name,prefix,reference,billing-authority,company,notes,opendatacommunities-uri,parliament-thesaurus,region,statistical-geography,twitter,website,wikidata,wikipedia,entry-date,start-date,end-date
-408,West Midlands Passenger Transport Executive,passenger-transport-executive,Q25171369,,,,,94501,,,,,Q25171369,West_Midlands_Passenger_Transport_Executive,2025-02-05,1969-10-01,2016-06-17
-15300000,Greater Manchester Passenger Transport Executive,passenger-transport-executive,Q54817549,,,,,37053,,,,,Q54817549,Greater_Manchester_Passenger_Transport_Executive,2025-02-05,1974-04-01,2011-04-01
-409,Merseytravel,passenger-transport-executive,Q6820591,,,,,,,,,http://www.merseytravel.gov.uk,Q6820591,Merseytravel,2025-02-05,1969-12-01,
-410,Transport for London,passenger-transport-executive,Q682520,,,,,84027,,,TfLTrafficNews,https://tfl.gov.uk/,Q682520,Transport_for_London,2025-02-05,2000-07-03,
-411,South Yorkshire Passenger Transport Executive,passenger-transport-executive,Q7569004,,,,,68146,,,,http://www.sypte.co.uk/,Q7569004,South_Yorkshire_Passenger_Transport_Executive,2025-02-05,1974-01-01,
-412,Transport for Greater Manchester,passenger-transport-executive,Q7834921,,,,,402762,,,,http://www.tfgm.com/,Q7834921,Transport_for_Greater_Manchester,2025-02-05,2011-04-01,
-413,Tyne and Wear Passenger Transport Executive,passenger-transport-executive,Q7860508,,,,,84349,,,,http://www.nexus.org.uk,Q7860508,Tyne_and_Wear_Passenger_Transport_Executive,2025-02-05,1974-04-01,
-414,Transport for West Midlands,passenger-transport-executive,Q7985947,,,,,,,,,https://www.tfwm.org.uk/,Q7985947,Transport_for_West_Midlands,2025-02-05,1969-10-01,
-415,West Yorkshire Passenger Transport Executive,passenger-transport-executive,Q7987043,,,,,94597,,,metrotravelnews,http://www.wymetro.com/,Q7987043,West_Yorkshire_Metro,2025-02-05,1974-01-01,2014-04-01
+408,West Midlands Passenger Transport Executive,wikidata,Q25171369,,,,,94501,,,,,Q25171369,West_Midlands_Passenger_Transport_Executive,2025-02-19,1969-10-01,2016-06-17
+15300000,Greater Manchester Passenger Transport Executive,wikidata,Q54817549,,,,,37053,,,,,Q54817549,Greater_Manchester_Passenger_Transport_Executive,2025-02-19,1974-04-01,2011-04-01
+409,Merseytravel,wikidata,Q6820591,,,,,,,,,http://www.merseytravel.gov.uk,Q6820591,Merseytravel,2025-02-19,1969-12-01,
+410,Transport for London,wikidata,Q682520,,,,,84027,,,TfLTrafficNews,https://tfl.gov.uk/,Q682520,Transport_for_London,2025-02-19,2000-07-03,
+411,South Yorkshire Passenger Transport Executive,wikidata,Q7569004,,,,,68146,,,,http://www.sypte.co.uk/,Q7569004,South_Yorkshire_Passenger_Transport_Executive,2025-02-19,1974-01-01,
+412,Transport for Greater Manchester,wikidata,Q7834921,,,,,402762,,,,http://www.tfgm.com/,Q7834921,Transport_for_Greater_Manchester,2025-02-19,2011-04-01,
+413,Tyne and Wear Passenger Transport Executive,wikidata,Q7860508,,,,,84349,,,,http://www.nexus.org.uk,Q7860508,Tyne_and_Wear_Passenger_Transport_Executive,2025-02-19,1974-04-01,
+414,Transport for West Midlands,wikidata,Q7985947,,,,,,,,,https://www.tfwm.org.uk/,Q7985947,Transport_for_West_Midlands,2025-02-19,1969-10-01,
+415,West Yorkshire Passenger Transport Executive,wikidata,Q7987043,,,,,94597,,,metrotravelnews,http://www.wymetro.com/,Q7987043,West_Yorkshire_Metro,2025-02-19,1974-01-01,2014-04-01

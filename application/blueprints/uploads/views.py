@@ -34,7 +34,7 @@ upload = Blueprint("upload", __name__)
 
 def _order_records(records):
     def sort_key(item):
-        if item.get("end-date") is None:
+        if item.get("end-date") is None or item.get("end-date") == "":
             return datetime.date.max
         else:
             return item.get("end-date")

@@ -22,6 +22,20 @@ The following command will load the production data into you local database, so 
     flask data load-db-backup
 
 
+## Authentication
+
+The application uses GitHub OAuth for authentication. Only members of the `digital-land` GitHub organization can log in to the application. The authentication flow:
+
+1. Users are redirected to GitHub to authorize the application
+2. After authorization, the application checks if the user is a member of the `digital-land` organization
+3. If they are a member, they are logged in
+4. If they are not a member:
+   - Their OAuth token is revoked
+   - They are redirected back to the index page with an error message
+
+Configuration of the application in Github is managed [here](https://github.com/organizations/digital-land/settings/installations). For the required application environment variables see the application settings -> config vars in the heroku dashboard.
+
+
 ## Automated tasks
 
 The following tasks are automatically run daily via the Heroku scheduler to maintain and update the application's data:

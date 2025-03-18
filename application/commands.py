@@ -53,7 +53,7 @@ def dataset_fields():
     print("loading dataset fields")
     for dataset in Dataset.query.all():
         schema_url = specfication_markdown_url.format(
-            base_url=base_git_content_url, dataset=dataset.dataset
+            base_git_content_url=base_git_content_url, dataset=dataset.dataset
         )
         markdown = requests.get(schema_url)
         if markdown.status_code == 200:
@@ -195,7 +195,7 @@ def _process_replacement_datasets(replacement_datasets):
 def _process_new_datasets(new_datasets):
     for dataset in new_datasets:
         schema_url = specfication_markdown_url.format(
-            base_url=base_git_content_url, dataset=dataset["dataset"]
+            base_git_content_url=base_git_content_url, dataset=dataset["dataset"]
         )
         dataset = Dataset(dataset=dataset["dataset"], name=dataset["name"])
         markdown = requests.get(schema_url)
@@ -382,7 +382,7 @@ def set_dataset_considerations():
     for dataset in Dataset.query.filter(Dataset.consideration.is_(None)).all():
         print(f"Consideration for {dataset.dataset} is not set")
         schema_url = specfication_markdown_url.format(
-            base_url=base_git_content_url, dataset=dataset.dataset
+            base_git_content_url=base_git_content_url, dataset=dataset.dataset
         )
         markdown = requests.get(schema_url)
         if markdown.status_code == 200:

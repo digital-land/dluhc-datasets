@@ -17,7 +17,7 @@ Create a postgres db:
 
 ### Loading production data
 
-The following command will load the production data into you local database, so there's not need to start with a flask db upgrade.
+The following command will load the production data into your local database, so there's not need to start with a flask db upgrade.
 
     flask data load-db-backup
 

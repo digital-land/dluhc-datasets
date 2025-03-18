@@ -32,6 +32,14 @@ See the dluhc-datasets/settings -> config vars for all configuration.
 Automatic deployment is set up from the Heroku dashboard for the application. See `/apps/dluhc-datasets/deploy/github` when
 logged into Heroku dashboard
 
+### DNS
+
+DNS for this application is managed between Digital Land route 53 and Heroku
+
+Configuration is managed on Heroku side on the `/apps/dluhc-datasets/settings` page of the dashboard
+
+Route 53 setup is manged [here](https://github.com/digital-land/digital-land-infrastructure/blob/main/systems/data-design/environments/development.tfvars)
+
 ## Monitoring
 
 There is monitoring of the application via Sentry - accessible through the Heroku dashboard page for this application on the

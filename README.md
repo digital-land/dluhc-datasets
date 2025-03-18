@@ -42,3 +42,19 @@ The following tasks are automatically run daily via the Heroku scheduler to main
 
 
 The tasks run in the early hours of the morning and are configured via the Heroku dashboard. For details login into the Heroku dashboard, navigate to the application, resources tab and click on Heroku scheduler.
+
+## GitHub Actions
+
+The repository uses GitHub Actions for continuous integration and automated backups:
+
+### CI Workflow
+- Runs on every push and pull request to the main branch
+- Installs Python dependencies
+- Runs flake8 for linting
+- Runs pytest for testing
+
+### Database Backup
+- Runs daily at 1am UTC
+- Downloads the latest database backup from Heroku
+- Commits the backup to the repository in the data directory
+- Requires Heroku authentication via `HEROKU_OAUTH_TOKEN` secret

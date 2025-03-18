@@ -30,6 +30,9 @@ The following tasks are automatically run daily via the Heroku scheduler to main
    - Checks for and adds new datasets to the system
    - Updates the field definitions for all datasets
 
+   The new datasets command checks digital land datasette for any new category datasets, or if there has been
+   a replacement of the dataset.
+
 2. `flask data set-considerations`
    - Updates dataset considerations from the specification
 

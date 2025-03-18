@@ -57,11 +57,12 @@ The application maintains a set of CSV files in the `/data` directory that serve
 4. The processed data is published on planning.data.gov.uk
 
 For example, you can access the ancient woodland status dataset at:
+
 `https://raw.githubusercontent.com/digital-land/dluhc-datasets/refs/heads/main/data/registers/ancient-woodland-status.csv`
 
 This process ensures that the authoritative dataset versions are maintained in this repository and then propagated to the platform.
 
-Therefore that url is the endpoint used [here](https://github.com/digital-land/config/blob/main/collection/ancient-woodland/endpoint.csv?plain=1#L3)
+Therefore for ancient woodland status, the endpoint for collection configuration is set [here](https://github.com/digital-land/config/blob/main/collection/ancient-woodland/endpoint.csv?plain=1#L3)
 
 
 ## Automated tasks

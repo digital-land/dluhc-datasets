@@ -89,30 +89,6 @@ def dataset_fields():
     print("db loaded")
 
 
-@data_cli.command("check-dataset-fields")
-def check_dataset_fields():
-    for dataset in Dataset.query.all():
-        schema_url = specfication_markdown_url.format(
-            base_url=base_git_content_url, dataset=dataset.dataset
-        )
-        markdown = requests.get(schema_url)
-        if markdown.status_code == 200:
-            front = frontmatter.loads(markdown.text)
-            print(f"\n{dataset.dataset} fields")
-            dataset_fields = set([field.field for field in dataset.fields])
-            specfication_fields = set([field["field"] for field in front["fields"]])
-
-            print(f"dataset \t {sorted(dataset_fields)}")
-            print(f"specification \t {sorted(specfication_fields)}")
-
-            if dataset_fields != specfication_fields:
-                print(f"missing fields {specfication_fields - dataset_fields}")
-                print(f"extra fields {dataset_fields - specfication_fields}")
-            else:
-                print(f"{dataset.dataset} has all fields in specification")
-                print("\n")
-
-
 @data_cli.command("new-datasets")
 def get_new_datasets():
     database_datasets = set([dataset.dataset for dataset in Dataset.query.all()])
@@ -214,44 +190,6 @@ def _process_replacement_datasets(replacement_datasets):
                 print(
                     f"Could migrate data to the replacement dataset {fields['replacement_dataset']} as it was not found"
                 )
-
-
-@data_cli.command("add-dataset")
-@click.argument("dataset")
-def add_dataset(dataset):
-    schema_url = specfication_markdown_url.format(
-        base_url=base_git_content_url, dataset=dataset
-    )
-    try:
-        resp = requests.get(schema_url)
-        resp.raise_for_status()
-        front = frontmatter.loads(resp.text)
-        dataset = Dataset(dataset=dataset)
-        dataset.name = front.get("name")
-        dataset.entity_minimum = int(front.get("entity-minimum"))
-        dataset.entity_maximum = int(front.get("entity-maximum"))
-        dataset.consideration = front.get("consideration")
-        dataset.custodian = front.get("Data design team")
-
-        print(f"dataset {dataset} with name {front.get('name')} added")
-        print(f"get fields for {dataset}")
-
-        for field in front.get("fields", []):
-            f = Field.query.get(field["field"])
-            if f is None:
-                human_readable = field["field"].replace("-", " ").capitalize()
-                f = Field(field=field["field"], name=human_readable)
-                f.datatype = field["datatype"]
-                if field.get("description"):
-                    f.description = field["description"]
-                db.session.add(f)
-                db.session.commit()
-            print(f"field {f.field} added to dataset {dataset.dataset}")
-            dataset.fields.append(f)
-            db.session.add(dataset)
-            db.session.commit()
-    except requests.exceptions.HTTPError as e:
-        print(f"Error adding dataset {dataset}: {e}")
 
 
 def _process_new_datasets(new_datasets):
@@ -363,29 +301,6 @@ def push_registers():
 def export(ctx):
     ctx.invoke(backup_registers)
     ctx.invoke(push_registers)
-
-
-@data_cli.command("assign-entity-numbers")
-def assign_entity_number():
-    print("assigning entity numbers")
-    for dataset in Dataset.query.all():
-        entity_min = dataset.entity_minimum
-        entity_max = dataset.entity_maximum
-        current = 0
-
-        for record in dataset.records:
-            if record.entity is None:
-                entity = entity_min + current
-                if entity > entity_max:
-                    print("ran out of entity numbers")
-                    break
-                print(
-                    f"assigning entity number {entity} to {record.prefix}:{record.reference}"
-                )  # noqa
-                record.entity = entity
-                current += 1
-                db.session.add(record)
-        db.session.commit()
 
 
 @data_cli.command("load-db-backup")
@@ -586,161 +501,6 @@ def set_dataset_references():
                 )
 
     print("Done")
-
-
-@data_cli.command("check-dataset-on-platform")
-def check_dataset_on_platform():
-    print("Checking datasets on platform")
-    on_platform = []
-    for dataset in (
-        Dataset.query.filter(Dataset.end_date.is_(None)).order_by(Dataset.dataset).all()
-    ):
-        try:
-            resp = requests.get(
-                platform_dataset_query.format(format=".html", dataset=dataset.dataset)
-            )
-            resp.raise_for_status()
-            print(f"Dataset {dataset.dataset} found on platform")
-            on_platform.append(dataset.dataset)
-        except requests.exceptions.RequestException as e:
-            print(f"Error checking dataset {dataset.dataset} on platform: {e}")
-            continue
-
-    mismatches = []
-    for dataset in on_platform:
-        print("checking records for", dataset)
-        resp = requests.get(
-            platform_dataset_query.format(format=".json", dataset=dataset)
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        dataset_editor_count = Record.query.filter(Record.dataset_id == dataset).count()
-        platform_count = data["count"]
-        if dataset_editor_count != platform_count:
-            print(
-                f"Record count mismatch for {dataset}. Local: {dataset_editor_count}, Remote: {platform_count}"
-            )
-            mismatches.append(
-                {
-                    "dataset": dataset,
-                    "dataset-editor-count": dataset_editor_count,
-                    "platform-count": platform_count,
-                }
-            )
-
-    if mismatches:
-        with open("dataset-editor-platform.csv", "w", newline="") as csvfile:
-            fieldnames = ["dataset", "dataset-editor-count", "platform-count"]
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            writer.writeheader()
-            writer.writerows(mismatches)
-        print("Mismatches written to dataset-editor-platform.csv")
-
-
-@data_cli.command("setup-orgs")
-def setup_organisations():
-    print("Setting up organisations")
-    url = f"{datasette_url}/dataset.json?_sort=dataset&typology__exact=organisation&_shape=array"
-    resp = requests.get(url)
-    resp.raise_for_status()
-    data = resp.json()
-    for d in data:
-        if d["dataset"] in [
-            "company",
-            "organisation",
-            "internal-drainage-board",
-            "neighbourhood-forum",
-        ]:
-            continue
-        if (
-            Dataset.query.filter(Dataset.dataset == d["dataset"]).one_or_none()
-            is not None
-        ):
-            print(f"Dataset {d['dataset']} already exists")
-            continue
-        print(f"Setup dataset {d['dataset']}")
-        dataset = Dataset(dataset=d["dataset"], name=d["name"])
-        dataset.entity_minimum = d["entity_minimum"]
-        dataset.entity_maximum = d["entity_maximum"]
-        dataset.description = d["description"] if d["description"] else None
-        db.session.add(dataset)
-        db.session.commit()
-        ds_fields_query = dataset_field_query.format(
-            datasette_url=datasette_url, dataset=d["dataset"]
-        )
-        resp = requests.get(ds_fields_query)
-        resp.raise_for_status()
-        data = resp.json()
-        for field in data:
-            f = Field.query.filter(Field.field == field["field"]).one_or_none()
-            if f is None:
-                print(f"Adding field {field['field']}")
-                f_query = field_query.format(
-                    datasette_url=datasette_url,
-                    dataset=d["dataset"],
-                    field=field["field"],
-                )
-                r = requests.get(f_query)
-                r.raise_for_status()
-                field_data = r.json()
-                f, data = next(iter(field_data.items()))
-                f = Field(field=f, name=data["name"], datatype=data["datatype"])
-                db.session.add(f)
-                db.session.commit()
-            dataset.fields.append(f)
-
-        org_repo_data_path = "organisation-collection/refs/heads/main/data"
-        records_csv = (
-            f"{base_git_content_url}/{org_repo_data_path}/{dataset.dataset}.csv"
-        )
-        resp = requests.get(records_csv)
-        resp.raise_for_status()
-        reader = csv.DictReader(resp.text.splitlines())
-        for index, row in enumerate(reader):
-            record = Record.factory(index, row["entity"], dataset.dataset, row)
-            db.session.add(record)
-            dataset.records.append(record)
-        db.session.commit()
-
-
-@data_cli.command("remove-orgs")
-def remove_orgs():
-    print("Removing organisations")
-    url = f"{datasette_url}/dataset.json?_sort=dataset&typology__exact=organisation&_shape=array"
-    resp = requests.get(url)
-    resp.raise_for_status()
-    data = resp.json()
-    for d in data:
-        if d["dataset"] in [
-            "company",
-            "organisation",
-            "internal-drainage-board",
-            "neighbourhood-forum",
-        ]:
-            continue
-        dataset = Dataset.query.filter(Dataset.dataset == d["dataset"]).one_or_none()
-        if dataset is None:
-            print(f"Dataset {d['dataset']} does not exist")
-            continue
-        print(f"Removing dataset {d['dataset']}")
-        db.session.delete(dataset)
-        db.session.commit()
-
-
-@data_cli.command("wikidata-prefix")
-def wikidata_prefix():
-    from flask import current_app
-
-    for dataset in current_app.config["WIKIDATA_PREFIX_DATASETS"]:
-        print(f"Setting wikidata prefix for {dataset}")
-        dataset = Dataset.query.filter(Dataset.dataset == dataset).one_or_none()
-        if dataset is None:
-            print(f"Dataset {dataset} does not exist")
-            continue
-        for record in dataset.records:
-            record.prefix = "wikidata"
-            db.session.add(record)
-        db.session.commit()
 
 
 def _get_repo(config):

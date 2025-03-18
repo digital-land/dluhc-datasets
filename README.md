@@ -15,13 +15,12 @@ Create a postgres db:
 
     createdb dluhc-datasets
 
-Make the db tables:
+### Loading production data
 
-    make upgrade
+The following command will load the production data into you local database, so there's not need to start with a flask db upgrade.
 
-Load the data:
+    flask data load-db-backup
 
-    make load
 
 ## Automated tasks
 

@@ -54,12 +54,6 @@ assets-clobber:
 	rm -rf application/static/
 	mkdir -p application/static
 
-make load::
-	flask data load
-
-make drop::
-	flask data drop
-
 upgrade::
 	flask db upgrade
 

@@ -68,6 +68,14 @@ The following tasks are automatically run daily via the Heroku scheduler to main
    - Creates backups of all registers
    - Pushes the backups to the GitHub repository
 
+   The registers backup csv files are all stored in the [data](/data) directory.
+
+   The platform collects the csv files from this data directory.
+
+   For example ancient woodland status is collected via this url:
+
+   [https://raw.githubusercontent.com/digital-land/dluhc-datasets/refs/heads/main/data/registers/ancient-woodland-status.csv](https://raw.githubusercontent.com/digital-land/dluhc-datasets/refs/heads/main/data/registers/ancient-woodland-status.csv)
+
 
 The tasks run in the early hours of the morning and are configured via the Heroku dashboard. For details login into the Heroku dashboard, navigate to the application, resources tab and click on Heroku scheduler.
 

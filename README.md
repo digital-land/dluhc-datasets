@@ -22,6 +22,14 @@ The following command will load the production data into you local database, so 
     flask data load-db-backup
 
 
+
+## Deployment
+
+The application is currently deployed to Heroku and is called `dluhc-datasets`
+
+See the dluhc-datasets/settings -> config vars for all configuration.
+
+
 ## Authentication
 
 The application uses GitHub OAuth for authentication. Only members of the `digital-land` GitHub organization can log in to the application. The authentication flow:

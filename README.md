@@ -32,6 +32,11 @@ See the dluhc-datasets/settings -> config vars for all configuration.
 Automatic deployment is set up from the Heroku dashboard for the application. See `/apps/dluhc-datasets/deploy/github` when
 logged into Heroku dashboard
 
+## Monitoring
+
+There is monitoring of the application via Sentry - accessible through the Heroku dashboard page for this application on the
+resources tab.
+
 
 ## Authentication
 

@@ -35,6 +35,7 @@ logged into Heroku dashboard
 
 ### Environment variables
 
+```
 DATABASE_URL:                [from deployment environment]
 DATASETS_REPO:                digital-land/dluhc-datasets
 DATASETS_REPO_REGISTERS_PATH: data/registers
@@ -48,7 +49,7 @@ PLATFORM_URL:                 https://www.planning.data.gov.uk
 SAFE_URLS:                    dluhc-datasets-d47c47408207.herokuapp.com,dluhc-datasets.planning-data.dev,dataset-editor.development.planning.data.gov.uk
 SECRET_KEY:                   [generate for deployment env]
 SPECIFICATION_REPO_URL:       https://github.com/digital-land/specification
-
+```
 
 ### DNS
 

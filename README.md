@@ -32,6 +32,24 @@ See the dluhc-datasets/settings -> config vars for all configuration.
 Automatic deployment is set up from the Heroku dashboard for the application. See `/apps/dluhc-datasets/deploy/github` when
 logged into Heroku dashboard
 
+
+### Environment variables
+
+DATABASE_URL:                [from deployment environment]
+DATASETS_REPO:                digital-land/dluhc-datasets
+DATASETS_REPO_REGISTERS_PATH: data/registers
+FLASK_CONFIG:                 application.config.Config
+GITHUB_APP_ID:                [from github application settings]
+GITHUB_APP_PRIVATE_KEY:       [from github application settings]
+GITHUB_CLIENT_ID:             [from github application settings]
+GITHUB_CLIENT_SECRET:         [from github application settings]
+PLANNING_DATA_DESIGN_URL:     https://design.planning.data.gov.uk
+PLATFORM_URL:                 https://www.planning.data.gov.uk
+SAFE_URLS:                    dluhc-datasets-d47c47408207.herokuapp.com,dluhc-datasets.planning-data.dev,dataset-editor.development.planning.data.gov.uk
+SECRET_KEY:                   [generate for deployment env]
+SPECIFICATION_REPO_URL:       https://github.com/digital-land/specification
+
+
 ### DNS
 
 DNS for this application is managed between Digital Land route 53 and Heroku

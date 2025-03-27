@@ -1,0 +1,60 @@
+name: Download and commit considerations CSV
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  download_and_commit:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Create data directory
+      run: mkdir -p data/registers
+
+    - name: Install jq
+      run: sudo apt-get install jq -y
+
+    - name: Download and process files
+      run: |
+        # Download the index.json
+        curl -s https://dataset-editor.development.planning.data.gov.uk/index.json > index.json
+
+        # Process each dataset
+        jq -r '.datasets[] | [.dataset, .csv] | @tsv' index.json | while IFS=$'\t' read -r dataset csv_url; do
+          echo "Downloading CSV for $dataset"
+
+          csv_url="https://dataset-editor.development.planning.data.gov.uk/dataset/${dataset}.csv"
+          output_file="data/registers/${dataset}.csv"
+
+          # Download the CSV file
+          if curl -s -f "$csv_url" -o "$output_file"; then
+            echo "Successfully downloaded $dataset"
+          else
+            echo "Failed to download $dataset"
+          fi
+        done
+
+        # Clean up index.json
+        rm index.json
+
+    - name: Set up git
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+    - name: Commit and push changes
+      run: |
+        git add data/registers/
+        if ! git diff-index --quiet HEAD --; then
+          git commit -m "Update register CSV files"
+          git push
+        else
+          echo "No changes to commit"
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

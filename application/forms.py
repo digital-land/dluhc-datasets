@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
 from govuk_frontend_wtf.wtforms_widgets import GovDateInput
-from wtforms import DateField, StringField, TextAreaField, URLField
+from wtforms import DateField, IntegerField, StringField, TextAreaField, URLField
 from wtforms.validators import URL, DataRequired, ValidationError
 
 
@@ -20,6 +20,7 @@ class FormBuilder:
         "text": TextAreaField,
         "url": URLField,
         "datetime": DateField,
+        "integer": IntegerField,
     }
 
     def build(self):
@@ -53,7 +54,7 @@ class FormBuilder:
         return sorted(self.fields)
 
     def __init__(self, fields, include_edit_notes=False, require_reference=True):
-        skip_fields = {"entity", "end-date", "entry-date", "prefix"}
+        skip_fields = {"end-date", "entry-date", "prefix"}
         self.fields = []
         self.include_edit_notes = include_edit_notes
         self.require_reference = require_reference

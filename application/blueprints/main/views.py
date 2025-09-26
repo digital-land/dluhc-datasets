@@ -191,11 +191,18 @@ def add_record(id):
             .first()
         )
         next_id = last_record.row_id + 1 if last_record else 0
-        entity = (
-            last_record.entity + 1
-            if (last_record is not None and last_record.entity is not None)
-            else dataset.entity_minimum
+
+        max_entity = (
+            db.session.query(db.func.max(Record.entity))
+            .filter(Record.dataset_id == dataset.dataset)
+            .scalar()
         )
+        entity = max_entity + 1 if max_entity is not None else dataset.entity_minimum
+        # entity = (
+        #     last_record.entity + 1
+        #     if (last_record is not None and last_record.entity is not None)
+        #     else dataset.entity_minimum
+        # )
         if not (dataset.entity_minimum <= entity <= dataset.entity_maximum):
             flash(
                 f"entity id {entity} is outside of range {dataset.entity_minimum} to {dataset.entity_maximum}"
@@ -296,6 +303,8 @@ def edit_record(id, record_id):
     if form.validate_on_submit():
         # capture current record data as "previous" before updating
 
+        record.entity = int(request.form.get("entity", record.entity))
+
         change_log = create_change_log(record, form.data, ChangeType.EDIT)
         dataset.change_log.append(change_log)
         db.session.add(dataset)
@@ -328,6 +337,7 @@ def edit_record(id, record_id):
                 form["start-date"].data = start_date
         else:
             for field in form_fields:
+                form[field.field].data = record.entity
                 if field.field == "start-date":
                     form[field.field].data = record.start_date
                 else:

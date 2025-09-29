@@ -171,7 +171,6 @@ def add_record(id):
     form_fields = builder.form_fields()
 
     if hasattr(form, "entity"):
-        print("hi")
         max_entity = (
             db.session.query(db.func.max(Record.entity))
             .filter(Record.dataset_id == dataset.dataset)
@@ -205,11 +204,7 @@ def add_record(id):
         )
         next_id = last_record.row_id + 1 if last_record else 0
         entity = int(form.entity.data) if hasattr(form, "entity") else next_entity
-        # entity = (
-        #     last_record.entity + 1
-        #     if (last_record is not None and last_record.entity is not None)
-        #     else dataset.entity_minimum
-        # )
+
         if not (dataset.entity_minimum <= entity <= dataset.entity_maximum):
             flash(
                 f"entity id {entity} is outside of range {dataset.entity_minimum} to {dataset.entity_maximum}"

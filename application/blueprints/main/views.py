@@ -169,6 +169,19 @@ def add_record(id):
     builder = FormBuilder(dataset.fields)
     form = builder.build()
     form_fields = builder.form_fields()
+
+    if hasattr(form, "entity"):
+        print("hi")
+        max_entity = (
+            db.session.query(db.func.max(Record.entity))
+            .filter(Record.dataset_id == dataset.dataset)
+            .scalar()
+        )
+        next_entity = (
+            max_entity + 1 if max_entity is not None else dataset.entity_minimum
+        )
+        form.entity.data = next_entity
+
     if form.validate_on_submit():
         data = form.data
 
@@ -191,13 +204,7 @@ def add_record(id):
             .first()
         )
         next_id = last_record.row_id + 1 if last_record else 0
-
-        max_entity = (
-            db.session.query(db.func.max(Record.entity))
-            .filter(Record.dataset_id == dataset.dataset)
-            .scalar()
-        )
-        entity = max_entity + 1 if max_entity is not None else dataset.entity_minimum
+        entity = int(form.entity.data) if hasattr(form, "entity") else next_entity
         # entity = (
         #     last_record.entity + 1
         #     if (last_record is not None and last_record.entity is not None)

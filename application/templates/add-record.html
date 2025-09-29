@@ -23,6 +23,21 @@
         {% if field.field == 'reference' %}
           {% set _hint = 'You can change this suggestion' %}
         {% endif %}
+        {% set error_message = None %}
+        {% if form.errors and form.errors[field.field] %}
+          {% set error_message = ' '.join(form.errors[field.field]) %}
+        {% endif %}
+        {{ appField(field, value=form[field.field].data, error_message=error_message, hint=_hint) }}
+      {% endfor %}
+      {{ form.csrf_token }}
+    </div>
+
+    <!-- <div class="govuk-form-group">
+      {% for field in form_fields %}
+        {% set _hint = '' %}
+        {% if field.field == 'reference' %}
+          {% set _hint = 'You can change this suggestion' %}
+        {% endif %}
         {% if form.errors %}
           {% if form.errors[field.field] %}
             {% set error_message = ' '.join(form.errors[field.field]) %}
@@ -35,7 +50,7 @@
         {% endif %}
       {% endfor %}
       {{ form.csrf_token }}
-    </div>
+    </div> -->
     {{
       govukButton({
         "text": "Add record",

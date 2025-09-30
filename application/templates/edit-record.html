@@ -31,6 +31,13 @@
               hint = "You cannot edit this field"
             )
           }}
+          {% elif field.field == 'entity' %}
+          {{ appField(
+              field,
+              error_message=' '.join(form.errors[field.field]) if form.errors[field.field] else '',
+              value=form[field.field].data if form[field.field].data else record.entity,
+              hint="You can edit this entity number to fix duplicates"
+          ) }}
           {% else %}
           {{
             appField(

@@ -89,3 +89,30 @@ def test_form_can_set_reference_not_required(app):
         form.validate()
 
         assert form.errors.get("reference") is None
+
+
+def test_entity_field_is_added(app):
+    with app.test_request_context():
+        fields = [Field(field="entity", datatype="integer", name="Entity")]
+        builder = FormBuilder(fields)
+        form = builder.build()
+
+        assert hasattr(form, "entity")
+        assert form.entity.data is None
+
+
+def test_entity_field_is_editable(app):
+    with app.test_request_context():
+        fields = [
+            Field(field="entity", datatype="integer", name="Entity"),
+        ]
+        builder = FormBuilder(fields)
+        form = builder.build()
+
+        # auto-populate
+        form.entity.data = 100
+        assert form.entity.data == 100
+
+        # editor changing it
+        form.entity.data = 110
+        assert form.entity.data == 110

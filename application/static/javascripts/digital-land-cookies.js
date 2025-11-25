@@ -107,11 +107,11 @@ class cookiePrefs{
 
   static save = (expires = 365) => {
     setCookie('cookies_preferences_set', true, expires)
-    setCookie('cookies_policy', JSON.stringify({
-      essential: this.essential,
-      settings: this.settings,
-      usage: this.usage,
-      campaigns: this.campaigns
+    setCookie('cookies_policy', JSON.stringify({ 
+      essential: this.essential, 
+      settings: this.settings, 
+      usage: this.usage, 
+      campaigns: this.campaigns 
     }), expires)
     hideCookieBanner()
     this.invalidateRejectedCookies()

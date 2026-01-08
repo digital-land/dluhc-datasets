@@ -30,6 +30,24 @@
     }) }}
 
     <form action="{{url_for('main.archive_record', id=record.dataset_id, record_id=record.id)}}" method="POST">
+
+      <div class="govuk-form-group">
+        <label class="govuk-label" for="end-date">
+          End date
+        </label>
+        <div class="govuk-hint">
+          The date this record stopped being valid.
+        </div>
+        <input
+          class="govuk-input govuk-date-input__input"
+          id="end-date"
+          name="end_date"
+          type="date"
+          value="{{ record.data.get('end-date', '') }}"
+          required
+        >
+      </div>
+
       {{
         buttonMenu({
           "items": [

@@ -362,13 +362,22 @@ def edit_record(id, record_id):
     "/dataset/<string:id>/record/<string:record_id>/archive", methods=["GET", "POST"]
 )
 def archive_record(id, record_id):
-    record = Record.query.filter(Record.dataset_id == id, Record.id == record_id).one()
+    record = Record.query.filter(
+        Record.dataset_id == id, 
+        Record.id == record_id
+    ).one()
 
     if request.method == "GET":
         return render_template("archive-record.html", record=record)
 
-    record.data["end-date"] = datetime.datetime.today().strftime("%Y-%m-%d")
-    record.end_date = datetime.datetime.today()
+    end_date_str = request.form.get("end_date")
+    if not end_date_str:
+        abort(400, "End date is required")
+
+    end_date = datetime.datetime.strptime(end_date_str, "%Y-%m-%d")
+
+    record.data["end-date"] = end_date_str
+    record.end_date = end_date
 
     change_log = ChangeLog(
         change_type=ChangeType.ARCHIVE,

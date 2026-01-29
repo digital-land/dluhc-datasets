@@ -7,6 +7,12 @@ from wtforms.validators import URL, DataRequired, ValidationError
 
 # change to a regex validator
 def curie_check(form, field):
+    if field.data is None:
+        return
+    value = str(field.data).strip()
+    if value == "":
+        return
+        
     if len(field.data.split(":")) != 2:
         raise ValidationError(
             f"{field.name} is a curie and should be in the format 'namespace:identifier'"

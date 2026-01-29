@@ -6,24 +6,25 @@
     <h1 class="govuk-heading-l">View record</h1>
   </div>
 </div>
+
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-three-quarters">
     <dl class="govuk-summary-list app-summary-list">
-
       {% for name, value in record.data.items() %}
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key app-summary-list__key">
-          {{name}}
+          {{ name }}
         </dt>
         <dd class="govuk-summary-list__value">
-          <p class="govuk-body">{{value}}</p>
+          <p class="govuk-body">{{ value }}</p>
         </dd>
       </div>
       {% endfor %}
     </dl>
   </div>
-  {% if not record.end_date %}
-    <div class="govuk-grid-column-two-thirds">
+
+  <div class="govuk-grid-column-two-thirds">
+    {% if not record.end_date %}
       {{
         buttonMenu({
           "classes": "govuk-!-margin-bottom-0",
@@ -32,11 +33,31 @@
               "text": "Edit this record",
               "type": "submit",
               "href": url_for('main.edit_record', id=record.dataset_id, record_id=record.id)
+            },
+            {
+              "text": "Archive this record",
+              "type": "submit",
+              "href": url_for('main.archive_record', id=record.dataset_id, record_id=record.id)
             }
           ]
         })
       }}
-    </div>
-  {% endif %}
+    {% else %}
+      <form action="{{ url_for('main.unarchive_record', id=record.dataset_id, record_id=record.id) }}" method="POST">
+        {{
+          buttonMenu({
+            "classes": "govuk-!-margin-bottom-0",
+            "items": [
+              {
+                "type": "submit",
+                "text": "Unarchive record",
+                "classes": "govuk-button--secondary"
+              }
+            ]
+          })
+        }}
+      </form>
+    {% endif %}
+  </div>
 </div>
 {% endblock content %}

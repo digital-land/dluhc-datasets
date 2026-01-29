@@ -395,6 +395,41 @@ def archive_record(id, record_id):
         url_for("main.get_record", id=record.dataset_id, record_id=record.id)
     )
 
+@main.route(
+    "/dataset/<string:id>/record/<string:record_id>/unarchive",
+    methods=["POST"],
+)
+@login_required
+def unarchive_record(id, record_id):
+    record = Record.query.filter(
+        Record.dataset_id == id,
+        Record.id == record_id
+    ).one()
+
+    if record.end_date is None:
+        abort(400, "Record is not archived")
+
+    # Clear archive state
+    record.end_date = None
+
+    if record.data and "end-date" in record.data:
+        del record.data["end-date"]
+
+    change_log = ChangeLog(
+        change_type=ChangeType.EDIT,
+        data={"action": "UNARCHIVE"},
+        dataset_id=record.dataset_id,
+        notes=f"Unarchived {record.prefix}:{record.reference}",
+        record_id=record.id,
+    )
+
+    db.session.add(record)
+    db.session.add(change_log)
+    db.session.commit()
+
+    return redirect(
+        url_for("main.get_record", id=record.dataset_id, record_id=record.id)
+    )
 
 @main.route("/dataset/<string:id>/schema")
 def schema(id):

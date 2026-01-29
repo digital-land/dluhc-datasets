@@ -23,6 +23,7 @@
     <h2 class="govuk-heading-m govuk-!-margin-bottom-1">{{ records | length }} records</h2>
   </div>
 </div>
+
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     {% if not dataset.end_date %}
@@ -36,56 +37,88 @@
                   <span class="app-data-table__header__label">{{ field.field }}</span>
                 </th>
               {% endfor %}
-              {% if session["user"] %}
+
+              {% if session["user"] and not history %}
                 <th scope="col" class="app-data-table__header app-data-table__header--ui">
                   <span class="govuk-visually-hidden">Action</span>
                 </th>
               {% endif %}
             </tr>
           </thead>
+
           <tbody class="app-data-table__body">
             {% for record in records %}
             <tr class="app-data-table__row">
               {% for field in dataset.sorted_fields() %}
-                <td class="app-data-table__cell">{{ record.get(field.field, None)| value_or_empty_string | replace('-','&#8209;') | safe }}</td>
+                <td class="app-data-table__cell">
+                  {{ record.get(field.field, None) | value_or_empty_string | replace('-','&#8209;') | safe }}
+                </td>
               {% endfor %}
-              {% if session["user"] and not record.end_date and not history %}
-              <td class="app-data-table__cell app-data-table__cell--ui">
-                {{
-                  buttonMenu({
-                    "items": [
-                      {
-                        "element": "a",
-                        "text": "Edit record",
-                        "classes": "govuk-button--secondary",
-                        "href": url_for("main.edit_record", id=dataset.dataset, record_id=record.id),
-                      },
-                      {
-                        "element": "a",
-                        "text": "Archive record",
-                        "classes": "govuk-button--secondary",
-                        "href": url_for("main.archive_record", id=dataset.dataset, record_id=record.id),
-                      }
-                    ]
-                  })
-                }}
-              </td>
+
+              {% if session["user"] and not history %}
+                <td class="app-data-table__cell app-data-table__cell--ui">
+                  {% if not record.end_date %}
+                    {{
+                      buttonMenu({
+                        "items": [
+                          {
+                            "element": "a",
+                            "text": "Edit record",
+                            "classes": "govuk-button--secondary",
+                            "href": url_for("main.edit_record", id=dataset.dataset, record_id=record.id),
+                          },
+                          {
+                            "element": "a",
+                            "text": "Archive record",
+                            "classes": "govuk-button--secondary",
+                            "href": url_for("main.archive_record", id=dataset.dataset, record_id=record.id),
+                          }
+                        ]
+                      })
+                    }}
+                  {% else %}
+                    <form action="{{ url_for('main.unarchive_record', id=dataset.dataset, record_id=record.id) }}" method="POST">
+                      {{
+                        buttonMenu({
+                          "items": [
+                            {
+                              "type": "submit",
+                              "text": "Unarchive record",
+                              "classes": "govuk-button--secondary"
+                            }
+                          ]
+                        })
+                      }}
+                    </form>
+                  {% endif %}
+                </td>
               {% endif %}
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </section>
-      <p class="govuk-hint govuk-!-margin-top-3">This dataset was last updated on {{dataset.last_updated.strftime("%d %B %Y")}}</p>
+
+      <p class="govuk-hint govuk-!-margin-top-3">
+        This dataset was last updated on {{ dataset.last_updated.strftime("%d %B %Y") }}
+      </p>
+
       {% if history %}
-        <p class="govuk-body govuk-!-margin-top-3"><a href="{{url_for('main.csv', id=dataset.dataset, history=True)}}">Download a csv file of the current data</a></p>
+        <p class="govuk-body govuk-!-margin-top-3">
+          <a href="{{ url_for('main.csv', id=dataset.dataset, history=True) }}">Download a csv file of the current data</a>
+        </p>
       {% else %}
-        <p class="govuk-body govuk-!-margin-top-3"><a href="{{url_for('main.csv', id=dataset.dataset)}}">Download a csv file of this data</a></p>
+        <p class="govuk-body govuk-!-margin-top-3">
+          <a href="{{ url_for('main.csv', id=dataset.dataset) }}">Download a csv file of this data</a>
+        </p>
+
         {% if session["user"] %}
-          <p class="govuk-body govuk-!-margin-top-3"><a href="{{url_for('upload.update_csv', dataset=dataset.dataset)}}">Upload a csv
-            file of updates for this dataset</a></p>
+          <p class="govuk-body govuk-!-margin-top-3">
+            <a href="{{ url_for('upload.update_csv', dataset=dataset.dataset) }}">Upload a csv file of updates for this dataset</a>
+          </p>
         {% endif %}
       {% endif %}
+
       {% else %}
         {{
           govukInsetText({
@@ -93,7 +126,9 @@
           })
         }}
         {% if session["user"] %}
-          <p class="govuk-body govuk-!-margin-top-3"><a href="{{url_for('upload.upload_csv', dataset=dataset.dataset)}}">Upload a csv file for this dataset</a></p>
+          <p class="govuk-body govuk-!-margin-top-3">
+            <a href="{{ url_for('upload.upload_csv', dataset=dataset.dataset) }}">Upload a csv file for this dataset</a>
+          </p>
         {% endif %}
       {% endif %}
     </div>

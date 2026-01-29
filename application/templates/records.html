@@ -51,7 +51,14 @@
             <tr class="app-data-table__row">
               {% for field in dataset.sorted_fields() %}
                 <td class="app-data-table__cell">
-                  {{ record.get(field.field, None) | value_or_empty_string | replace('-','&#8209;') | safe }}
+                  {% if field.field == "reference" %}
+                    <a class="govuk-link"
+                       href="{{ url_for('main.get_record', id=dataset.dataset, record_id=record.id) }}">
+                      {{ record.get(field.field, None) | value_or_empty_string }}
+                    </a>
+                  {% else %}
+                    {{ record.get(field.field, None) | value_or_empty_string | replace('-','&#8209;') | safe }}
+                  {% endif %}                
                 </td>
               {% endfor %}
 

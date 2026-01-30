@@ -14,6 +14,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    session,
     url_for,
 )
 from sqlalchemy import desc
@@ -236,6 +237,7 @@ def add_record(id):
             record_id=record.id,
             notes=notes,
             dataset_id=dataset.dataset,
+            github_login=session.get("user", {}).get("login")
         )
         db.session.add(change_log)
         db.session.commit()
@@ -389,6 +391,7 @@ def archive_record(id, record_id):
         dataset_id=record.dataset_id,
         notes=f"Archived {record.prefix}:{record.reference}",
         record_id=record.id,
+        github_login=session.get("user", {}).get("login")
     )
 
     db.session.add(record)
@@ -406,26 +409,40 @@ def archive_record(id, record_id):
 @login_required
 def unarchive_record(id, record_id):
     record_uuid = uuid.UUID(record_id)
-    record = Record.query.filter(
-        Record.dataset_id == id,
-        Record.id == record_uuid
-    ).one()
+    record = (
+        Record.query.filter(
+            Record.dataset_id == id,
+            Record.id == record_uuid,
+        ).one()
+    )
 
     if record.end_date is None:
         abort(400, "Record is not archived")
 
+    previous = record.to_dict()
+
     # Clear archive state
     record.end_date = None
-
     if record.data and "end-date" in record.data:
         del record.data["end-date"]
 
+    current = record.to_dict()
+
+    # Normalise None -> "" to match existing create_change_log behaviour
+    for k, v in list(previous.items()):
+        if v is None:
+            previous[k] = ""
+    for k, v in list(current.items()):
+        if v is None:
+            current[k] = ""
+
     change_log = ChangeLog(
-        change_type=ChangeType.EDIT,
-        data={"action": "UNARCHIVE"},
+        change_type=ChangeType.UNARCHIVE,
+        data={"from": previous, "to": current},
         dataset_id=record.dataset_id,
         notes=f"Unarchived {record.prefix}:{record.reference}",
         record_id=record.id,
+        github_login=session.get("user", {}).get("login"),
     )
 
     db.session.add(record)

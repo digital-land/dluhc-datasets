@@ -50,3 +50,6 @@ class TestConfig(Config):
     ENV = "test"
     DEBUG = True
     TESTING = True
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    WTF_CSRF_ENABLED = False

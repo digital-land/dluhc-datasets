@@ -4,7 +4,7 @@ from enum import Enum, auto
 from functools import total_ordering
 from typing import List, Optional
 
-from flask import url_for
+from flask import url_for, session
 from sqlalchemy import JSON, UUID, ForeignKey, Text, event
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.mutable import MutableDict
@@ -35,6 +35,7 @@ class ChangeType(Enum):
     ADD = "ADD"
     EDIT = "EDIT"
     ARCHIVE = "ARCHIVE"
+    UNARCHIVE = "UNARCHIVE"
 
 
 class ChangeLog(db.Model):
@@ -417,6 +418,7 @@ def create_change_log(record, data, change_type):
         data={"from": previous, "to": current},
         notes=edit_notes,
         record_id=record.id,
+        github_login=session.get("user", {}).get("login"),
     )
     return change_log
 

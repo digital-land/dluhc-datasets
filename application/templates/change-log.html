@@ -4,12 +4,20 @@
 {% if changes_by_date.items() | length > 0 %}
   {% for change_date, changes in changes_by_date.items() %}
   <table class="govuk-table">
-    <caption class="govuk-table__caption govuk-table__caption--m">{{ change_date.strftime("%d %B %Y") }}</caption>
+    <caption class="govuk-table__caption govuk-table__caption--m">
+      {{ change_date.strftime("%d %B %Y") }}
+    </caption>
     <thead class="govuk-table__head">
       <tr class="govuk-table__row">
-        <th scope="col" class="govuk-table__header govuk-!-width-one-third"><span class="govuk-visually-hidden">Event</span></th>
-        <th scope="col" class="govuk-table__header govuk-!-width-one-third">Change notes</th>
-        <th scope="col" class="govuk-table__header govuk-!-width-one-third govuk-!-text-align-right"><span class="govuk-visually-hidden">Action</span></th>
+        <th scope="col" class="govuk-table__header govuk-!-width-one-third">
+          <span class="govuk-visually-hidden">Event</span>
+        </th>
+        <th scope="col" class="govuk-table__header govuk-!-width-one-third">
+          Change notes
+        </th>
+        <th scope="col" class="govuk-table__header govuk-!-width-one-third govuk-!-text-align-right">
+          <span class="govuk-visually-hidden">Action</span>
+        </th>
       </tr>
     </thead>
     <tbody class="govuk-table__body">
@@ -22,11 +30,37 @@
               {{ govukTag({ "text": "Edited record" }) }}
             {% elif change.change_type.name == "ARCHIVE" %}
               {{ govukTag({ "text": "Archived record", "classes": "govuk-tag--red" }) }}
+            {% elif change.change_type.name == "UNARCHIVE" %}
+              {{ govukTag({ "text": "Unarchived record", "classes": "govuk-tag--blue" }) }}
             {% endif %}
           </td>
-          <td class="govuk-table__cell govuk-!-width-one-third">{% if change.notes %}{{change.notes}}{% endif %}</td>
+
+          <td class="govuk-table__cell govuk-!-width-one-third">
+            {% if change.notes %}
+              <p class="govuk-body govuk-!-margin-bottom-1">
+                {{ change.notes }}
+              </p>
+            {% endif %}
+
+            {% if change.github_login %}
+              <p class="govuk-body-s govuk-!-margin-bottom-0 govuk-secondary-text-colour">
+                By
+                <a
+                  href="https://github.com/{{ change.github_login }}"
+                  class="govuk-link"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  @{{ change.github_login }}
+                </a>
+              </p>
+            {% endif %}
+          </td>
+
           <td class="govuk-table__cell govuk-!-width-one-third govuk-!-text-align-right">
-            <a href="{{ url_for('main.get_record', id=change.dataset_id, record_id=change.record_id) }}">View record</a>
+            <a href="{{ url_for('main.get_record', id=change.dataset_id, record_id=change.record_id) }}">
+              View record
+            </a>
           </td>
         </tr>
       {% endfor %}
@@ -40,6 +74,4 @@
     })
   }}
 {% endif %}
-
-
 {% endblock content_primary %}

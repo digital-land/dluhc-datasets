@@ -1,5 +1,6 @@
 import datetime
 import io
+import uuid
 from collections import OrderedDict
 from csv import DictWriter
 
@@ -281,7 +282,8 @@ def add_record(id):
 @main.route("/dataset/<string:id>/record/<string:record_id>", methods=["GET"])
 @login_required
 def get_record(id, record_id):
-    record = Record.query.filter(Record.dataset_id == id, Record.id == record_id).one()
+    record_uuid = uuid.UUID(record_id)
+    record = Record.query.filter(Record.dataset_id == id, Record.id == record_uuid).one()
     return render_template("view-record.html", record=record)
 
 
@@ -293,8 +295,9 @@ def edit_record(id, record_id):
     dataset = Dataset.query.get_or_404(id)
     if dataset.end_date is not None:
         abort(404)
+    record_uuid = uuid.UUID(record_id)
     record = Record.query.filter(
-        Record.dataset_id == dataset.dataset, Record.id == record_id
+        Record.dataset_id == dataset.dataset, Record.id == record_uuid
     ).one()
     builder = FormBuilder(
         record.dataset.fields, include_edit_notes=True, require_reference=False
@@ -362,9 +365,10 @@ def edit_record(id, record_id):
     "/dataset/<string:id>/record/<string:record_id>/archive", methods=["GET", "POST"]
 )
 def archive_record(id, record_id):
+    record_uuid = uuid.UUID(record_id)
     record = Record.query.filter(
         Record.dataset_id == id, 
-        Record.id == record_id
+        Record.id == record_uuid
     ).one()
 
     if request.method == "GET":
@@ -401,9 +405,10 @@ def archive_record(id, record_id):
 )
 @login_required
 def unarchive_record(id, record_id):
+    record_uuid = uuid.UUID(record_id)
     record = Record.query.filter(
         Record.dataset_id == id,
-        Record.id == record_id
+        Record.id == record_uuid
     ).one()
 
     if record.end_date is None:

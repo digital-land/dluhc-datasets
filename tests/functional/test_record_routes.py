@@ -14,12 +14,6 @@ import pytest
 from application.extensions import db
 from application.models import ChangeLog, ChangeType, Dataset, Record
 
-
-@pytest.fixture
-def client(app):
-    return app.test_client()
-
-
 @pytest.fixture(autouse=True)
 def _db(app):
     """

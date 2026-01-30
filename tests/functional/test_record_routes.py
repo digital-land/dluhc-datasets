@@ -125,7 +125,7 @@ def test_unarchive_post_clears_end_date_and_json(client, app):
             .first()
         )
         assert change is not None
-        assert change.change_type == ChangeType.EDIT
+        assert change.change_type == ChangeType.UNARCHIVE
         assert "Unarchived" in (change.notes or "")
 
 

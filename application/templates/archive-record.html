@@ -24,20 +24,14 @@
 
 <p class="govuk-body govuk-!-margin-bottom-6">Archiving this record sets its end date indicating that it is no longer in use.</p>
 
-    {{ govukWarningText({
-      "html": 'This action cannot be undone',
-      "iconFallbackText": "Warning"
-    }) }}
-
     <form action="{{url_for('main.archive_record', id=record.dataset_id, record_id=record.id)}}" method="POST">
 
+      <h2 class="govuk-heading-m">End date</h2>
+      
       <div class="govuk-form-group">
         <label class="govuk-label" for="end-date">
-          End date
+          Date the record stopped being valid
         </label>
-        <div class="govuk-hint">
-          The date this record stopped being valid.
-        </div>
         <input
           class="govuk-input govuk-date-input__input"
           id="end-date"

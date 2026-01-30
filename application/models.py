@@ -5,8 +5,8 @@ from functools import total_ordering
 from typing import List, Optional
 
 from flask import url_for
-from sqlalchemy import UUID, ForeignKey, Text, event
-from sqlalchemy.dialects.postgresql import ENUM, JSONB
+from sqlalchemy import JSON, UUID, ForeignKey, Text, event
+from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -51,7 +51,7 @@ class ChangeLog(db.Model):
     created_date: Mapped[datetime.date] = mapped_column(
         db.Date, default=datetime.datetime.today
     )
-    data: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
+    data: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     record_id: Mapped[Optional[uuid.UUID]] = mapped_column(
@@ -170,7 +170,7 @@ class Record(DateModel):
     description: Mapped[str] = mapped_column(Text, nullable=True)
     notes: Mapped[str] = mapped_column(Text, nullable=True)
 
-    data: Mapped[dict] = mapped_column(MutableDict.as_mutable(JSONB), nullable=False)
+    data: Mapped[dict] = mapped_column(MutableDict.as_mutable(JSON), nullable=False)
 
     dataset_id: Mapped[str] = mapped_column(Text, ForeignKey("dataset.dataset"))
     dataset: Mapped["Dataset"] = relationship("Dataset", back_populates="records")
@@ -352,9 +352,9 @@ class UpdateRecord(db.Model):
     update_id: Mapped[uuid.uuid4] = mapped_column(
         UUID(as_uuid=True), db.ForeignKey("update.id")
     )
-    data: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    data: Mapped[dict] = mapped_column(JSON, nullable=False)
     processed: Mapped[bool] = mapped_column(db.Boolean, default=False, nullable=False)
-    changes: Mapped[dict] = mapped_column(JSONB, nullable=True)
+    changes: Mapped[dict] = mapped_column(JSON, nullable=True)
     new_record: Mapped[bool] = mapped_column(db.Boolean, default=False, nullable=False)
 
 

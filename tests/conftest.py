@@ -17,3 +17,13 @@ def app():
 @pytest.fixture
 def client(app):
     return app.test_client()
+
+from application.extensions import db
+
+@pytest.fixture(autouse=True)
+def db_session(app):
+    with app.app_context():
+        db.create_all()
+        yield
+        db.session.remove()
+        db.drop_all()

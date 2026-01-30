@@ -12,21 +12,7 @@ import uuid
 import pytest
 
 from application.extensions import db
-from application.models import ChangeLog, ChangeType, Dataset, Record
-
-@pytest.fixture(autouse=True)
-def _db(app):
-    """
-    Create tables for each test and drop afterwards.
-
-    If you already have a db fixture elsewhere, delete this and use yours.
-    """
-    with app.app_context():
-        db.create_all()
-        yield
-        db.session.remove()
-        db.drop_all()
-
+from application.models import ChangeLog, ChangeType, Dataset, Record, Field
 
 def _login(client):
     # Match how your app checks auth in login_required
@@ -154,45 +140,61 @@ def test_unarchive_active_record_returns_400(client, app):
 
 def test_edit_post_updates_data_and_creates_changelog(client, app):
     """
-    Light-touch test: prove the edit route accepts a POST and writes a changelog.
+    Route-level test: POSTing to edit updates the record and writes an EDIT ChangeLog.
 
-    This assumes your edit form includes edit_notes (required) and that
-    record.data fields are updated via create_change_log().
+    Key detail: FormBuilder only creates WTForms fields that exist in dataset.fields.
+    So we must seed the dataset with a 'region' field, otherwise the posted 'region'
+    value will be ignored and no update will occur.
     """
     _login(client)
+
     dataset_id = _seed_dataset(app)
+
+    # Seed the dataset with the field(s) that the edit form should expose
+    with app.app_context():
+        dataset = Dataset.query.get(dataset_id)
+
+        # Ensure this dataset has a 'region' field so the POSTed value is accepted
+        field = Field(field="region", datatype="curie", name="Region")
+        db.session.add(field)
+        db.session.commit()
+
+        # Link the field to the dataset (many-to-many)
+        dataset.fields.append(field)
+        db.session.add(dataset)
+        db.session.commit()
+
     record_id = _seed_record(app, dataset_id, data={"region": "local-authority:ABC"})
 
     resp = client.post(
         f"/dataset/{dataset_id}/record/{record_id}/edit",
         data={
-            # your edit route reads entity from request.form
+            # your edit route reads entity from request.form (and Record.entity is separate to Record.data)
             "entity": "123",
-            # this is required by include_edit_notes=True in FormBuilder
+            # required because include_edit_notes=True
             "edit_notes": "test edit",
-            # include at least one actual field that ends up in record.data
+            # field we expect to be written into record.data
             "region": "local-authority:XYZ",
         },
         follow_redirects=False,
     )
 
-    # Depending on validation, this might be 302 or might re-render with 200.
-    # If it re-renders, you’ll need to seed dataset.fields properly for this dataset.
-    assert resp.status_code in (200, 302, 303)
+    # edit_record redirects back to the dataset page on success
+    assert resp.status_code in (302, 303)
 
     with app.app_context():
         rec = Record.query.get(record_id)
-        # If validation passed, this should be updated.
-        # If validation failed due to missing dataset fields, it will remain unchanged.
-        # We at least assert no crash + changelog exists when redirecting.
-        if resp.status_code in (302, 303):
-            assert rec.data.get("region") == "local-authority:XYZ"
+        assert rec.data.get("region") == "local-authority:XYZ"
 
         change = (
             ChangeLog.query.filter(ChangeLog.record_id == record_id)
             .order_by(ChangeLog.created_date.desc())
             .first()
         )
-        if resp.status_code in (302, 303):
-            assert change is not None
-            assert change.change_type == ChangeType.EDIT
+        assert change is not None
+        assert change.change_type == ChangeType.EDIT
+
+        # Optional extra checks: ensure changelog captured the from/to values
+        assert change.data is not None
+        assert change.data["from"].get("region") == "local-authority:ABC"
+        assert change.data["to"].get("region") == "local-authority:XYZ"

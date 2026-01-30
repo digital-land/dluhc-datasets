@@ -62,6 +62,7 @@ class ChangeLog(db.Model):
         ),
     )
     record: Mapped["Record"] = relationship("Record", back_populates="change_log")
+    github_login: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     def __repr__(self):
         parts = [

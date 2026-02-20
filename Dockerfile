@@ -24,7 +24,6 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 COPY . .
 RUN pip install -r requirements/requirements.txt
-RUN pip install -r requirements/dev-requirements.txt
 EXPOSE 5050
 
 ENTRYPOINT ["./docker-entrypoint.sh"]

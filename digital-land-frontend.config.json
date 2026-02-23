@@ -1,4 +1,5 @@
 {
+  "digitalLandFrontendPath": "node_modules/@planning-data/digital-land-frontend/",
   "scssPath": "./src/scss",
   "jsOutputPath": "application/static/javascripts",
   "stylesheetsOutputPath": "application/static/stylesheets",

@@ -1,5 +1,5 @@
 entity,name,prefix,reference,description,documentation-url,notes,permitted-development-right-class,permitted-development-right-part,entry-date,start-date,end-date
-11500001,"Enlargement, improvement or other alteration of a dwellinghouse",permitted-development-right,1A,"The enlargement, improvement or other alteration of a dwellinghouse",https://www.legislation.gov.uk/uksi/2015/596/schedule/2/part/1/crossheading/class-a-enlargement-improvement-or-other-alteration-of-a-dwellinghouse/made,,A,1,2020-12-31,1995-01-01,
+11500001,"Enlargement, improvement or other alteration of a dwellinghouse",permitted-development-right,1A,"The enlargement, improvement or other alteration of a dwellinghouse",https://www.legislation.gov.uk/uksi/2015/596/schedule/2/part/1/crossheading/class-a-enlargement-improvement-or-other-alteration-of-a-dwellinghouse/made,,A,1,2020-12-31,,
 11500149,Enlargement of a dwellinghouse by construction of additional storeys,permitted-development-right,1AA,"The enlargement of a dwellinghouse consisting of the construction of
 (a)up to two additional storeys, where the existing dwellinghouse consists of two or more storeys; or
 (b)one additional storey, where the existing dwellinghouse consists of one storey,
@@ -485,3 +485,4 @@ for the purpose of mineral exploration, and the provision or assembly on that la
 (a)the installation, alteration or replacement of any telecommunication apparatus,
 (b)the use of land in an emergency for a period not exceeding six months to station and operate moveable telecommunication apparatus required for the replacement of unserviceable telecommunication apparatus, including the provision of moveable structures on the land for the purposes of that use, or
 (c)development ancillary to radio equipment housing.",https://www.legislation.gov.uk/uksi/1995/418/schedule/2/part/24/crossheading/class-a,,A,24,2024-03-27,1995-06-03,2015-03-15
+11500194,testing,permitted-development-right,testing,testing add record,https://www.newforestnpa.gov.uk/planning/conservation-areas/,None,AA,1,2025-09-29,2023-04-05,

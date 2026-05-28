@@ -13,8 +13,10 @@
   <div class='govuk-grid-column-two-thirds'>
     <p class="govuk-body-l">Use this page to find the code for the {{ dataset.name }} you need to include in your data.</p>
     <p class="govuk-body">There are datasets that have {{ dataset.name }} as a field. The code you put in this field must be one of the codes on this page.</p>
-    <p class="govuk-body">If the field accepts multiple codes separated by a <code>;</code> then each instance should be a code from the list below.</p>
-
+    {% if dataset.dataset == "permitted-development-right" %}
+      <p class="govuk-body">This field accepts multiple codes. Separate each code with a <code>;</code> character.</p>
+    {% endif %}
+    
     <h3 class="govuk-heading-m">Where is this field used</h3>
     <ul class="govuk-list govuk-list--bullet">
       {% for reference in dataset.references %}

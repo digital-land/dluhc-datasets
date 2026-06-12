@@ -386,6 +386,12 @@ def create_change_log(record, data, change_type):
                 record.start_date = start_date
                 record.data["start-date"] = start_date.strftime(format)
 
+    # sync start_date back to record.data to keep CSV export in sync
+    if record.start_date:
+        record.data["start-date"] = date_to_string(record.start_date)
+    elif "start-date" in record.data:
+        record.data.pop("start-date")
+
     # set existing reference as it is not in data
     record.data["reference"] = reference
 

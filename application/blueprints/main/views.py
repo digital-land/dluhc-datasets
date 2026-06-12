@@ -14,6 +14,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    session,
     url_for,
 )
 from sqlalchemy import desc
@@ -25,6 +26,8 @@ from application.utils import collect_start_date, login_required
 
 main = Blueprint("main", __name__)
 
+def _github_login():
+    return session.get("user", {}).get("login")
 
 def get_tab_list(dataset):
     return [
@@ -236,6 +239,7 @@ def add_record(id):
             record_id=record.id,
             notes=notes,
             dataset_id=dataset.dataset,
+            github_login=_github_login(),
         )
         db.session.add(change_log)
         db.session.commit()
@@ -310,7 +314,9 @@ def edit_record(id, record_id):
 
         record.entity = int(request.form.get("entity", record.entity))
 
-        change_log = create_change_log(record, form.data, ChangeType.EDIT)
+        change_log = create_change_log(
+            record, {**form.data, **request.form}, ChangeType.EDIT,github_login=_github_login()
+            )
         dataset.change_log.append(change_log)
         db.session.add(dataset)
         db.session.commit()
@@ -345,6 +351,8 @@ def edit_record(id, record_id):
                 form[field.field].data = record.entity
                 if field.field == "start-date":
                     form[field.field].data = record.start_date
+                elif field.field == "end-date":
+                    form[field.field].data = record.end_date
                 else:
                     form[field.field].data = record.data.get(field.field, None)
 
@@ -360,81 +368,6 @@ def edit_record(id, record_id):
             error_list=error_list,
         )
 
-
-@main.route(
-    "/dataset/<string:id>/record/<string:record_id>/archive", methods=["GET", "POST"]
-)
-def archive_record(id, record_id):
-    record_uuid = uuid.UUID(record_id)
-    record = Record.query.filter(
-        Record.dataset_id == id, 
-        Record.id == record_uuid
-    ).one()
-
-    if request.method == "GET":
-        return render_template("archive-record.html", record=record)
-
-    end_date_str = request.form.get("end_date")
-    if not end_date_str:
-        abort(400, "End date is required")
-
-    end_date = datetime.datetime.strptime(end_date_str, "%Y-%m-%d")
-
-    record.data["end-date"] = end_date_str
-    record.end_date = end_date
-
-    change_log = ChangeLog(
-        change_type=ChangeType.ARCHIVE,
-        data=record.data,
-        dataset_id=record.dataset_id,
-        notes=f"Archived {record.prefix}:{record.reference}",
-        record_id=record.id,
-    )
-
-    db.session.add(record)
-    db.session.add(change_log)
-    db.session.commit()
-
-    return redirect(
-        url_for("main.get_record", id=record.dataset_id, record_id=record.id)
-    )
-
-@main.route(
-    "/dataset/<string:id>/record/<string:record_id>/unarchive",
-    methods=["POST"],
-)
-@login_required
-def unarchive_record(id, record_id):
-    record_uuid = uuid.UUID(record_id)
-    record = Record.query.filter(
-        Record.dataset_id == id,
-        Record.id == record_uuid
-    ).one()
-
-    if record.end_date is None:
-        abort(400, "Record is not archived")
-
-    # Clear archive state
-    record.end_date = None
-
-    if record.data and "end-date" in record.data:
-        del record.data["end-date"]
-
-    change_log = ChangeLog(
-        change_type=ChangeType.EDIT,
-        data={"action": "UNARCHIVE"},
-        dataset_id=record.dataset_id,
-        notes=f"Unarchived {record.prefix}:{record.reference}",
-        record_id=record.id,
-    )
-
-    db.session.add(record)
-    db.session.add(change_log)
-    db.session.commit()
-
-    return redirect(
-        url_for("main.get_record", id=record.dataset_id, record_id=record.id)
-    )
 
 @main.route("/dataset/<string:id>/schema")
 def schema(id):

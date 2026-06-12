@@ -51,14 +51,14 @@ def date_to_string(date):
 def collect_start_date(data):
     parts = []
     format = ""
-    if data.get("year"):
-        parts.append(data.get("year"))
+    if data.get("start-date-year"):
+        parts.append(data.get("start-date-year"))
         format = "%Y"
-    if data.get("month"):
-        parts.append(data.get("month"))
+    if data.get("start-date-month"):
+        parts.append(data.get("start-date-month"))
         format = f"{format}-%m"
-    if data.get("day"):
-        parts.append(data.get("day"))
+    if data.get("start-date-day"):
+        parts.append(data.get("start-date-day"))
         format = f"{format}-%d"
     if parts:
         return "-".join(parts), format

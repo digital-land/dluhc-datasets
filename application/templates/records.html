@@ -64,40 +64,18 @@
 
               {% if session["user"] and not history %}
                 <td class="app-data-table__cell app-data-table__cell--ui">
-                  {% if not record.end_date %}
-                    {{
-                      buttonMenu({
-                        "items": [
-                          {
-                            "element": "a",
-                            "text": "Edit record",
-                            "classes": "govuk-button--secondary",
-                            "href": url_for("main.edit_record", id=dataset.dataset, record_id=record.id),
-                          },
-                          {
-                            "element": "a",
-                            "text": "Archive record",
-                            "classes": "govuk-button--secondary",
-                            "href": url_for("main.archive_record", id=dataset.dataset, record_id=record.id),
-                          }
-                        ]
-                      })
-                    }}
-                  {% else %}
-                    <form action="{{ url_for('main.unarchive_record', id=dataset.dataset, record_id=record.id) }}" method="POST">
-                      {{
-                        buttonMenu({
-                          "items": [
-                            {
-                              "type": "submit",
-                              "text": "Unarchive record",
-                              "classes": "govuk-button--secondary"
-                            }
-                          ]
-                        })
-                      }}
-                    </form>
-                  {% endif %}
+                  {{
+                    buttonMenu({
+                      "items": [
+                        {
+                          "element": "a",
+                          "text": "Edit record",
+                          "classes": "govuk-button--secondary",
+                          "href": url_for("main.edit_record", id=dataset.dataset, record_id=record.id),
+                        }
+                      ]
+                    })
+                  }}
                 </td>
               {% endif %}
             </tr>
@@ -142,7 +120,7 @@
   {% else %}
     {{
       govukInsetText({
-        'text': 'This dataset has been archived and is no longer available for editing.'
+        'text': 'This dataset has been ended and is no longer available for editing.'
       })
     }}
   {% endif %}

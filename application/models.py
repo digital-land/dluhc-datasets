@@ -34,7 +34,6 @@ class DateModel(db.Model):
 class ChangeType(Enum):
     ADD = "ADD"
     EDIT = "EDIT"
-    ARCHIVE = "ARCHIVE"
 
 
 class ChangeLog(db.Model):
@@ -53,6 +52,7 @@ class ChangeLog(db.Model):
     )
     data: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    github_login: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     record_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         UUID(as_uuid=True),
@@ -358,27 +358,32 @@ class UpdateRecord(db.Model):
     new_record: Mapped[bool] = mapped_column(db.Boolean, default=False, nullable=False)
 
 
-def create_change_log(record, data, change_type):
+def create_change_log(record, data, change_type, github_login=None):
     previous = record.to_dict()
     reference = previous["reference"]
 
     for key, value in data.items():
-        if key not in ["csrf_token", "edit_notes", "csv_file", "entity"]:
+        if key not in ["csrf_token", "edit_notes", "csv_file", "entity", "start-date-day", "start-date-month", "start-date-year", "end-date-day", "end-date-month", "end-date-year"]:
             k = key
             v = value
             if "-date" in k:
                 k = k.replace("-date", "_date")
-                if isinstance(v, str):
+                if isinstance(v, datetime.date):
                     v = value
-                elif isinstance(v, datetime.date):
-                    v = date_to_string(value)
+                elif isinstance(v, str) and v:
+                    try:
+                        v = datetime.datetime.strptime(v, "%Y-%m-%d").date()
+                    except ValueError:
+                        v = None
+                else:
+                    v = None 
             if hasattr(record, k):
                 setattr(record, k, v)
             else:
                 record.data[key] = v
 
-    # if this comes from a form, start date is in the form
-    if data.get("year") or data.get("month") or data.get("day"):
+    # handle start-date from prefixed form fields
+    if data.get("start-date-year") or data.get("start-date-month") or data.get("start-date-day"):
         start_date, format = collect_start_date(data)
         if start_date:
             start_date = datetime.datetime.strptime(start_date, format)
@@ -386,16 +391,39 @@ def create_change_log(record, data, change_type):
                 record.start_date = start_date
                 record.data["start-date"] = start_date.strftime(format)
 
+    # handle end-date from prefixed form fields
+    end_date_year = data.get("end-date-year")
+    end_date_month = data.get("end-date-month")
+    end_date_day = data.get("end-date-day")
+    if end_date_year or end_date_month or end_date_day:
+        parts = []
+        fmt = ""
+        if end_date_year:
+            parts.append(end_date_year)
+            fmt = "%Y"
+        if end_date_month:
+            parts.append(end_date_month)
+            fmt = f"{fmt}-%m"
+        if end_date_day:
+            parts.append(end_date_day)
+            fmt = f"{fmt}-%d"
+        if parts:
+            end_date_str = "-".join(parts)
+            end_date = datetime.datetime.strptime(end_date_str, fmt)
+            record.end_date = end_date
+            record.data["end-date"] = end_date_str
+    else:
+        record.end_date = None
+        record.data.pop("end-date", None)
+
+    # sync start_date back to record.data to keep CSV export in sync
+    if record.start_date:
+        record.data["start-date"] = date_to_string(record.start_date)
+    elif "start-date" in record.data:
+        record.data.pop("start-date")
+
     # set existing reference as it is not in data
     record.data["reference"] = reference
-
-    # check for end date in the original record and data
-    if change_type == ChangeType.ARCHIVE:
-        end_date = data.get("end-date")
-        if end_date is None:
-            record.end_date = datetime.datetime.today()
-        else:
-            record.end_date = end_date
 
     edit_notes = data.get("edit_notes", None)
     if edit_notes:
@@ -416,6 +444,7 @@ def create_change_log(record, data, change_type):
         data={"from": previous, "to": current},
         notes=edit_notes,
         record_id=record.id,
+        github_login=github_login,
     )
     return change_log
 

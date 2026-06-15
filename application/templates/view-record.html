@@ -24,40 +24,18 @@
   </div>
 
   <div class="govuk-grid-column-two-thirds">
-    {% if not record.end_date %}
-      {{
-        buttonMenu({
-          "classes": "govuk-!-margin-bottom-0",
-          "items": [
-            {
-              "text": "Edit this record",
-              "type": "submit",
-              "href": url_for('main.edit_record', id=record.dataset_id, record_id=record.id)
-            },
-            {
-              "text": "Archive this record",
-              "type": "submit",
-              "href": url_for('main.archive_record', id=record.dataset_id, record_id=record.id)
-            }
-          ]
-        })
-      }}
-    {% else %}
-      <form action="{{ url_for('main.unarchive_record', id=record.dataset_id, record_id=record.id) }}" method="POST">
-        {{
-          buttonMenu({
-            "classes": "govuk-!-margin-bottom-0",
-            "items": [
-              {
-                "type": "submit",
-                "text": "Unarchive record",
-                "classes": "govuk-button--secondary"
-              }
-            ]
-          })
-        }}
-      </form>
-    {% endif %}
+    {{
+      buttonMenu({
+        "classes": "govuk-!-margin-bottom-0",
+        "items": [
+          {
+            "text": "Edit this record",
+            "type": "submit",
+            "href": url_for('main.edit_record', id=record.dataset_id, record_id=record.id)
+          }
+        ]
+      })
+    }}
   </div>
 </div>
 {% endblock content %}

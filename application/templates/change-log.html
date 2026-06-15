@@ -9,6 +9,7 @@
       <tr class="govuk-table__row">
         <th scope="col" class="govuk-table__header govuk-!-width-one-third"><span class="govuk-visually-hidden">Event</span></th>
         <th scope="col" class="govuk-table__header govuk-!-width-one-third">Change notes</th>
+        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">Changed by</th>
         <th scope="col" class="govuk-table__header govuk-!-width-one-third govuk-!-text-align-right"><span class="govuk-visually-hidden">Action</span></th>
       </tr>
     </thead>
@@ -20,11 +21,10 @@
               {{ govukTag({ "text": "New record", "classes": "govuk-tag--green" }) }}
             {% elif change.change_type.name == "EDIT" %}
               {{ govukTag({ "text": "Edited record" }) }}
-            {% elif change.change_type.name == "ARCHIVE" %}
-              {{ govukTag({ "text": "Archived record", "classes": "govuk-tag--red" }) }}
             {% endif %}
           </td>
           <td class="govuk-table__cell govuk-!-width-one-third">{% if change.notes %}{{change.notes}}{% endif %}</td>
+          <td class="govuk-table__cell">{% if change.github_login %}{{ change.github_login }}{% endif %}</td>
           <td class="govuk-table__cell govuk-!-width-one-third govuk-!-text-align-right">
             <a href="{{ url_for('main.get_record', id=change.dataset_id, record_id=change.record_id) }}">View record</a>
           </td>

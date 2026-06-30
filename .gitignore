@@ -259,6 +259,9 @@ dist
 .pnp.*
 
 
+# generated frontend assets
+application/static/
+
 # ide files
 .code
 .idea

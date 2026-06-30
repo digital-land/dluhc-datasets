@@ -1,5 +1,5 @@
 init::
-	python -m pip install --upgrade pip
+	python -m pip install "pip<26"
 	python -m pip install pip-tools
 	python -m piptools sync requirements/dev-requirements.txt requirements/requirements.txt
 	python -m pre_commit install

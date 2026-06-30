@@ -1,0 +1,9 @@
+.git/
+.venv/
+node_modules/
+application/static/
+__pycache__/
+*.pyc
+*.pyo
+.env
+.flaskenv

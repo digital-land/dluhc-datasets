@@ -16,7 +16,7 @@
     "copy:images_local": "npx copyfiles src/images/**/*.{png,ico,svg,jpg,jpeg,webp} application/static -u 2",
     "copy:images": "run-s copy:images_*",
     "copyjs": "rsync -ar src/javascripts/ application/static/javascripts",
-    "postinstall": "npm run copyjs && npm run nps copy.javascripts && npm run nps build.stylesheets && npm run nps build.javascripts",
+    "postinstall": "npm run copyjs && npm run nps copy.javascripts && npm run nps build.stylesheets && npm run nps build.javascripts && npm run copy:images",
     "start": "run-p watch flask"
   },
   "repository": {

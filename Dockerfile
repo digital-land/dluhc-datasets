@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM python:3.10-slim
+FROM python:3.13-slim
 WORKDIR /code
 
 ENV FLASK_CONFIG=application.config.DevelopmentConfig

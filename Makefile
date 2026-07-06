@@ -15,6 +15,9 @@ upgrade::
 	python -m piptools compile --upgrade requirements/dev-requirements.in
 	python -m piptools sync requirements/requirements.txt requirements/dev-requirements.txt
 
+test:
+	pytest
+
 black:
 	black application tests
 

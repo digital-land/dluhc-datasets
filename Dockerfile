@@ -4,6 +4,8 @@ FROM node:20-slim AS frontend-builder
 WORKDIR /code
 RUN apt-get update && apt-get install -y --no-install-recommends rsync && rm -rf /var/lib/apt/lists/*
 COPY package.json .
+COPY digital-land-frontend.config.json .
+COPY rollup.config.js .
 COPY src/ src/
 RUN npm install
 

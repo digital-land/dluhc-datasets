@@ -7,10 +7,8 @@ These tests exercise Flask routes + database state.
 import datetime
 import uuid
 
-import pytest
-
 from application.extensions import db
-from application.models import ChangeLog, ChangeType, Dataset, Record, Field
+from application.models import ChangeLog, ChangeType, Dataset, Field, Record
 
 
 def _login(client):

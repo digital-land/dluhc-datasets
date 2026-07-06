@@ -1,5 +1,15 @@
 # syntax=docker/dockerfile:1
-FROM python:3.10-slim
+
+FROM node:20-slim AS frontend-builder
+WORKDIR /code
+RUN apt-get update && apt-get install -y --no-install-recommends rsync && rm -rf /var/lib/apt/lists/*
+COPY package.json .
+COPY digital-land-frontend.config.json .
+COPY rollup.config.js .
+COPY src/ src/
+RUN npm install
+
+FROM python:3.13-slim
 WORKDIR /code
 
 ENV FLASK_CONFIG=application.config.DevelopmentConfig
@@ -13,7 +23,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc g++ git libproj-dev proj-bin gdal-bin wget gnupg2  \
     && rm -rf /var/lib/apt/lists/*
 
-
 RUN wget -qO- https://www.postgresql.org/media/keys/ACCC4CF8.asc \
     | gpg --dearmor > /usr/share/keyrings/pgdg.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" \
@@ -22,6 +31,8 @@ RUN wget -qO- https://www.postgresql.org/media/keys/ACCC4CF8.asc \
 RUN apt-get update && \
     apt-get install -y postgresql-client-16 && \
     rm -rf /var/lib/apt/lists/*
+
+COPY --from=frontend-builder /code/application/static/ application/static/
 COPY . .
 RUN pip install -r requirements/requirements.txt
 EXPOSE 5050

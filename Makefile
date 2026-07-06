@@ -1,9 +1,6 @@
 init::
-	python -m pip install --upgrade pip
+	python -m pip install "pip<26"  # pip-tools 7.5.3 is incompatible with pip>=26, see https://github.com/jazzband/pip-tools/issues/2319
 	python -m pip install pip-tools
-	python -m piptools compile requirements/requirements.in
-	python -m piptools compile requirements/dev-requirements.in
-
 	python -m piptools sync requirements/dev-requirements.txt requirements/requirements.txt
 	python -m pre_commit install
 	npm install
@@ -17,6 +14,9 @@ upgrade::
 	python -m piptools compile --upgrade requirements/requirements.in
 	python -m piptools compile --upgrade requirements/dev-requirements.in
 	python -m piptools sync requirements/requirements.txt requirements/dev-requirements.txt
+
+test:
+	pytest
 
 black:
 	black application tests

@@ -1,4 +1,5 @@
-name: Deploy
+name: Publish
+run-name: Publish - ${{ github.head_ref || github.ref_name }} to ${{ inputs.environment }} by @${{ github.actor }}
 
 on:
   push:
@@ -67,7 +68,7 @@ jobs:
       - uses: aws-actions/amazon-ecr-login@v2
 
       - run: docker pull $DOCKER_REPO:main || echo "no current latest image"
-      
+
       - run: docker build --build-arg DEPLOY_TIME="$(date +%Y-%m-%dT%H:%M:%S)" -t $DOCKER_REPO:${{ steps.vars.outputs.sha_short }} .
 
       - run: docker tag $DOCKER_REPO:${{ steps.vars.outputs.sha_short }} $DOCKER_REPO:main

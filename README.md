@@ -23,17 +23,19 @@ The following command will load the production data into your local database, so
 
 
 
-## Deployment
+## CI & CD
 
-The application is currently deployed to Heroku and is called `dluhc-datasets`.
+The application is deployed to AWS and using our [standard CI/CD best practices](https://digital-land.github.io/technical-documentation/architecture-and-infrastructure/ci-cd-strategy/), and deployments should follow the [standard deployment procedure](https://digital-land.github.io/technical-documentation/development/deploy-and-release-procedure/).
 
-See the dluhc-datasets/settings -> config vars for all configuration.
+Key github actions for this:
 
-Automatic deployment is set up from the Heroku dashboard for the application. See `/apps/dluhc-datasets/deploy/github` when
-logged into Heroku dashboard
-
+* Test - runs automated linting and testing on code on pushes to non main branches as well as being called by the publish action on pushes to main
+* Publish (currently migrating from Deploy) - builds and publishes docker image to environments in the repo. Can be used to manually deploy to development for testing.
 
 ### Environment variables
+
+> [!WARNING]
+> These variables are from deploying to Heroku and need to be updated for deployments to AWS
 
 ```
 DATABASE_URL:                [from deployment environment]
@@ -51,19 +53,9 @@ SECRET_KEY:                   [generate for deployment env]
 SPECIFICATION_REPO_URL:       https://github.com/digital-land/specification
 ```
 
-### DNS
-
-DNS for this application is managed between Digital Land route 53 and Heroku
-
-Configuration is managed on Heroku side on the `/apps/dluhc-datasets/settings` page of the dashboard
-
-Route 53 setup is manged [here](https://github.com/digital-land/digital-land-infrastructure/blob/main/systems/data-design/environments/development.tfvars)
-
 ## Monitoring
 
-There is monitoring of the application via Sentry - accessible through the Heroku dashboard page for this application on the
-resources tab.
-
+There is monitoring of the application via Sentry and AWS metrics. We could consider adding this to our Uptime monitor too.
 
 ## Authentication
 
@@ -99,6 +91,9 @@ Therefore for ancient woodland status, the endpoint for collection configuration
 
 ## Automated tasks
 
+> [!WARNING]
+> These variables are from deploying to Heroku and need to be updated for deployments to AWS. They may be ran in Github actions now like the database action below
+
 The following tasks are automatically run daily via the Heroku scheduler to maintain and update the application's data:
 
 1. `flask data new-datasets && flask data dataset-fields`
@@ -124,16 +119,6 @@ The following tasks are automatically run daily via the Heroku scheduler to main
 
 
 The tasks run in the early hours of the morning and are configured via the Heroku dashboard. For details login into the Heroku dashboard, navigate to the application, resources tab and click on Heroku scheduler.
-
-## GitHub Actions
-
-The repository uses GitHub Actions for continuous integration and automated backups:
-
-### CI Workflow
-- Runs on every push and pull request to the main branch
-- Installs Python dependencies
-- Runs flake8 for linting
-- Runs pytest for testing
 
 ### Database Backup
 - Runs daily at 1am UTC

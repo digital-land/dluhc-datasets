@@ -7,21 +7,94 @@ A tool to manage DLUHC's datasets. For example, the listed-building-grade datase
 
 ## Quick start
 
-Make python virtualenv then:
+There are two ways to run the project locally. Docker Compose is recommended
+because it supplies the application runtime, PostgreSQL database, frontend asset
+builder and watcher, database migrations, and initial data loading.
 
+### Docker Compose (recommended)
+
+Docker Desktop (or another installation with Docker Compose) is the only local
+dependency. Start the complete development environment with:
+
+    docker compose up --build
+
+The application is available at <http://localhost:5050>. Python and frontend
+source files are mounted into their containers, so development changes are picked
+up without rebuilding the images.
+
+Stop the services with:
+
+    docker compose down
+
+The PostgreSQL and Node modules volumes are retained. Use
+`docker compose down --volumes` only when you also want to remove the local
+database and installed Node modules.
+
+### Python
+
+This option runs Python and Node.js directly on the host. It requires Python 3.13,
+Node.js 20, PostgreSQL, PostgreSQL client tools, and the native GDAL and PROJ
+libraries.
+
+Create and activate a Python virtual environment, install the dependencies, and
+create the database:
+
+    python -m venv .venv
+    source .venv/bin/activate
     make init
-
-Create a postgres db:
-
     createdb dluhc-datasets
 
-### Loading production data
+Create a `.env` file containing at least:
 
-The following command will load the production data into your local database, so there's not need to start with a flask db upgrade.
+    DATABASE_URL=postgresql:///dluhc-datasets
+    SECRET_KEY=local-development-only
 
-    flask data load-db-backup
+Apply the migrations and start Flask:
 
+    flask db upgrade
+    make run
 
+The application is available at <http://localhost:5050>. In a second terminal,
+activate the same virtual environment and start the frontend asset watcher:
+
+    source .venv/bin/activate
+    make watch
+
+## Loading data into your local database
+
+The repository includes a production-derived PostgreSQL dump at
+`data/latest_backup.dump`. The dump was created on **31 March 2025**
+from PostgreSQL 15.8, so it is a historical snapshot and may not reflect current
+production data.
+
+### Docker Compose
+
+Compose loads the bundled dump automatically. The one-shot `load-data` service
+runs [`scripts/docker-load-data.sh`](scripts/docker-load-data.sh) after PostgreSQL
+becomes healthy and before the application starts. It skips the restore when the
+database already contains dataset data.
+
+To run the loader manually:
+
+    docker compose run --rm load-data
+
+To discard the existing Compose database and restore the dump from scratch:
+
+    docker compose down --volumes
+    docker compose up --build
+
+### Python and local PostgreSQL
+
+Restore the bundled dump into the local PostgreSQL database, then apply any newer
+migrations:
+
+    pg_restore --clean --if-exists --no-acl --no-owner \
+      --dbname dluhc-datasets data/latest_backup.dump
+    DATABASE_URL=postgresql:///dluhc-datasets flask db upgrade
+
+This requires PostgreSQL client tools compatible with the PostgreSQL 15.8 dump.
+Set `DATABASE_URL` differently if the local connection requires a username,
+password, or host.
 
 ## CI & CD
 
@@ -119,9 +192,3 @@ The following tasks are automatically run daily via the Heroku scheduler to main
 
 
 The tasks run in the early hours of the morning and are configured via the Heroku dashboard. For details login into the Heroku dashboard, navigate to the application, resources tab and click on Heroku scheduler.
-
-### Database Backup
-- Runs daily at 1am UTC
-- Downloads the latest database backup from Heroku
-- Commits the backup to the repository in the data directory
-- Requires Heroku authentication via `HEROKU_OAUTH_TOKEN` secret

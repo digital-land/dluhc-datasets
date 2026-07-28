@@ -1,6 +1,7 @@
 import datetime
 import os
 import tempfile
+import uuid
 from collections import OrderedDict
 from csv import DictReader
 
@@ -30,6 +31,23 @@ from application.models import (
 from application.utils import parse_date
 
 upload = Blueprint("upload", __name__)
+
+
+def _get_pending_update(dataset, update_id):
+    try:
+        parsed_update_id = uuid.UUID(update_id)
+    except (AttributeError, TypeError, ValueError):
+        abort(404, "Invalid update ID")
+
+    pending_update = Update.query.filter(
+        Update.id == parsed_update_id,
+        Update.dataset_id == dataset,
+        Update.status == UpdateStatus.PENDING,
+    ).one_or_none()
+    if pending_update is None:
+        abort(404, f"No update found for this {dataset}")
+
+    return pending_update
 
 
 def _order_records(records):
@@ -186,16 +204,7 @@ def update_csv(dataset):
     "/dataset/<string:dataset>/process-updates/<string:update>", methods=["GET"]
 )
 def process_updates(dataset, update):
-    update = Update.query.filter(
-        Update.id == update,
-        Update.dataset_id == dataset,
-        Update.status == UpdateStatus.PENDING,
-    ).one_or_none()
-    if update is None:
-        return abort(404, f"No update found for this {dataset}")
-
-    if update is None:
-        return abort(404, f"No update found for this {dataset}")
+    update = _get_pending_update(dataset, update)
 
     for record in update.records:
         entity = record.data.get("entity")
@@ -238,13 +247,7 @@ def process_updates(dataset, update):
     "/dataset/<string:dataset>/process-updates/<string:update>", methods=["POST"]
 )
 def apply_updates(dataset, update):
-    update = Update.query.filter(
-        Update.id == update,
-        Update.dataset_id == dataset,
-        Update.status == UpdateStatus.PENDING,
-    ).one_or_none()
-    if update is None:
-        return abort(404, f"No update found for this {dataset}")
+    update = _get_pending_update(dataset, update)
 
     dataset = update.dataset
     update_record_ids = set(request.form.getlist("record_id"))
@@ -292,13 +295,7 @@ def apply_updates(dataset, update):
     "/dataset/<string:dataset>/process-updates/<string:update>/cancel", methods=["GET"]
 )
 def cancel_updates(dataset, update):
-    update = Update.query.filter(
-        Update.id == update,
-        Update.dataset_id == dataset,
-        Update.status == UpdateStatus.PENDING,
-    ).one_or_none()
-    if update is None:
-        return abort(404, f"No update found for this {dataset}")
+    update = _get_pending_update(dataset, update)
 
     update.status = UpdateStatus.CANCELLED
     for record in update.records:

@@ -1,0 +1,73 @@
+services:
+  app:
+    build:
+      context: .
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@database:5432/dluhc_datasets
+      DATASETS_REPO_NAME: ${DATASETS_REPO_NAME:-digital-land/dluhc-datasets}
+      DATASETS_REPO_REGISTERS_PATH: ${DATASETS_REPO_REGISTERS_PATH:-data/registers}
+      FLASK_APP: application.wsgi:app
+      FLASK_CONFIG: application.config.DevelopmentConfig
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+      PLANNING_DATA_DESIGN_URL: ${PLANNING_DATA_DESIGN_URL:-https://design.planning.data.gov.uk}
+      PLATFORM_URL: ${PLATFORM_URL:-https://www.planning.data.gov.uk}
+      SAFE_URLS: ${SAFE_URLS:-localhost:5050}
+      SECRET_KEY: ${SECRET_KEY:-local-development-only}
+      SPECIFICATION_REPO_URL: ${SPECIFICATION_REPO_URL:-https://github.com/digital-land/specification}
+    ports:
+      - "5050:5050"
+    volumes:
+      - .:/code
+    depends_on:
+      database:
+        condition: service_healthy
+      assets:
+        condition: service_started
+      load-data:
+        condition: service_completed_successfully
+
+  load-data:
+    build:
+      context: .
+    entrypoint: ["sh", "/code/docker-load-data.sh"]
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@database:5432/dluhc_datasets
+      FLASK_APP: application.wsgi:app
+      FLASK_CONFIG: application.config.DevelopmentConfig
+      SECRET_KEY: ${SECRET_KEY:-local-development-only}
+    volumes:
+      - .:/code
+    depends_on:
+      database:
+        condition: service_healthy
+
+  assets:
+    build:
+      context: .
+      target: frontend-builder
+    command: sh -c "npm run postinstall && npm run watch"
+    init: true
+    volumes:
+      - .:/code
+      - node_modules:/code/node_modules
+
+  database:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: dluhc_datasets
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d dluhc_datasets"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  node_modules:
+  postgres_data:

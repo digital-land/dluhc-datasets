@@ -70,9 +70,9 @@ production data.
 ### Docker Compose
 
 Compose loads the bundled dump automatically. The one-shot `load-data` service
-runs [`docker-load-data.sh`](docker-load-data.sh) after PostgreSQL becomes healthy
-and before the application starts. It skips the restore when the database already
-contains dataset data.
+runs [`scripts/docker-load-data.sh`](scripts/docker-load-data.sh) after PostgreSQL
+becomes healthy and before the application starts. It skips the restore when the
+database already contains dataset data.
 
 To run the loader manually:
 

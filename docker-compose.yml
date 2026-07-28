@@ -30,7 +30,7 @@ services:
   load-data:
     build:
       context: .
-    entrypoint: ["sh", "/code/docker-load-data.sh"]
+    entrypoint: ["sh", "/code/scripts/docker-load-data.sh"]
     environment:
       DATABASE_URL: postgresql://postgres:postgres@database:5432/dluhc_datasets
       FLASK_APP: application.wsgi:app

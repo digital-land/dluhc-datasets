@@ -9,10 +9,12 @@ import click
 import frontmatter
 import github
 import requests
+from flask import current_app
 from flask.cli import AppGroup
 
 from application.extensions import db
 from application.models import Dataset, Field, Record, Reference
+from application.specification import Specification
 
 data_cli = AppGroup("data")
 
@@ -21,70 +23,36 @@ specfication_markdown_url = (
     "{base_git_content_url}/specification/main/content/dataset/{dataset}.md"
 )
 
-datasette_url = "https://datasette.planning.data.gov.uk/digital-land"
-field_query = "{datasette_url}/field.json?field__exact={field}&_shape=object"
-fields_query = f"{datasette_url}/field.json?_shape=array"
-dataset_query_part = "dataset__not=category&realm__exact=dataset&typology__exact=category&_shape=array"  # noqa
-dataset_query = f"{datasette_url}/dataset.json?{dataset_query_part}"
-dataset_field_query = (
-    "{datasette_url}/dataset_field.json?dataset__exact={dataset}&_shape=array"
-)
-dataset_replacement_query = (
-    f"{datasette_url}/dataset.json?_shape=object&replacement_dataset__notblank=1"
-)
-dataset_editor_base_url = "https://dataset-editor.development.planning.data.gov.uk"
 
-
-dataset_field_field_query = (
-    "{datasette_url}/dataset_field.json?field__exact={dataset}&_shape=array"  # noqa
-)
-dataset_field_field_dataset_query = "{datasette_url}/dataset_field.json?field_dataset__exact={dataset}&_shape=array"  # noqa
-
-specification_dataset_query = "{datasette_url}/specification_dataset.json?dataset__exact={dataset}&_shape=array"  # noqa
-
-
-platform_dataset_query = (
-    "https://www.planning.data.gov.uk/entity{format}?dataset={dataset}"
-)
+def _specification():
+    return Specification(current_app.config.get("SPECIFICATION_URL"))
 
 
 @data_cli.command("dataset-fields")
 def dataset_fields():
     print("loading dataset fields")
+    specification = _specification()
     for dataset in Dataset.query.all():
-        schema_url = specfication_markdown_url.format(
-            base_git_content_url=base_git_content_url, dataset=dataset.dataset
-        )
-        markdown = requests.get(schema_url)
-        if markdown.status_code == 200:
-            front = frontmatter.loads(markdown.text)
-            fields = [field["field"] for field in front["fields"]]
-            updated_fields = [field for field in fields if field != dataset.name]
+        fields = specification.dataset_fields(dataset.dataset)
+        if not fields:
+            print(f"no fields found in the specification for {dataset.dataset}")
+            continue
 
-            for field in updated_fields:
-                f = Field.query.get(field)
-                if f is None:
-                    human_readable = field.replace("-", " ").capitalize()
-                    f = Field(field=field, name=human_readable)
-                    query = field_query.format(datasette_url=datasette_url, field=field)
-                    resp = requests.get(query)
-                    data = resp.json()
-                    f.datatype = data[field]["datatype"]
-                    if data[field].get("description"):
-                        f.description = data[field]["description"]
-                    db.session.add(f)
-                    db.session.commit()
-                    print(f"new field {f.field} added to {dataset.dataset}")
+        for field in fields:
+            f = _get_or_create_field(field, specification)
+            if f is None:
+                print(
+                    f"field {field} of {dataset.dataset} is not in the specification, skipping"
+                )
+                continue
 
-                if f not in dataset.fields:
-                    dataset.fields.append(f)
-                    db.session.add(dataset)
-                    db.session.commit()
-                    print(f"field {f.field} added to {dataset.dataset}")
-                else:
-                    print(f"field {f.field} already in schema for {dataset.dataset}")
-        else:
-            print(f"no markdown file found at {schema_url}")
+            if f not in dataset.fields:
+                dataset.fields.append(f)
+                db.session.add(dataset)
+                db.session.commit()
+                print(f"field {f.field} added to {dataset.dataset}")
+            else:
+                print(f"field {f.field} already in schema for {dataset.dataset}")
 
     print("db loaded")
 
@@ -93,24 +61,23 @@ def dataset_fields():
 def get_new_datasets():
     database_datasets = set([dataset.dataset for dataset in Dataset.query.all()])
 
-    resp = requests.get(dataset_replacement_query)
-    replacement_datasets = resp.json()
+    specification = _specification()
+    replacement_datasets = specification.replacement_datasets()
 
-    resp = requests.get(dataset_query)
-    data = resp.json()
+    data = specification.category_datasets()
     new_datasets = [
         dataset
         for dataset in data
-        if dataset["dataset"] not in database_datasets and dataset["end_date"] != ""
+        if dataset["dataset"] not in database_datasets and dataset["end-date"] == ""
     ]
-    ended_datasets = [dataset for dataset in data if dataset["end_date"] != ""]
+    ended_datasets = [dataset for dataset in data if dataset["end-date"] != ""]
 
     # process new datasets first as they may be replacements for existing
     # datasets and therefore need to be available in the database for the
     # processing of replacements
     if new_datasets:
         print("New datasets found")
-        _process_new_datasets(new_datasets)
+        _process_new_datasets(new_datasets, specification)
     else:
         print("No new datasets found")
 
@@ -129,7 +96,7 @@ def _process_ended_datasets(ended_datasets):
             Dataset.dataset == dataset["dataset"], Dataset.end_date.is_(None)
         ).one_or_none()
         if d is not None:
-            end_date_str = dataset["end_date"]
+            end_date_str = dataset["end-date"]
             end_date = datetime.datetime.strptime(end_date_str, "%Y-%m-%d").date()
             d.end_date = end_date
             db.session.add(d)
@@ -138,8 +105,9 @@ def _process_ended_datasets(ended_datasets):
 
 
 def _process_replacement_datasets(replacement_datasets):
-    for dataset, fields in replacement_datasets.items():
-        replacement_dataset = fields["replacement_dataset"]
+    for row in replacement_datasets:
+        dataset = row["dataset"]
+        replacement_dataset = row["replacement-dataset"]
 
         d = Dataset.query.filter(Dataset.dataset == replacement_dataset).one_or_none()
         if d is not None:
@@ -155,7 +123,7 @@ def _process_replacement_datasets(replacement_datasets):
             Dataset.dataset == dataset, Dataset.end_date.is_not(None)
         ).one_or_none()
         new_dataset = Dataset.query.filter(
-            Dataset.dataset == fields["replacement_dataset"]
+            Dataset.dataset == replacement_dataset
         ).one_or_none()
 
         if old_dataset is not None and new_dataset is not None:
@@ -178,7 +146,7 @@ def _process_replacement_datasets(replacement_datasets):
             db.session.add(new_dataset)
             db.session.commit()
 
-            print(f"dataset {dataset} replaced by {fields['replacement_dataset']}")
+            print(f"dataset {dataset} replaced by {replacement_dataset}")
 
         else:
             if old_dataset is None:
@@ -188,43 +156,61 @@ def _process_replacement_datasets(replacement_datasets):
 
             if new_dataset is None:
                 print(
-                    f"Could migrate data to the replacement dataset {fields['replacement_dataset']} as it was not found"
+                    f"Could migrate data to the replacement dataset {replacement_dataset} as it was not found"
                 )
 
 
-def _process_new_datasets(new_datasets):
-    for dataset in new_datasets:
-        schema_url = specfication_markdown_url.format(
-            base_git_content_url=base_git_content_url, dataset=dataset["dataset"]
-        )
-        dataset = Dataset(dataset=dataset["dataset"], name=dataset["name"])
-        markdown = requests.get(schema_url)
-        if markdown.status_code == 200:
-            front = frontmatter.loads(markdown.text)
-            dataset.entity_minimum = int(front.get("entity-minimum"))
-            dataset.entity_maximum = int(front.get("entity-maximum"))
-            dataset.consideration = front.get("consideration")
-            dataset.custodian = front.get("Data design team")
+def _process_new_datasets(new_datasets, specification):
+    for row in new_datasets:
+        dataset = Dataset(dataset=row["dataset"], name=row["name"])
+        dataset.entity_minimum = _as_int(row["entity-minimum"])
+        dataset.entity_maximum = _as_int(row["entity-maximum"])
+        dataset.consideration = row["consideration"]
         db.session.add(dataset)
         db.session.commit()
         print(f"dataset {dataset.dataset} with name {dataset.name} added")
         print(f"get fields for {dataset.dataset}")
-        for field in front.get("fields"):
-            f = Field.query.get(field["field"])
+        for field in specification.dataset_fields(dataset.dataset):
+            f = _get_or_create_field(field, specification)
             if f is None:
-                human_readable = field["field"].replace("-", " ").capitalize()
-                f = Field(field=field["field"], name=human_readable)
-                f.datatype = field["datatype"]
-                if field.get("description"):
-                    f.description = field["description"]
-                db.session.add(f)
-                db.session.commit()
+                print(
+                    f"field {field} of {dataset.dataset} is not in the specification, skipping"
+                )
+                continue
             print(f"field {f.field} added to dataset {dataset.dataset}")
             dataset.fields.append(f)
             db.session.add(dataset)
             db.session.commit()
 
-        print("New datasets added to database")
+    print("New datasets added to database")
+
+
+def _as_int(value):
+    return int(value) if value else None
+
+
+def _get_or_create_field(field, specification):
+    """The Field row for a specification field, created from the specification if new.
+
+    Returns None when the specification has no such field, so that one unknown
+    field cannot stop the rest of a dataset's schema being loaded.
+    """
+    f = Field.query.get(field)
+    if f is not None:
+        return f
+
+    specified = specification.field(field)
+    if specified is None:
+        return None
+
+    f = Field(field=field, name=field.replace("-", " ").capitalize())
+    f.datatype = specified["datatype"]
+    if specified["description"]:
+        f.description = specified["description"]
+    db.session.add(f)
+    db.session.commit()
+    print(f"new field {f.field} added")
+    return f
 
 
 @data_cli.command("backup-registers")
@@ -403,81 +389,38 @@ def set_dataset_references():
     print("Setting references for datasets")
 
     refs = {}
+    specification = _specification()
 
     for dataset in Dataset.query.order_by(Dataset.dataset).all():
-        try:
-            resp = requests.get(
-                dataset_field_field_dataset_query.format(
-                    datasette_url=datasette_url, dataset=dataset.dataset
-                )
-            )
-            resp.raise_for_status()
-            data = resp.json()
-
-            for d in data:
-                referenced_by = d.get("dataset")
-                if not referenced_by:
-                    print(f"No references found for {dataset.dataset}")
-                    continue
-
-                if dataset.dataset in refs:
-                    refs[dataset.dataset].append(
-                        {"referenced_by": referenced_by, "specification": None}
-                    )
-                else:
-                    refs[dataset.dataset] = [
-                        {"referenced_by": referenced_by, "specification": None}
-                    ]
-
-            resp = requests.get(
-                dataset_field_field_query.format(
-                    datasette_url=datasette_url, dataset=dataset.dataset
-                )
-            )
-            resp.raise_for_status()
-            data = resp.json()
-
-            for d in data:
-                referenced_by = d.get("dataset")
-                if not referenced_by:
-                    print(f"No references found for {dataset.dataset}")
-                    continue
-
-                if dataset.dataset in refs:
-                    refs[dataset.dataset].append(
-                        {"referenced_by": referenced_by, "specification": None}
-                    )
-                else:
-                    refs[dataset.dataset] = [
-                        {"referenced_by": referenced_by, "specification": None}
-                    ]
-
-        except requests.exceptions.HTTPError as e:
-            print(f"Error setting references for {dataset.dataset}: {e}")
+        referencing = specification.datasets_referencing(dataset.dataset)
+        if not referencing:
+            print(f"No references found for {dataset.dataset}")
             continue
+
+        refs[dataset.dataset] = [
+            {"referenced_by": referenced_by, "specification": None}
+            for referenced_by in referencing
+        ]
 
     for d, r in refs.items():
         print(f"References for {d}")
         for ref in r:
-            resp = requests.get(
-                specification_dataset_query.format(
-                    datasette_url=datasette_url, dataset=ref["referenced_by"]
-                )
+            specification_name = specification.specification_for_dataset(
+                ref["referenced_by"]
             )
-            resp.raise_for_status()
-            specification_data = resp.json()
-            if not specification_data:
+            if specification_name is None:
                 print(f"No specification found for {ref['referenced_by']}")
             else:
-                specification = specification_data[0].get("specification")
-                ref["specification"] = specification
-                print(f"Specification {specification} found for {ref['referenced_by']}")
+                ref["specification"] = specification_name
+                print(
+                    f"Specification {specification_name} found for {ref['referenced_by']}"
+                )
 
     for d, r in refs.items():
         for ref in r:
             referenced_by = ref["referenced_by"]
-            specification = ref["specification"]
-            if specification is None:
+            specification_name = ref["specification"]
+            if specification_name is None:
                 reference = Reference.query.filter(
                     Reference.dataset_id == d, Reference.referenced_by == referenced_by
                 ).one_or_none()
@@ -485,19 +428,19 @@ def set_dataset_references():
                 reference = Reference.query.filter(
                     Reference.dataset_id == d,
                     Reference.referenced_by == referenced_by,
-                    Reference.specification == specification,
+                    Reference.specification == specification_name,
                 ).one_or_none()
 
             if reference is None:
                 reference = Reference(
                     dataset_id=d,
                     referenced_by=referenced_by,
-                    specification=specification,
+                    specification=specification_name,
                 )
                 db.session.add(reference)
                 db.session.commit()
                 print(
-                    f"Reference {referenced_by} with specification {specification} added to {d}"
+                    f"Reference {referenced_by} with specification {specification_name} added to {d}"
                 )
 
     print("Done")

@@ -1,4 +1,5 @@
 import pytest
+from werkzeug.datastructures import MultiDict
 from wtforms import StringField, URLField
 from wtforms.form import Form
 
@@ -89,6 +90,34 @@ def test_form_can_set_reference_not_required(app):
         form.validate()
 
         assert form.errors.get("reference") is None
+
+
+def test_form_url_field_is_not_required(app):
+    with app.test_request_context():
+        fields = [
+            Field(field="documentation-url", datatype="url", name="Documentation url"),
+        ]
+        builder = FormBuilder(fields)
+        form = builder.build()
+
+        form["documentation-url"].data = None
+        form.validate()
+
+        assert form.errors.get("documentation-url") is None
+
+
+def test_form_url_field_still_rejects_an_invalid_url(app):
+    with app.test_request_context():
+        fields = [
+            Field(field="documentation-url", datatype="url", name="Documentation url"),
+        ]
+        builder = FormBuilder(fields)
+        form = builder.build()
+
+        form.process(MultiDict({"documentation-url": "not a url"}))
+        form.validate()
+
+        assert form.errors.get("documentation-url")
 
 
 def test_entity_field_is_added(app):

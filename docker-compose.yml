@@ -15,6 +15,7 @@ services:
       SAFE_URLS: ${SAFE_URLS:-localhost:5050}
       SECRET_KEY: ${SECRET_KEY:-local-development-only}
       SPECIFICATION_REPO_URL: ${SPECIFICATION_REPO_URL:-https://github.com/digital-land/specification}
+      SPECIFICATION_URL: ${SPECIFICATION_URL:-https://files.planning.data.gov.uk/specification}
     ports:
       - "5050:5050"
     volumes:

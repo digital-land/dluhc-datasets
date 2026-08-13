@@ -22,6 +22,10 @@ class Config:
     DATASETS_REPO_NAME = os.getenv("DATASETS_REPO_NAME")
     DATASETS_REPO_REGISTERS_PATH = os.getenv("DATASETS_REPO_REGISTERS_PATH")
     SPECIFICATION_REPO_URL = os.getenv("SPECIFICATION_REPO_URL")
+    # where the built specification csv files are published
+    SPECIFICATION_URL = os.getenv(
+        "SPECIFICATION_URL", "https://files.planning.data.gov.uk/specification"
+    )
     PLATFORM_URL = os.getenv("PLATFORM_URL")
     PLANNING_DATA_DESIGN_URL = os.getenv("PLANNING_DATA_DESIGN_URL")
     WIKIDATA_PREFIX_DATASETS = set(

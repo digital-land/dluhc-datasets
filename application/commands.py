@@ -81,13 +81,16 @@ def get_new_datasets():
     else:
         print("No new datasets found")
 
+    # end datasets before processing replacements. a replacement only matches
+    # an old dataset once that dataset has an end date, so on the run where the
+    # specification first marks it ended it has to be ended here first
+    if ended_datasets:
+        _process_ended_datasets(ended_datasets)
+
     if replacement_datasets:
         _process_replacement_datasets(replacement_datasets)
     else:
         print("No replacement datasets found")
-
-    if ended_datasets:
-        _process_ended_datasets(ended_datasets)
 
 
 def _process_ended_datasets(ended_datasets):
@@ -111,7 +114,7 @@ def _process_replacement_datasets(replacement_datasets):
 
         d = Dataset.query.filter(Dataset.dataset == replacement_dataset).one_or_none()
         if d is not None:
-            if d.records is not None or d.change_log is not None:
+            if d.records or d.change_log:
                 print(
                     f"Replacement dataset {replacement_dataset} has already been processed and contains data. Skipping."
                 )

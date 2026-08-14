@@ -15,6 +15,10 @@ import requests
 DEFAULT_SPECIFICATION_URL = "https://files.planning.data.gov.uk/specification"
 CSV_URL = "{base_url}/{name}.csv"
 
+# these fetches run ahead of the app starting in docker-entrypoint.sh, so a
+# stalled connection would otherwise hold up startup indefinitely
+TIMEOUT = (5, 30)
+
 
 class Specification:
     """A lazily fetched view over the published specification CSVs.
@@ -32,9 +36,12 @@ class Specification:
     def _rows(self, name):
         if name not in self.rows:
             url = CSV_URL.format(base_url=self.base_url, name=name)
-            response = requests.get(url)
+            response = requests.get(url, timeout=TIMEOUT)
             response.raise_for_status()
-            self.rows[name] = list(csv.DictReader(io.StringIO(response.text)))
+            # the CSVs are UTF-8, but requests falls back to ISO-8859-1 for
+            # text/* without a charset, which would give us mojibake
+            content = response.content.decode("utf-8")
+            self.rows[name] = list(csv.DictReader(io.StringIO(content)))
         return self.rows[name]
 
     def field(self, field):

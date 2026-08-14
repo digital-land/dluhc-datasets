@@ -37,7 +37,7 @@ CSVS = {
 
 class FakeResponse:
     def __init__(self, text):
-        self.text = text
+        self.content = text.encode("utf-8")
 
     def raise_for_status(self):
         pass
@@ -50,7 +50,7 @@ def requested():
 
 @pytest.fixture
 def specification(monkeypatch, requested):
-    def fake_get(url):
+    def fake_get(url, **kwargs):
         requested.append(url)
         name = url.rsplit("/", 1)[-1].removesuffix(".csv")
         return FakeResponse(CSVS[name])
@@ -66,7 +66,7 @@ def test_csvs_are_read_from_the_published_specification_files(specification, req
 
 
 def test_base_url_can_be_overridden(monkeypatch, requested):
-    def fake_get(url):
+    def fake_get(url, **kwargs):
         requested.append(url)
         return FakeResponse(FIELD_CSV)
 
@@ -127,6 +127,40 @@ def test_specification_for_dataset(specification):
         "design-code"
     )
     assert specification.specification_for_dataset("not-a-dataset") is None
+
+
+def test_csvs_are_fetched_with_a_timeout(monkeypatch):
+    """These run ahead of the app starting, so a stalled connection must not hang."""
+    calls = []
+
+    def fake_get(url, **kwargs):
+        calls.append(kwargs)
+        return FakeResponse(FIELD_CSV)
+
+    monkeypatch.setattr("application.specification.requests.get", fake_get)
+    Specification().field("name")
+
+    assert calls[0]["timeout"] is not None
+
+
+def test_csvs_are_decoded_as_utf_8(monkeypatch):
+    """requests falls back to ISO-8859-1 for text/* without a charset."""
+    csv_with_utf_8 = (
+        "field,name,datatype,description\n"
+        "name,Name,string,The record’s name — as published\n"
+    )
+
+    class NoCharsetResponse(FakeResponse):
+        encoding = "ISO-8859-1"
+
+    monkeypatch.setattr(
+        "application.specification.requests.get",
+        lambda url, **kwargs: NoCharsetResponse(csv_with_utf_8),
+    )
+
+    field = Specification().field("name")
+
+    assert field["description"] == "The record’s name — as published"
 
 
 def test_each_csv_is_only_fetched_once(specification, requested):

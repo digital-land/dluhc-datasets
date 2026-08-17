@@ -39,6 +39,16 @@ class Config:
             "waste-authority",
         ]
     )
+    # Datasets this service manages which are not category datasets, and so are
+    # not picked up by the typology rule in Specification.managed_datasets.
+    # Naming one here is how a non category dataset gets added, so that it is a
+    # reviewed change picked up on the next restart, rather than a command run
+    # by hand against the deployed database.
+    ADDITIONAL_DATASETS = set(
+        [
+            "company",
+        ]
+    )
 
 
 class DevelopmentConfig(Config):

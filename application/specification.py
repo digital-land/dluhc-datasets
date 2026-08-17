@@ -29,8 +29,9 @@ class Specification:
     process never serves stale definitions.
     """
 
-    def __init__(self, base_url=None):
+    def __init__(self, base_url=None, additional_datasets=None):
         self.base_url = (base_url or DEFAULT_SPECIFICATION_URL).rstrip("/")
+        self.additional_datasets = set(additional_datasets or [])
         self.rows = {}
 
     def _rows(self, name):
@@ -51,15 +52,30 @@ class Specification:
                 return row
         return None
 
-    def category_datasets(self):
-        """The datasets this application manages records for."""
-        return [
-            row
-            for row in self._rows("dataset")
-            if row["typology"] == "category"
+    def managed_datasets(self):
+        """The datasets this application manages records for.
+
+        Category datasets, plus any named explicitly in ADDITIONAL_DATASETS.
+        The named ones are how a dataset outside the typology rule, such as an
+        organisation dataset, gets managed here. A named dataset which is not
+        in the specification simply matches nothing, so a stale or mistyped
+        name cannot create anything.
+        """
+        return [row for row in self._rows("dataset") if self._is_managed(row)]
+
+    def _is_managed(self, row):
+        if row["dataset"] in self.additional_datasets:
+            return True
+        return (
+            row["typology"] == "category"
             and row["realm"] == "dataset"
             and row["dataset"] != "category"
-        ]
+        )
+
+    def unknown_additional_datasets(self):
+        """Named additional datasets which have no row in the specification."""
+        specified = {row["dataset"] for row in self._rows("dataset")}
+        return sorted(self.additional_datasets - specified)
 
     def replacement_datasets(self):
         """Datasets which name another dataset as their replacement."""

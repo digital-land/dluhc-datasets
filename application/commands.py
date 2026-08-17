@@ -25,7 +25,10 @@ specfication_markdown_url = (
 
 
 def _specification():
-    return Specification(current_app.config.get("SPECIFICATION_URL"))
+    return Specification(
+        current_app.config.get("SPECIFICATION_URL"),
+        additional_datasets=current_app.config.get("ADDITIONAL_DATASETS"),
+    )
 
 
 @data_cli.command("dataset-fields")
@@ -64,7 +67,13 @@ def get_new_datasets():
     specification = _specification()
     replacement_datasets = specification.replacement_datasets()
 
-    data = specification.category_datasets()
+    unknown = specification.unknown_additional_datasets()
+    if unknown:
+        print(
+            f"additional datasets not in the specification, skipping: {', '.join(unknown)}"
+        )
+
+    data = specification.managed_datasets()
     new_datasets = [
         dataset
         for dataset in data

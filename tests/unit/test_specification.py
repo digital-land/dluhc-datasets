@@ -76,15 +76,47 @@ def test_base_url_can_be_overridden(monkeypatch, requested):
     assert requested == ["https://example.com/specification/field.csv"]
 
 
-def test_category_datasets_excludes_other_typologies_and_the_category_dataset(
+def test_managed_datasets_excludes_other_typologies_and_the_category_dataset(
     specification,
 ):
-    datasets = [row["dataset"] for row in specification.category_datasets()]
+    datasets = [row["dataset"] for row in specification.managed_datasets()]
 
     assert "design-code-rule-category" in datasets
     assert "design-code-feature" in datasets
     assert "conservation-area" not in datasets
     assert "category" not in datasets
+
+
+def test_managed_datasets_includes_named_additional_datasets(monkeypatch):
+    """A non category dataset is managed when it is named in the config."""
+
+    def fake_get(url, **kwargs):
+        name = url.rsplit("/", 1)[-1].removesuffix(".csv")
+        return FakeResponse(CSVS[name])
+
+    monkeypatch.setattr("application.specification.requests.get", fake_get)
+    specification = Specification(additional_datasets=["conservation-area"])
+
+    datasets = [row["dataset"] for row in specification.managed_datasets()]
+
+    assert "conservation-area" in datasets
+    assert "design-code-rule-category" in datasets
+
+
+def test_a_named_dataset_not_in_the_specification_is_skipped(monkeypatch):
+    """A stale or mistyped name must not create anything, and must be reported."""
+
+    def fake_get(url, **kwargs):
+        name = url.rsplit("/", 1)[-1].removesuffix(".csv")
+        return FakeResponse(CSVS[name])
+
+    monkeypatch.setattr("application.specification.requests.get", fake_get)
+    specification = Specification(additional_datasets=["not-a-dataset"])
+
+    datasets = [row["dataset"] for row in specification.managed_datasets()]
+
+    assert "not-a-dataset" not in datasets
+    assert specification.unknown_additional_datasets() == ["not-a-dataset"]
 
 
 def test_dataset_fields_returns_the_schema_for_a_dataset(specification):

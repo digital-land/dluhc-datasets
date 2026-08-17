@@ -30,6 +30,12 @@ def _github_login():
     return session.get("user", {}).get("login")
 
 def get_tab_list(dataset):
+    # links, history and schema 404 for an ended dataset
+    if dataset.end_date is not None:
+        return [
+            {"title": "Records", "url": url_for("main.dataset", id=dataset.dataset)},
+            {"title": "Changes", "url": url_for("main.change_log", id=dataset.dataset)},
+        ]
     return [
         {"title": "Records", "url": url_for("main.dataset", id=dataset.dataset)},
         {"title": "Links", "url": url_for("main.links", id=dataset.dataset)},
@@ -42,13 +48,13 @@ def get_tab_list(dataset):
 @main.route("/")
 @main.route("/index")
 def index():
-    ds = (
-        db.session.query(Dataset)
-        .filter(Dataset.end_date.is_(None))
-        .order_by(Dataset.dataset)
-        .all()
+    ds = db.session.query(Dataset).order_by(Dataset.dataset).all()
+    return render_template(
+        "datasets.html",
+        datasets=[d for d in ds if d.end_date is None],
+        archived_datasets=[d for d in ds if d.end_date is not None],
+        isHomepage=True,
     )
-    return render_template("datasets.html", datasets=ds, isHomepage=True)
 
 
 @main.route("/index.json")

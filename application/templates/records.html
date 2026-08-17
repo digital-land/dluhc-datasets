@@ -26,8 +26,15 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    {% if not dataset.end_date %}
-      {% if records | length > 0 %}
+    {% if dataset.end_date %}
+      {{
+        govukInsetText({
+          'text': 'This dataset has been ended and is no longer available for editing.'
+        })
+      }}
+    {% endif %}
+
+    {% if records | length > 0 %}
       <section class="app-table-container">
         <table class="app-data-table">
           <thead class="app-data-table__head">
@@ -38,7 +45,7 @@
                 </th>
               {% endfor %}
 
-              {% if session["user"] and not history %}
+              {% if session["user"] and not history and not dataset.end_date %}
                 <th scope="col" class="app-data-table__header app-data-table__header--ui">
                   <span class="govuk-visually-hidden">Action</span>
                 </th>
@@ -62,7 +69,7 @@
                 </td>
               {% endfor %}
 
-              {% if session["user"] and not history %}
+              {% if session["user"] and not history and not dataset.end_date %}
                 <td class="app-data-table__cell app-data-table__cell--ui">
                   {{
                     buttonMenu({
@@ -88,7 +95,8 @@
         This dataset was last updated on {{ dataset.last_updated.strftime("%d %B %Y") }}
       </p>
 
-      {% if history %}
+      {% if dataset.end_date %}
+      {% elif history %}
         <p class="govuk-body govuk-!-margin-top-3">
           <a href="{{ url_for('main.csv', id=dataset.dataset, history=True) }}">Download a csv file of the current data</a>
         </p>
@@ -110,20 +118,13 @@
             'text': 'There are no records for the ' + dataset.name + ' dataset'
           })
         }}
-        {% if session["user"] %}
+        {% if session["user"] and not dataset.end_date %}
           <p class="govuk-body govuk-!-margin-top-3">
             <a href="{{ url_for('upload.upload_csv', dataset=dataset.dataset) }}">Upload a csv file for this dataset</a>
           </p>
         {% endif %}
-      {% endif %}
-    </div>
-  {% else %}
-    {{
-      govukInsetText({
-        'text': 'This dataset has been ended and is no longer available for editing.'
-      })
-    }}
-  {% endif %}
+    {% endif %}
+  </div>
 </div>
 
 {% endblock content_primary %}

@@ -40,5 +40,32 @@
     </table>
 
   </div>
+
+  {% if archived_datasets %}
+  <div class="govuk-grid-column-full">
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">Archived datasets</h2>
+    <p class="govuk-body">These datasets have been ended in the specification. They are kept for reference and can no longer be edited.</p>
+    <table class="app-table app-table--responsive">
+      <thead>
+        <tr>
+          <th scope="col" class="govuk-table__header">Dataset</th>
+          <th scope="col" class="govuk-table__header govuk-table__header--numeric">Total records</th>
+          <th scope="col" class="govuk-table__header govuk-table__header--numeric">End date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for dataset in archived_datasets %}
+        <tr>
+          <th scope="row" class="govuk-table__header">
+            <a href="{{url_for('main.dataset', id=dataset.dataset)}}">{{ dataset.name }}</a>
+          </th>
+          <td data-label="Total records" class="govuk-table__cell govuk-table__cell--numeric">{{ dataset.records | length }}</td>
+          <td data-label="End date" class="govuk-table__cell govuk-table__cell--numeric">{{ dataset.end_date.strftime("%d/%m/%Y") }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
 </div>
 {% endblock content %}

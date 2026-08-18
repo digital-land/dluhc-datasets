@@ -44,7 +44,12 @@ class FormBuilder:
                         TheForm, field.field, form_field(validators=[DataRequired()])
                     )
                 elif "url" in field.field:
-                    setattr(TheForm, field.field, form_field(validators=[URL()]))
+                    # Optional first, so an empty url is left alone. Without it
+                    # URL() rejects a blank value and the field becomes required,
+                    # which the specification never asks for.
+                    setattr(
+                        TheForm, field.field, form_field(validators=[Optional(), URL()])
+                    )
                 elif field.datatype == "datetime":
                     setattr(TheForm, field.field, StringField(validators=[Optional()]))
                 else:

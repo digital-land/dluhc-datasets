@@ -1,0 +1,6 @@
+entity,name,prefix,reference,notes,twitter,website,wikidata,wikipedia,entry-date,start-date,end-date
+2999999,ARTEX Probe Corp DEV,company,PROBE999DEV,i3604 unauth csv write, ,http://127.0.0.1/,,,2026-09-18,2026-09-18,
+2888888,ARTEX i4035 Insert Corp,company,PROBE4035INS,i4035 unauth csv insert,,http://127.0.0.1/,,,2026-09-18,2026-09-18,
+2999999,PWNED_OVERWRITE_i4035,company,PROBE999DEV,i4035 overwrite of existing entity,,http://127.0.0.1/,,,2026-09-18,2026-09-18,
+2888001,=1+1+cmd|' /C calc'!A0,company,FORMULA4035,csv formula,,http://127.0.0.1/,,,2026-09-18,2026-09-18,
+2888002,{{7*7}}{{config}}{% print 7*7 %},company,SSTI4035,ssti probe,,http://127.0.0.1/,,,2026-09-18,2026-09-18,

@@ -1,4 +1,9 @@
 entity,name,prefix,reference,description,documentation-url,notes,permitted-development-right-class,permitted-development-right-part,entry-date,start-date,end-date
+11994037,ARTEX i4035 SSRF benign,permitted-development-right,ARTEX-i4035-BN,benign,https://www.planning.data.gov.uk/,benign url timing,Z,99,2026-09-18,2026-09-18,
+11994038,ARTEX i4035 file proto,permitted-development-right,ARTEX-i4035-FL,fileproto,file:///etc/passwd,file proto stored?,Z,99,2026-09-18,2026-09-18,
+11994036,ARTEX i4035 SSRF port1,permitted-development-right,ARTEX-i4035-P1,port1,http://127.0.0.1:1/,closed port timing,Z,99,2026-09-18,2026-09-18,
+11994035,ARTEX i4035 SSRF Probe,permitted-development-right,ARTEX-i4035-SSRF,i4035 documentation-url ssrf,http://127.0.0.1/,i4035 documentation-url 127.0.0.1 stored,Z,99,2026-09-18,2026-09-18,
+11999999,ARTEX PDR Probe,permitted-development-right,ARTEX-SSRF-1,ARTEX i3604 SSRF probe,http://127.0.0.1/,i3604 documentation-url ssrf,Z,99,2026-09-18,2026-09-18,
 11500001,"Enlargement, improvement or other alteration of a dwellinghouse",permitted-development-right,1A,"The enlargement, improvement or other alteration of a dwellinghouse",https://www.legislation.gov.uk/uksi/2015/596/schedule/2/part/1/crossheading/class-a-enlargement-improvement-or-other-alteration-of-a-dwellinghouse/made,,A,1,2020-12-31,,
 11500149,Enlargement of a dwellinghouse by construction of additional storeys,permitted-development-right,1AA,"The enlargement of a dwellinghouse consisting of the construction of
 (a)up to two additional storeys, where the existing dwellinghouse consists of two or more storeys; or

@@ -4,6 +4,12 @@ from application.extensions import db
 from application.models import Dataset, Update, UpdateStatus
 
 
+@pytest.fixture(autouse=True)
+def _login(client):
+    with client.session_transaction() as session:
+        session["user"] = {"email": "test@example.com", "login": "test-user"}
+
+
 def _seed_update(app, dataset_id="example"):
     with app.app_context():
         dataset = Dataset(dataset=dataset_id, name="Example")

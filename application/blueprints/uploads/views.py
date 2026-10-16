@@ -28,7 +28,7 @@ from application.models import (
     UpdateStatus,
     create_change_log,
 )
-from application.utils import parse_date
+from application.utils import login_required, parse_date
 
 upload = Blueprint("upload", __name__)
 
@@ -62,6 +62,7 @@ def _order_records(records):
 
 
 @upload.route("/dataset/<string:dataset>/upload", methods=["GET", "POST"])
+@login_required
 def upload_csv(dataset):
     form = CsvUploadForm()
     ds = Dataset.query.get(dataset)
@@ -153,6 +154,7 @@ def upload_csv(dataset):
 
 
 @upload.route("/dataset/<string:dataset>/update", methods=["GET", "POST"])
+@login_required
 def update_csv(dataset):
     form = CsvUploadForm()
     ds = Dataset.query.get(dataset)
@@ -203,6 +205,7 @@ def update_csv(dataset):
 @upload.route(
     "/dataset/<string:dataset>/process-updates/<string:update>", methods=["GET"]
 )
+@login_required
 def process_updates(dataset, update):
     update = _get_pending_update(dataset, update)
 
@@ -246,6 +249,7 @@ def process_updates(dataset, update):
 @upload.route(
     "/dataset/<string:dataset>/process-updates/<string:update>", methods=["POST"]
 )
+@login_required
 def apply_updates(dataset, update):
     update = _get_pending_update(dataset, update)
 
@@ -294,6 +298,7 @@ def apply_updates(dataset, update):
 @upload.route(
     "/dataset/<string:dataset>/process-updates/<string:update>/cancel", methods=["GET"]
 )
+@login_required
 def cancel_updates(dataset, update):
     update = _get_pending_update(dataset, update)
 

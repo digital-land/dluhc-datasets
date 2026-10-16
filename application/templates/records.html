@@ -64,8 +64,10 @@
                       {{ record.get(field.field, None) | value_or_empty_string }}
                     </a>
                   {% else %}
-                    {{ record.get(field.field, None) | value_or_empty_string | replace('-','&#8209;') | safe }}
-                  {% endif %}                
+                    {# replaces - with the non-breaking hyphen character U+2011 so values do not wrap at
+                       a hyphen. Never mark this safe: record values come from uploads and must be escaped. #}
+                    {{ record.get(field.field, None) | value_or_empty_string | replace('-', '‑') }}
+                  {% endif %}
                 </td>
               {% endfor %}
 

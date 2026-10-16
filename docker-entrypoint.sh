@@ -8,4 +8,6 @@ flask db upgrade
 flask data new-datasets || echo "WARNING: flask data new-datasets failed"
 flask data dataset-fields || echo "WARNING: flask data dataset-fields failed"
 
-flask run --debug
+# Run the command the container was started with: gunicorn by default (see the
+# Dockerfile CMD), or the debug server docker compose passes for local work.
+exec "$@"

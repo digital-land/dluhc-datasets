@@ -13,11 +13,13 @@
             No valid updates found. Click cancel to return to the dataset.
           </strong>
         </div>
-          <p>
-            <a href="{{ url_for('upload.cancel_updates', update=update, dataset=dataset.dataset) }}"
-                class="govuk-button govuk-button--warning">Cancel</a></p>
+          <form action="{{ url_for('upload.cancel_updates', update=update, dataset=dataset.dataset) }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="govuk-button govuk-button--warning">Cancel</button>
+          </form>
       {% endif %}
     <form action="{{ url_for('upload.apply_updates', update=update, dataset=dataset.dataset) }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <section class="app-table-container">
         <table class="app-data-table">
           <thead class="app-data-table__head">
@@ -39,7 +41,9 @@
                 <tr class="app-data-table__row">
                 {% for field in dataset.sorted_fields() %}
                   <td class="app-data-table__cell app-data-table__cell--ui">
-                    {{ record.data.get(field.field, None)| value_or_empty_string | replace('-','&#8209;') | safe }}
+                    {# replaces - with the non-breaking hyphen character U+2011 so values do not wrap at
+                       a hyphen. Never mark this safe: record values come from uploads and must be escaped. #}
+                    {{ record.data.get(field.field, None) | value_or_empty_string | replace('-', '‑') }}
                     {% if record.changes and record.changes.get(field.field) %}
                       <p class="govuk-body-s">({{record.changes.get(field.field)}})</p>
                     {% endif %}

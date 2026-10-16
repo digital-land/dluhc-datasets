@@ -145,3 +145,36 @@ def test_entity_field_is_editable(app):
         # editor changing it
         form.entity.data = 110
         assert form.entity.data == 110
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        # checked because of its datatype, though its name does not contain url
+        Field(field="website", datatype="url", name="Website"),
+        Field(field="documentation-url", datatype="url", name="Documentation url"),
+    ],
+)
+@pytest.mark.parametrize(
+    "value",
+    [
+        "file:///etc/passwd",
+        "gopher://127.0.0.1:80/_GET%20/",
+        "http://169.254.169.254/latest/meta-data/",
+    ],
+)
+def test_url_field_rejects_unsafe_url(app, field, value):
+    # submitted as form data, as Optional() checks what was posted
+    with app.test_request_context(method="POST", data={field.field: value}):
+        form = FormBuilder([field]).build()
+        form.validate()
+        assert form.errors.get(field.field)
+
+
+@pytest.mark.parametrize("value", ["https://www.planning.data.gov.uk/", ""])
+def test_url_field_accepts_public_url_or_blank(app, value):
+    field = Field(field="website", datatype="url", name="Website")
+    with app.test_request_context(method="POST", data={"website": value}):
+        form = FormBuilder([field]).build()
+        form.validate()
+        assert form.errors.get("website") is None

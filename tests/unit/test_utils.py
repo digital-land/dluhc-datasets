@@ -1,6 +1,54 @@
 import datetime
 
-from application.utils import date_to_string, parse_date
+import pytest
+
+from application.utils import date_to_string, parse_date, url_error
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        None,
+        "",
+        "  ",
+        "https://www.planning.data.gov.uk/",
+        "http://example.com/path?query=1#fragment",
+        "HTTPS://EXAMPLE.COM",
+        "https://example.com:8443/",
+        "https://8.8.8.8/",
+    ],
+)
+def test_url_error_accepts_public_http_urls(value):
+    assert url_error(value) is None
+
+
+# includes every url field value seen in the September 2026 attack
+@pytest.mark.parametrize(
+    "value",
+    [
+        "file:///etc/passwd",
+        "file:///app/application/factory.py",
+        "file:///proc/self/environ",
+        "gopher://127.0.0.1:80/_GET%20/",
+        "http://127.0.0.1/",
+        "http://127.0.0.1:1/",
+        "http://169.254.169.254/latest/meta-data/",
+        "http://169.254.170.2/v2/credentials",
+        "http://localhost:5050/",
+        "http://app.localhost/",
+        "http://[::1]/",
+        "http://10.0.0.1/",
+        "http://192.168.1.1/",
+        "javascript:alert(1)",
+        "ftp://example.com/file",
+        "example.com",
+        "https://",
+        "https://exa mple.com/",
+        "https://example.com:notaport/",
+    ],
+)
+def test_url_error_rejects_unsafe_urls(value):
+    assert url_error(value) is not None
 
 
 def test_parse_date():

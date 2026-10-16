@@ -4,6 +4,7 @@ import tempfile
 import uuid
 from collections import OrderedDict
 from csv import DictReader
+from types import SimpleNamespace
 
 from flask import (
     Blueprint,
@@ -28,7 +29,7 @@ from application.models import (
     UpdateStatus,
     create_change_log,
 )
-from application.utils import parse_date
+from application.utils import is_url_field, login_required, parse_date, url_error
 
 upload = Blueprint("upload", __name__)
 
@@ -62,6 +63,7 @@ def _order_records(records):
 
 
 @upload.route("/dataset/<string:dataset>/upload", methods=["GET", "POST"])
+@login_required
 def upload_csv(dataset):
     form = CsvUploadForm()
     ds = Dataset.query.get(dataset)
@@ -86,9 +88,17 @@ def upload_csv(dataset):
                             url_for("upload.upload_csv", dataset=ds.dataset)
                         )
 
+                    rows = list(reader)
+                    url_errors = _url_errors(rows, ds.fields)
+                    if url_errors:
+                        flash(_url_errors_message(url_errors))
+                        return redirect(
+                            url_for("upload.upload_csv", dataset=ds.dataset)
+                        )
+
                     records = OrderedDict()
 
-                    for data in reader:
+                    for data in rows:
                         entity = data.get("entity")
                         if entity and int(entity) >= starting_entity:
                             starting_entity = int(entity) + 1
@@ -153,6 +163,7 @@ def upload_csv(dataset):
 
 
 @upload.route("/dataset/<string:dataset>/update", methods=["GET", "POST"])
+@login_required
 def update_csv(dataset):
     form = CsvUploadForm()
     ds = Dataset.query.get(dataset)
@@ -179,6 +190,11 @@ def update_csv(dataset):
                     for row in reader:
                         records.append(row)
 
+                url_errors = _url_errors(records, ds.fields)
+                if url_errors:
+                    flash(_url_errors_message(url_errors))
+                    return redirect(url_for("upload.update_csv", dataset=ds.dataset))
+
                 update = Update(dataset_id=ds.dataset)
                 for record in records:
                     update.records.append(UpdateRecord(data=record))
@@ -203,9 +219,13 @@ def update_csv(dataset):
 @upload.route(
     "/dataset/<string:dataset>/process-updates/<string:update>", methods=["GET"]
 )
+@login_required
 def process_updates(dataset, update):
     update = _get_pending_update(dataset, update)
 
+    # The review is worked out for display only and not saved, so viewing this
+    # page never changes the database.
+    rows = []
     for record in update.records:
         entity = record.data.get("entity")
         if entity is None or entity.strip() == "":
@@ -217,27 +237,31 @@ def process_updates(dataset, update):
             Record.entity == entity,
             Record.end_date.is_(None),
         ).one_or_none()
+        changes = None
         if current_record is not None:
             expected_fields = [field.field for field in current_record.dataset.fields]
-            record.changes = _check_update(
+            changes = _check_update(
                 record.data,
                 current_record.to_dict(),
                 expected_fields,
                 current_record.change_log,
             )
-        else:
-            record.new_record = True
+        rows.append(
+            SimpleNamespace(
+                id=record.id,
+                data=record.data,
+                processed=record.processed,
+                changes=changes,
+                new_record=current_record is None,
+            )
+        )
 
-        if db.session.dirty:
-            db.session.add(record)
-            db.session.commit()
-
-    updates = any([_any_updates(record) for record in update.records])
+    updates = any([_any_updates(row) for row in rows])
 
     return render_template(
         "process-updates.html",
         update=update.id,
-        records=update.records,
+        records=rows,
         dataset=update.dataset,
         updates=updates,
     )
@@ -246,6 +270,7 @@ def process_updates(dataset, update):
 @upload.route(
     "/dataset/<string:dataset>/process-updates/<string:update>", methods=["POST"]
 )
+@login_required
 def apply_updates(dataset, update):
     update = _get_pending_update(dataset, update)
 
@@ -292,8 +317,9 @@ def apply_updates(dataset, update):
 
 
 @upload.route(
-    "/dataset/<string:dataset>/process-updates/<string:update>/cancel", methods=["GET"]
+    "/dataset/<string:dataset>/process-updates/<string:update>/cancel", methods=["POST"]
 )
+@login_required
 def cancel_updates(dataset, update):
     update = _get_pending_update(dataset, update)
 
@@ -320,6 +346,26 @@ def _check_update(record, current_record, fields, change_log):
                 changes[key] = f"Updated from '{current_value}' to '{new_value}'"
 
     return changes
+
+
+def _url_errors(rows, fields):
+    url_fields = [field.field for field in fields if is_url_field(field)]
+    errors = []
+    # line 1 of the file is the header
+    for line, row in enumerate(rows, start=2):
+        for field in url_fields:
+            error = url_error(row.get(field))
+            if error:
+                errors.append(f"line {line} {field} {error}")
+    return errors
+
+
+def _url_errors_message(errors, limit=10):
+    # the upload page shows a single message, so the errors are combined
+    shown = errors[:limit]
+    if len(errors) > limit:
+        shown.append(f"and {len(errors) - limit} more")
+    return "CSV file not uploaded, it contains invalid urls: " + "; ".join(shown)
 
 
 def _allowed_file(filename):

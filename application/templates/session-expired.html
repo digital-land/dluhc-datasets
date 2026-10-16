@@ -1,0 +1,11 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-three-quarters">
+    <h1 class="govuk-heading-l">Your changes were not saved</h1>
+    <p class="govuk-body">The page was open for too long, so your changes could not be checked and nothing was saved.</p>
+    <p class="govuk-body"><a href="{{ back_url }}" class="govuk-link">Go back and try again</a></p>
+  </div>
+</div>
+{% endblock content %}

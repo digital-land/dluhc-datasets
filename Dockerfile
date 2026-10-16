@@ -17,7 +17,6 @@ ENV FLASK_APP=application.wsgi:app
 
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_RUN_PORT=5050
-ENV FLASK_DEBUG=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc g++ git libproj-dev proj-bin gdal-bin wget gnupg2  \
@@ -38,3 +37,6 @@ RUN pip install -r requirements/requirements.txt
 EXPOSE 5050
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
+# The debug server must never run in a deployed environment: its debugger runs
+# arbitrary code from the browser. docker-compose.yml overrides this for local work.
+CMD ["gunicorn", "--bind", "0.0.0.0:5050", "--workers", "2", "--threads", "4", "--access-logfile", "-", "application.wsgi:app"]

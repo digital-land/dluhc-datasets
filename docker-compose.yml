@@ -2,6 +2,8 @@ services:
   app:
     build:
       context: .
+    # local only: the image's default command is gunicorn without the debugger
+    command: ["flask", "run", "--debug"]
     environment:
       DATABASE_URL: postgresql://postgres:postgres@database:5432/dluhc_datasets
       DATASETS_REPO_NAME: ${DATASETS_REPO_NAME:-digital-land/dluhc-datasets}

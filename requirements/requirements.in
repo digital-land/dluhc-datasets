@@ -10,7 +10,6 @@ flask-sslify
 requests
 python-frontmatter
 Authlib
-flask-sslify
 is-safe-url
 flask-talisman
 flask-debugtoolbar

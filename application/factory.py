@@ -62,9 +62,13 @@ def register_extensions(app):
     # request.form directly rather than through a FlaskForm
     csrf.init_app(app)
 
-    from flask_sslify import SSLify
+    # Only for hosting where TLS ends at the app itself. Behind CloudFront, which
+    # redirects http visitors itself and reaches the app over plain http, the app
+    # cannot tell an https visitor from an http one and redirecting would loop.
+    if app.config["HTTPS_REDIRECT"]:
+        from flask_sslify import SSLify
 
-    sslify = SSLify(app)  # noqa
+        SSLify(app)
 
     # create the CSP for the app - until then leave commented out
     # talisman.init_app(app, content_security_policy=None)

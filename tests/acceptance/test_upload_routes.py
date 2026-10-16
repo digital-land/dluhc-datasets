@@ -1,9 +1,17 @@
+import io
 import re
 
 import pytest
 
 from application.extensions import db
-from application.models import Dataset, Update, UpdateRecord, UpdateStatus
+from application.models import (
+    Dataset,
+    Field,
+    Record,
+    Update,
+    UpdateRecord,
+    UpdateStatus,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -124,3 +132,68 @@ def test_update_actions_accept_csrf_token_from_review_page(client, app, action, 
     assert response.status_code == 302
     with app.app_context():
         assert db.session.get(Update, update_id).status == status
+
+
+def _seed_dataset_with_url_field(app, dataset_id="example"):
+    with app.app_context():
+        dataset = Dataset(
+            dataset=dataset_id, name="Example", entity_minimum=1, entity_maximum=100
+        )
+        for field, datatype in [
+            ("entity", "integer"),
+            ("name", "string"),
+            ("reference", "string"),
+            ("website", "url"),
+        ]:
+            dataset.fields.append(Field(field=field, datatype=datatype, name=field))
+        db.session.add(dataset)
+        db.session.commit()
+
+
+def _post_csv(client, path, content):
+    return client.post(
+        path,
+        data={"csv_file": (io.BytesIO(content.encode()), "records.csv")},
+        content_type="multipart/form-data",
+    )
+
+
+CSV_WITH_UNSAFE_URLS = (
+    "entity,name,reference,website\n"
+    "1,Good,good,https://www.planning.data.gov.uk/\n"
+    "2,File,file,file:///etc/passwd\n"
+    "3,Metadata,metadata,http://169.254.169.254/latest/meta-data/\n"
+)
+
+
+@pytest.mark.parametrize("action", ["upload", "update"])
+def test_csv_with_unsafe_urls_is_rejected(client, app, action):
+    _seed_dataset_with_url_field(app)
+
+    response = _post_csv(client, f"/dataset/example/{action}", CSV_WITH_UNSAFE_URLS)
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == f"/dataset/example/{action}"
+    with client.session_transaction() as session:
+        (_, message), *_ = session["_flashes"]
+    assert "line 3 website must start with http:// or https://" in message
+    assert "line 4 website must not link to a local or internal address" in message
+    with app.app_context():
+        # the whole file is rejected, including its valid row
+        assert Record.query.count() == 0
+        assert Update.query.count() == 0
+
+
+def test_csv_upload_with_public_urls_adds_records(client, app):
+    _seed_dataset_with_url_field(app)
+
+    response = _post_csv(
+        client,
+        "/dataset/example/upload",
+        "entity,name,reference,website\n1,Good,good,https://www.planning.data.gov.uk/\n",
+    )
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/dataset/example"
+    with app.app_context():
+        assert Record.query.count() == 1

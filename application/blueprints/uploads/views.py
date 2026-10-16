@@ -29,7 +29,7 @@ from application.models import (
     UpdateStatus,
     create_change_log,
 )
-from application.utils import login_required, parse_date
+from application.utils import is_url_field, login_required, parse_date, url_error
 
 upload = Blueprint("upload", __name__)
 
@@ -88,9 +88,17 @@ def upload_csv(dataset):
                             url_for("upload.upload_csv", dataset=ds.dataset)
                         )
 
+                    rows = list(reader)
+                    url_errors = _url_errors(rows, ds.fields)
+                    if url_errors:
+                        flash(_url_errors_message(url_errors))
+                        return redirect(
+                            url_for("upload.upload_csv", dataset=ds.dataset)
+                        )
+
                     records = OrderedDict()
 
-                    for data in reader:
+                    for data in rows:
                         entity = data.get("entity")
                         if entity and int(entity) >= starting_entity:
                             starting_entity = int(entity) + 1
@@ -181,6 +189,11 @@ def update_csv(dataset):
                     records = []
                     for row in reader:
                         records.append(row)
+
+                url_errors = _url_errors(records, ds.fields)
+                if url_errors:
+                    flash(_url_errors_message(url_errors))
+                    return redirect(url_for("upload.update_csv", dataset=ds.dataset))
 
                 update = Update(dataset_id=ds.dataset)
                 for record in records:
@@ -333,6 +346,26 @@ def _check_update(record, current_record, fields, change_log):
                 changes[key] = f"Updated from '{current_value}' to '{new_value}'"
 
     return changes
+
+
+def _url_errors(rows, fields):
+    url_fields = [field.field for field in fields if is_url_field(field)]
+    errors = []
+    # line 1 of the file is the header
+    for line, row in enumerate(rows, start=2):
+        for field in url_fields:
+            error = url_error(row.get(field))
+            if error:
+                errors.append(f"line {line} {field} {error}")
+    return errors
+
+
+def _url_errors_message(errors, limit=10):
+    # the upload page shows a single message, so the errors are combined
+    shown = errors[:limit]
+    if len(errors) > limit:
+        shown.append(f"and {len(errors) - limit} more")
+    return "CSV file not uploaded, it contains invalid urls: " + "; ".join(shown)
 
 
 def _allowed_file(filename):

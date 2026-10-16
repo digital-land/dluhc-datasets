@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
 from wtforms import IntegerField, StringField, TextAreaField, URLField
-from wtforms.validators import URL, DataRequired, ValidationError, Optional
+from wtforms.validators import URL, DataRequired, Optional, ValidationError
+
+from application.utils import is_url_field, url_error
 
 
 # change to a regex validator
@@ -11,11 +13,17 @@ def curie_check(form, field):
     value = str(field.data).strip()
     if value == "":
         return
-        
+
     if len(field.data.split(":")) != 2:
         raise ValidationError(
-            f"{field.name} is a curie and should be in the format 'namespace:identifier'"
+            f"{field.name} is a curie and should be in the format 'namespace:identifier'"  # noqa: E231
         )
+
+
+def url_check(form, field):
+    error = url_error(field.data)
+    if error:
+        raise ValidationError(f"{field.name} {error}")
 
 
 class FormBuilder:
@@ -43,12 +51,14 @@ class FormBuilder:
                     setattr(
                         TheForm, field.field, form_field(validators=[DataRequired()])
                     )
-                elif "url" in field.field:
+                elif is_url_field(field):
                     # Optional first, so an empty url is left alone. Without it
                     # URL() rejects a blank value and the field becomes required,
                     # which the specification never asks for.
                     setattr(
-                        TheForm, field.field, form_field(validators=[Optional(), URL()])
+                        TheForm,
+                        field.field,
+                        form_field(validators=[Optional(), URL(), url_check]),
                     )
                 elif field.datatype == "datetime":
                     setattr(TheForm, field.field, StringField(validators=[Optional()]))

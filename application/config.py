@@ -18,6 +18,9 @@ class Config:
     GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
     GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
     SAFE_URLS = set(os.getenv("SAFE_URLS", "").split(","))
+    # Redirect http requests to https in the app. Off by default: in AWS TLS ends
+    # at CloudFront, so the app only ever sees http and redirecting would loop.
+    HTTPS_REDIRECT = os.getenv("HTTPS_REDIRECT", "false").lower() == "true"
     AUTHENTICATION_ON = True
     DATASETS_REPO_NAME = os.getenv("DATASETS_REPO_NAME")
     DATASETS_REPO_REGISTERS_PATH = os.getenv("DATASETS_REPO_REGISTERS_PATH")

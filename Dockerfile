@@ -12,7 +12,9 @@ RUN npm install
 FROM python:3.13-slim
 WORKDIR /code
 
-ENV FLASK_CONFIG=application.config.DevelopmentConfig
+# DevelopmentConfig turns authentication off, so it must be asked for explicitly
+# (docker-compose.yml does) rather than being what a deployment gets by default.
+ENV FLASK_CONFIG=application.config.Config
 ENV FLASK_APP=application.wsgi:app
 
 ENV FLASK_RUN_HOST=0.0.0.0

@@ -19,6 +19,7 @@ def create_app(config_filename):
     register_templates(app)
     register_filters(app)
     register_extensions(app)
+    register_error_handlers(app)
     register_commands(app)
 
     return app
@@ -52,11 +53,14 @@ def register_filters(app):
 
 
 def register_extensions(app):
-    from application.extensions import db, migrate, oauth
+    from application.extensions import csrf, db, migrate, oauth
 
     db.init_app(app)
     migrate.init_app(app, db)
     oauth.init_app(app)
+    # every POST must carry a CSRF token, including routes that read
+    # request.form directly rather than through a FlaskForm
+    csrf.init_app(app)
 
     from flask_sslify import SSLify
 
@@ -84,6 +88,20 @@ def register_extensions(app):
         sentry_sdk.init(
             dsn=os.environ.get("SENTRY_DSN"), integrations=[FlaskIntegration()]
         )
+
+
+def register_error_handlers(app):
+    from flask import render_template, request, url_for
+    from flask_wtf.csrf import CSRFError
+    from is_safe_url import is_safe_url
+
+    @app.errorhandler(CSRFError)
+    def csrf_error(error):
+        # usually a form left open longer than WTF_CSRF_TIME_LIMIT
+        back_url = request.referrer
+        if not back_url or not is_safe_url(back_url, app.config.get("SAFE_URLS", {})):
+            back_url = url_for("main.index")
+        return render_template("session-expired.html", back_url=back_url), 400
 
 
 def register_templates(app):

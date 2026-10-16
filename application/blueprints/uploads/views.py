@@ -4,6 +4,7 @@ import tempfile
 import uuid
 from collections import OrderedDict
 from csv import DictReader
+from types import SimpleNamespace
 
 from flask import (
     Blueprint,
@@ -209,6 +210,9 @@ def update_csv(dataset):
 def process_updates(dataset, update):
     update = _get_pending_update(dataset, update)
 
+    # The review is worked out for display only and not saved, so viewing this
+    # page never changes the database.
+    rows = []
     for record in update.records:
         entity = record.data.get("entity")
         if entity is None or entity.strip() == "":
@@ -220,27 +224,31 @@ def process_updates(dataset, update):
             Record.entity == entity,
             Record.end_date.is_(None),
         ).one_or_none()
+        changes = None
         if current_record is not None:
             expected_fields = [field.field for field in current_record.dataset.fields]
-            record.changes = _check_update(
+            changes = _check_update(
                 record.data,
                 current_record.to_dict(),
                 expected_fields,
                 current_record.change_log,
             )
-        else:
-            record.new_record = True
+        rows.append(
+            SimpleNamespace(
+                id=record.id,
+                data=record.data,
+                processed=record.processed,
+                changes=changes,
+                new_record=current_record is None,
+            )
+        )
 
-        if db.session.dirty:
-            db.session.add(record)
-            db.session.commit()
-
-    updates = any([_any_updates(record) for record in update.records])
+    updates = any([_any_updates(row) for row in rows])
 
     return render_template(
         "process-updates.html",
         update=update.id,
-        records=update.records,
+        records=rows,
         dataset=update.dataset,
         updates=updates,
     )
@@ -296,7 +304,7 @@ def apply_updates(dataset, update):
 
 
 @upload.route(
-    "/dataset/<string:dataset>/process-updates/<string:update>/cancel", methods=["GET"]
+    "/dataset/<string:dataset>/process-updates/<string:update>/cancel", methods=["POST"]
 )
 @login_required
 def cancel_updates(dataset, update):

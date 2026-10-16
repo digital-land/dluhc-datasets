@@ -1,33 +1,18 @@
-import datetime
 import io
 import uuid
 from collections import OrderedDict
 from csv import DictWriter
 
 import requests
-from flask import (
-    Blueprint,
-    abort,
-    current_app,
-    flash,
-    make_response,
-    redirect,
-    render_template,
-    request,
-    session,
-    url_for,
-)
+from flask import Blueprint, abort, make_response, render_template, url_for
 from sqlalchemy import desc
 
 from application.extensions import db
-from application.forms import FormBuilder
-from application.models import ChangeLog, ChangeType, Dataset, Record, create_change_log
-from application.utils import collect_start_date, login_required
+from application.models import ChangeLog, Dataset, Record
+from application.utils import login_required
 
 main = Blueprint("main", __name__)
 
-def _github_login():
-    return session.get("user", {}).get("login")
 
 def get_tab_list(dataset):
     # links, history and schema 404 for an ended dataset
@@ -170,209 +155,14 @@ def change_log(id):
     )
 
 
-@main.route("/dataset/<string:id>/add", methods=["GET", "POST"])
-@login_required
-def add_record(id):
-    dataset = Dataset.query.get_or_404(id)
-    if dataset.end_date is not None:
-        abort(404)
-    builder = FormBuilder(dataset.fields)
-    form = builder.build()
-    form_fields = builder.form_fields()
-
-    if hasattr(form, "entity"):
-        max_entity = (
-            db.session.query(db.func.max(Record.entity))
-            .filter(Record.dataset_id == dataset.dataset)
-            .scalar()
-        )
-        next_entity = (
-            max_entity + 1 if max_entity is not None else dataset.entity_minimum
-        )
-        form.entity.data = next_entity
-
-    if form.validate_on_submit():
-        data = form.data
-
-        start_date, _ = collect_start_date(request.form)
-        if start_date:
-            data["start-date"] = start_date
-
-        # set prefix to as it is not in form
-        data["prefix"] = (
-            "wikidata"
-            if dataset.dataset in current_app.config["WIKIDATA_PREFIX_DATASETS"]
-            else dataset.dataset
-        )
-        data["entry-date"] = datetime.datetime.today().strftime("%Y-%m-%d")
-
-        last_record = (
-            db.session.query(Record)
-            .filter_by(dataset_id=dataset.dataset)
-            .order_by(Record.row_id.desc())
-            .first()
-        )
-        next_id = last_record.row_id + 1 if last_record else 0
-        entity = int(form.entity.data) if hasattr(form, "entity") else next_entity
-
-        if not (dataset.entity_minimum <= entity <= dataset.entity_maximum):
-            flash(
-                f"entity id {entity} is outside of range {dataset.entity_minimum} to {dataset.entity_maximum}"
-            )
-            return redirect(url_for("main.dataset", id=dataset.dataset))
-
-        if "csrf_token" in data:
-            del data["csrf_token"]
-
-        record = Record(row_id=next_id, entity=entity)
-        extra_data = {}
-        for key, val in data.items():
-            if hasattr(record, key):
-                setattr(record, key, val)
-            else:
-                extra_data[key] = val
-        if extra_data:
-            record.data = extra_data
-
-        dataset.records.append(record)
-        db.session.add(dataset)
-        db.session.commit()
-
-        notes = f"Added record {record.prefix}:{record.reference}"
-        change_log = ChangeLog(
-            change_type=ChangeType.ADD,
-            data=data,
-            record_id=record.id,
-            notes=notes,
-            dataset_id=dataset.dataset,
-            github_login=_github_login(),
-        )
-        db.session.add(change_log)
-        db.session.commit()
-
-        return redirect(url_for("main.dataset", id=dataset.dataset))
-
-    if form.errors:
-        error_list = [
-            {
-                "href": f"#{field}",
-                "text": f"{' '.join(errors)} {form[field].label.text}",
-            }
-            for field, errors in form.errors.items()
-        ]
-        # if any start date fields present - bind to correct form fields
-        start_date, format = collect_start_date(request.form)
-        if start_date:
-            start_date = datetime.datetime.strptime(start_date, format)
-            form["start-date"].data = start_date
-    else:
-        error_list = None
-
-    breadcrumbs = {
-        "items": [
-            {"text": "Datasets", "href": url_for("main.index")},
-            {
-                "text": dataset.name,
-                "href": url_for("main.dataset", id=dataset.dataset),
-            },
-            {"text": "Add a record"},
-        ]
-    }
-
-    return render_template(
-        "add-record.html",
-        dataset=dataset,
-        form=form,
-        form_fields=form_fields,
-        error_list=error_list,
-        breadcrumbs=breadcrumbs,
-    )
-
-
 @main.route("/dataset/<string:id>/record/<string:record_id>", methods=["GET"])
 @login_required
 def get_record(id, record_id):
     record_uuid = uuid.UUID(record_id)
-    record = Record.query.filter(Record.dataset_id == id, Record.id == record_uuid).one()
-    return render_template("view-record.html", record=record)
-
-
-@main.route(
-    "/dataset/<string:id>/record/<string:record_id>/edit", methods=["GET", "POST"]
-)
-@login_required
-def edit_record(id, record_id):
-    dataset = Dataset.query.get_or_404(id)
-    if dataset.end_date is not None:
-        abort(404)
-    record_uuid = uuid.UUID(record_id)
     record = Record.query.filter(
-        Record.dataset_id == dataset.dataset, Record.id == record_uuid
+        Record.dataset_id == id, Record.id == record_uuid
     ).one()
-    builder = FormBuilder(
-        record.dataset.fields, include_edit_notes=True, require_reference=False
-    )
-    form = builder.build()
-    form_fields = builder.form_fields()
-
-    if form.validate_on_submit():
-        # capture current record data as "previous" before updating
-
-        record.entity = int(request.form.get("entity", record.entity))
-
-        change_log = create_change_log(
-            record, {**form.data, **request.form}, ChangeType.EDIT,github_login=_github_login()
-            )
-        dataset.change_log.append(change_log)
-        db.session.add(dataset)
-        db.session.commit()
-        return redirect(url_for("main.dataset", id=dataset.dataset))
-
-    else:
-        breadcrumbs = {
-            "items": [
-                {"text": "Datasets", "href": url_for("main.index")},
-                {
-                    "text": dataset.name,
-                    "href": url_for("main.dataset", id=dataset.dataset),
-                },
-                {"text": "Edit record"},
-            ]
-        }
-
-        if form.errors:
-            error_list = [
-                {
-                    "href": f"#{field}",
-                    "text": f"{' '.join(errors)} {form[field].label.text}",
-                }
-                for field, errors in form.errors.items()
-            ]
-            start_date, format = collect_start_date(request.form)
-            if start_date != record.start_date:
-                start_date = datetime.datetime.strptime(start_date, format)
-                form["start-date"].data = start_date
-        else:
-            for field in form_fields:
-                form[field.field].data = record.entity
-                if field.field == "start-date":
-                    form[field.field].data = record.start_date
-                elif field.field == "end-date":
-                    form[field.field].data = record.end_date
-                else:
-                    form[field.field].data = record.data.get(field.field, None)
-
-            error_list = None
-
-        return render_template(
-            "edit-record.html",
-            dataset=record.dataset,
-            record=record,
-            form=form,
-            form_fields=form_fields,
-            breadcrumbs=breadcrumbs,
-            error_list=error_list,
-        )
+    return render_template("view-record.html", record=record)
 
 
 @main.route("/dataset/<string:id>/schema")
@@ -481,7 +271,7 @@ def csv(id):
         response = make_response(csv_output)
         response.headers[
             "Content-Disposition"
-        ] = f"attachment; filename={dataset.dataset}.csv"
+        ] = f"attachment; filename={dataset.dataset}.csv"  # noqa: E702
         response.headers["Content-Type"] = "text/csv; charset=utf-8"
         return response
     else:

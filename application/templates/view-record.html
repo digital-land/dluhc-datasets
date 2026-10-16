@@ -22,20 +22,5 @@
       {% endfor %}
     </dl>
   </div>
-
-  <div class="govuk-grid-column-two-thirds">
-    {{
-      buttonMenu({
-        "classes": "govuk-!-margin-bottom-0",
-        "items": [
-          {
-            "text": "Edit this record",
-            "type": "submit",
-            "href": url_for('main.edit_record', id=record.dataset_id, record_id=record.id)
-          }
-        ]
-      })
-    }}
-  </div>
 </div>
 {% endblock content %}

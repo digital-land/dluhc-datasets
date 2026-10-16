@@ -4,20 +4,6 @@
 
 <div class="app-grid-row app-grid-row--space-between govuk-!-margin-bottom-3">
   <div class="app-grid-column">
-    {% if session["user"] and not history and not dataset.end_date %}
-      {{
-        buttonMenu({
-          "classes": "govuk-!-margin-bottom-6",
-          "items": [
-            {
-              "element": "a",
-              "text": "Add record",
-              "href": url_for("main.add_record", id=dataset.dataset),
-            }
-          ]
-        })
-      }}
-    {% endif %}
   </div>
   <div class="app-grid-column">
     <h2 class="govuk-heading-m govuk-!-margin-bottom-1">{{ records | length }} records</h2>
@@ -44,12 +30,6 @@
                   <span class="app-data-table__header__label">{{ field.field }}</span>
                 </th>
               {% endfor %}
-
-              {% if session["user"] and not history and not dataset.end_date %}
-                <th scope="col" class="app-data-table__header app-data-table__header--ui">
-                  <span class="govuk-visually-hidden">Action</span>
-                </th>
-              {% endif %}
             </tr>
           </thead>
 
@@ -65,26 +45,9 @@
                     </a>
                   {% else %}
                     {{ record.get(field.field, None) | value_or_empty_string | replace('-','&#8209;') | safe }}
-                  {% endif %}                
+                  {% endif %}
                 </td>
               {% endfor %}
-
-              {% if session["user"] and not history and not dataset.end_date %}
-                <td class="app-data-table__cell app-data-table__cell--ui">
-                  {{
-                    buttonMenu({
-                      "items": [
-                        {
-                          "element": "a",
-                          "text": "Edit record",
-                          "classes": "govuk-button--secondary",
-                          "href": url_for("main.edit_record", id=dataset.dataset, record_id=record.id),
-                        }
-                      ]
-                    })
-                  }}
-                </td>
-              {% endif %}
             </tr>
             {% endfor %}
           </tbody>
@@ -104,12 +67,6 @@
         <p class="govuk-body govuk-!-margin-top-3">
           <a href="{{ url_for('main.csv', id=dataset.dataset) }}">Download a csv file of this data</a>
         </p>
-
-        {% if session["user"] %}
-          <p class="govuk-body govuk-!-margin-top-3">
-            <a href="{{ url_for('upload.update_csv', dataset=dataset.dataset) }}">Upload a csv file of updates for this dataset</a>
-          </p>
-        {% endif %}
       {% endif %}
 
       {% else %}
@@ -118,11 +75,6 @@
             'text': 'There are no records for the ' + dataset.name + ' dataset'
           })
         }}
-        {% if session["user"] and not dataset.end_date %}
-          <p class="govuk-body govuk-!-margin-top-3">
-            <a href="{{ url_for('upload.upload_csv', dataset=dataset.dataset) }}">Upload a csv file for this dataset</a>
-          </p>
-        {% endif %}
     {% endif %}
   </div>
 </div>

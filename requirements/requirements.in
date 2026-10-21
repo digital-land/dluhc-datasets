@@ -1,4 +1,7 @@
-digital_land_frontend @ git+https://github.com/digital-land/digital-land-frontend.git#egg=digital_land_frontend
+digital-land-frontend==0.8.0
+# templates for GOV.UK Frontend 5.11.1, the version package.json pins for the
+# stylesheets and javascript; 4.x is built for GOV.UK Frontend 6
+govuk-frontend-jinja==3.7.0
 Flask
 Flask-WTF
 gunicorn

@@ -1,5 +1,7 @@
 -c requirements.txt
 pytest
+# fakes the http calls the GitHub sign in makes, in tests/acceptance/test_auth_routes.py
+responses
 flake8
 pre-commit
 black

@@ -10,7 +10,7 @@ alembic==1.18.4
     #   flask-migrate
 alembic-postgresql-enum==1.9.0
     # via -r requirements/requirements.in
-authlib==1.7.2
+authlib==1.9.1
     # via -r requirements/requirements.in
 blinker==1.9.0
     # via

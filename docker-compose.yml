@@ -31,14 +31,11 @@ services:
         condition: service_completed_successfully
 
   load-data:
-    build:
-      context: .
+    # the postgres image has psql and pg_restore matching the database version
+    image: postgres:16
     entrypoint: ["sh", "/code/scripts/docker-load-data.sh"]
     environment:
       DATABASE_URL: postgresql://postgres:postgres@database:5432/dluhc_datasets
-      FLASK_APP: application.wsgi:app
-      FLASK_CONFIG: application.config.DevelopmentConfig
-      SECRET_KEY: ${SECRET_KEY:-local-development-only}
     volumes:
       - .:/code
     depends_on:
